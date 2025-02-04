@@ -6,7 +6,13 @@ namespace client
     {
         this->port = port;
     };
-
+    server::~server()
+    {
+        if (sockfd > 0)
+        {
+            close(sockfd);
+        }
+    }
     void server::start()
     {
         // 创建UDP套接字
@@ -45,5 +51,4 @@ namespace client
         close(sockfd);
     }
 
-   
 }

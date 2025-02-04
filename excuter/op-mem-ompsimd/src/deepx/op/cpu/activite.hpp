@@ -12,6 +12,13 @@ namespace deepx::op::cpu
             tensor.data[i] = std::max(0.0f, tensor.data[i]);
         });
     }
+ 
+    template<typename T>
+    void relu(Tensor<T> &tensor,Tensor<T> &output){
+        tensor.shape.rangeParallel(tensor.shape.dim, [&tensor,&output](int i){
+            output.data[i] = std::max(0.0f, tensor.data[i]);
+        });
+    }
 
     template<typename T>
     void reluGradInplace(Tensor<T> &tensor){
@@ -19,6 +26,14 @@ namespace deepx::op::cpu
             tensor.data[i] = tensor.data[i] > 0 ? 1 : 0;
         });
     }
+
+    template<typename T>
+    void reluGrad(Tensor<T> &tensor,Tensor<T> &output){
+        tensor.shape.rangeParallel(tensor.shape.dim, [&tensor,&output](int i){
+            output.data[i] = tensor.data[i] > 0 ? 1 : 0;
+        });
+    }
+
     /*
     gelu 激活函数
     平滑性：GELU是一个平滑的激活函数，能够在输入接近零时提供更好的梯度传播。

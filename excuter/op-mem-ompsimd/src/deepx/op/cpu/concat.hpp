@@ -17,7 +17,6 @@ namespace deepx::op::cpu
                     {
                         int concatIdxCurrentTensor=indices[axis];;
                         int tensorIdx=0;
-
                         while (tensorIdx < tensors.size()  ) {
                             if (concatIdxCurrentTensor<tensors[tensorIdx].shape[axis]) {
                                 break;

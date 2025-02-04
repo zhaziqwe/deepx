@@ -17,8 +17,8 @@ void test_relu()
     Tensor<float> tensor = New<float>({1, 2, 3});
     uniform(tensor, -1, 1);
     mem.add("tensor", std::make_shared<Tensor<float>>(tensor));
-    Relu<float> relu("tensor");
-    relu.run(mem);
+    ReluInplace<float> reluInplace("tensor");
+    reluInplace.forward(mem);
     print(*mem.get("tensor").get());
 }
 

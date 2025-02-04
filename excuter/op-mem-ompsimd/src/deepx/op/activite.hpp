@@ -11,28 +11,74 @@ namespace deepx::op
     class Relu : public Op<T>
     {
     public:
-        Relu(string arg)
+        Relu(string input,string output)
         {
             this->name = std::string("relu") + "_" + dtype<T>::name();
-            this->args.push_back(arg);
-        } // 只声明构造函数
-        void run(mem::Mem<T> &mem) override;
+            this->args.push_back(input);
+            this->returns.push_back(output);
+        } 
+ 
+        void forward(mem::Mem<T> &mem) override;
+        void backward(mem::Mem<T> &mem) override;
     };
 
     template <>
     class Relu<float> : public Op<float>
     {
     public:
-        Relu(string arg)
+        Relu(string input,string output)
         {
             this->name = std::string("relu") + "_" + dtype<float>::name();
-            this->args.push_back(arg);
+            this->args.push_back(input);
+            this->returns.push_back(output);
         }
-        void run(mem::Mem<float> &mem) override
+        void forward(mem::Mem<float> &mem) override
+        {   
+            auto input = mem.get(this->args[0]).get();
+            auto output = mem.get(this->returns[0]).get();
+            cpu::relu(*input,*output);
+        };
+        void backward(mem::Mem<float> &mem) override
+        {
+            auto input = mem.get(this->args[0]).get();
+            auto output = mem.get(this->returns[0]).get();
+            cpu::reluGrad(*input,*output);
+        };
+    };
+
+    template <typename T>
+    class ReluInplace : public Op<T>
+    {
+    public:
+        ReluInplace(string arg)
+        {
+            this->name = std::string("reluInplace") + "_" + dtype<T>::name();
+            this->args.push_back(arg);
+        } // 只声明构造函数
+        void forward(mem::Mem<T> &mem) override;
+        void backward(mem::Mem<T> &mem) override;
+    };
+
+    template <>
+    class ReluInplace<float> : public Op<float>
+    {
+    public:
+        ReluInplace (string input)
+        {
+            this->name = std::string("reluInplace") + "_" + dtype<float>::name();
+            this->args.push_back(input);
+        }
+        void forward(mem::Mem<float> &mem) override
         {
             auto tensor = mem.get(this->args[0]).get();
             cpu::reluInplace(*tensor);
         };
+        void backward(mem::Mem<float> &mem) override
+        {
+            auto tensor = mem.get(this->args[0]).get();
+            cpu::reluGradInplace(*tensor);
+        };
     };
+
 }
 #endif

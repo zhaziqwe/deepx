@@ -30,9 +30,16 @@ namespace deepx::op
             returns = node["returns"].as<std::vector<std::string>>();
         }
 
-        virtual void run(mem::Mem<T> &mem)
+        // 前向传播
+        virtual void forward(mem::Mem<T> &mem)
         {
-            std::cout << "run op: " << name << std::endl;
+            std::cout << "forward op: " << name << std::endl;
+        }
+
+        // 反向传播
+        virtual void backward(mem::Mem<T> &mem)
+        {
+            std::cout << "backward op: " << name << std::endl;
         }
     };
 }
