@@ -22,6 +22,7 @@ namespace deepx::op
         vector<string> returns;
 
     public:
+        Op() = default;
         void load(const YAML::Node &node)
         {
             name = node["name"].as<std::string>();

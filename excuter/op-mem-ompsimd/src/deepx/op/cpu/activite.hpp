@@ -8,14 +8,14 @@ namespace deepx::op::cpu
 {   
     template<typename T>
     void reluInplace(Tensor<T> &tensor){
-        tensor.shape.rangeParallel(tensor.shape.size, [&tensor](int i){
+        tensor.shape.rangeParallel(tensor.shape.dim, [&tensor](int i){
             tensor.data[i] = std::max(0.0f, tensor.data[i]);
         });
     }
 
     template<typename T>
     void reluGradInplace(Tensor<T> &tensor){
-        tensor.shape.rangeParallel(tensor.shape.size, [&tensor](int i){
+        tensor.shape.rangeParallel(tensor.shape.dim, [&tensor](int i){
             tensor.data[i] = tensor.data[i] > 0 ? 1 : 0;
         });
     }

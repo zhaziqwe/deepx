@@ -3,6 +3,8 @@
 #include "deepx/mem/mem.hpp"
 #include "deepx/tensor.hpp"
 #include "deepx/op/cpu/new.hpp"
+#include "deepx/op/cpu/init.hpp"
+#include "deepx/op/cpu/print.hpp"
 
 using namespace deepx::op;
 using namespace deepx;
@@ -15,10 +17,12 @@ int main()
     for (int i = 0; i < 10; i++)
     {
         Tensor<float> tensor = New<float>({1, 2, 3});
+        uniform(tensor,0,1);
         mem.add("tensor" + std::to_string(i), std::make_shared<Tensor<float>>(tensor));
     }
     cout << mem.size() << endl;
     cout << mem.exists("tensor0") << endl;
+    print(*mem.get("tensor0").get());
     mem.clear();
     cout << mem.size() << endl;
     return 0;
