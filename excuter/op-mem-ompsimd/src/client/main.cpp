@@ -2,6 +2,9 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <deepx/op/cpu/init.hpp>
+#include <deepx/op/cpu/new.hpp>
+#include <deepx/op/cpu/print.hpp>
 
 #include <stdutil/vector.hpp>
 
@@ -15,6 +18,14 @@ using namespace deepx::mem;
 int main()
 {
     Mem<float> mem;
+    deepx::Tensor<float> tensor = cpu::New<float>({1, 2, 3});
+    cpu::uniform(tensor,-1,1);
+    mem.add("tensor", std::make_shared<deepx::Tensor<float>>(tensor));
+
+    deepx::Tensor<float> result = cpu::New<float>({1, 2, 3});
+
+    mem.add("result", std::make_shared<deepx::Tensor<float>>(result));
+
     client::server server(8080);
     server.func = [&mem](char *buffer)
     {
@@ -27,6 +38,8 @@ int main()
 
             Relu<float> relu(input, output);
             relu.forward(mem);
+
+            cpu::print(*mem.get("result").get());
         }
     };
     server.start();
