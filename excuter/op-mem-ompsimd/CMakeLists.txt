@@ -13,7 +13,9 @@ set(CMAKE_BUILD_TYPE Debug)
 include_directories(src)
  
 # 源文件
-file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE DEEPX_SOURCES "src/deepx/*.cpp")
+file(GLOB_RECURSE STDUTIL_SOURCES "src/stdutil/*.cpp")
+file(GLOB_RECURSE CLIENT_SOURCES "src/client/*.cpp")
 
 # cpu 线性代数库
 list(APPEND CMAKE_PREFIX_PATH "/usr/lib/x86_64-linux-gnu/openblas-pthread/cmake")
@@ -46,12 +48,13 @@ find_package(yaml-cpp REQUIRED)
 
 find_package(Boost REQUIRED COMPONENTS system)
 find_package(yaml-cpp REQUIRED)
+ 
+add_library(deepx SHARED 
+    ${DEEPX_SOURCES}
+    ${STDUTIL_SOURCES}
+)
 
-# 包含Boost头文件路径
-include_directories(${Boost_INCLUDE_DIRS})
-
-add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries( deepx
     PUBLIC 
     yaml-cpp
     ${JEMALLOC_LIBRARIES}    
@@ -60,10 +63,13 @@ target_link_libraries(${PROJECT_NAME}
     OpenMP::OpenMP_CXX
     hwy
 )
-
-
+add_executable(${PROJECT_NAME} ${CLIENT_SOURCES})
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    deepx
+)
 # 测试
-# add_subdirectory(test/tensor)
-# add_subdirectory(test/op)
+add_subdirectory(test/tensor)
+add_subdirectory(test/op)
 # # 数据集测试
 # add_subdirectory(test/dataset)

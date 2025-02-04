@@ -2,13 +2,12 @@
 #include "deepx/op/cpu/new.hpp"
 #include "deepx/tensormap.hpp"
 #include "deepx/op/cpu/init.hpp"
-#include "deepx/op/cpu/funclist.hpp"
 using namespace deepx;
 using namespace deepx::op::cpu;
 
 void test_tensormap_new(int n)
 {
-    auto oplist=opsfloat32();
+ 
     TensorMap<float> tensorMap(oplist); // 使用命名空间
 
     for (int i = 0; i < n; i++)

@@ -6,7 +6,7 @@
 #include <deepx/op/cpu/print.hpp>
 #include "deepx/tensor.hpp"
 #include "deepx/op/cpu/new.hpp"
-#include "deepx/op/cuda/new.hpp"
+ 
 #include "deepx/op/cpu/matmul.hpp"
 #include "deepx/op/cpu/init.hpp"
 #include "deepx/shape_matmul.hpp"
@@ -62,10 +62,7 @@ void bench_tensor_matmul(int i) {
     save(tensor3,"4_tensor_matmul"+std::to_string(i)+"result");
     std::cout << "time:" << duration.count() << " seconds" << std::endl;
 }
-void test_tensor_matmul_cuda(){
-    deepx::Tensor<float> tensor=deepx::op::cuda::New<float>({2, 3});
-
-}
+ 
 int main(){
     test_tensor_matmul();
     //test_tensor_matmul_cuda();

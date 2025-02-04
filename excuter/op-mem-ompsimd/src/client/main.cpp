@@ -47,9 +47,9 @@ void start_server() {
 
         try {
             YAML::Node config = YAML::Load(buffer);
-            deepx::op::Op op;
-            op.load(config);
-            std::cout << "Name = " << op.name << ", args = " << op.args << ", returns = " << op.returns  << std::endl;
+            // deepx::op::Op op;
+            // op.load(config);
+            // std::cout << "Name = " << op.name << ", args = " << op.args << ", returns = " << op.returns  << std::endl;
         } catch (const YAML::Exception& e) {
             std::cerr << "YAML Exception: " << e.what() << std::endl;
         }
