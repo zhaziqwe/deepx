@@ -18,20 +18,6 @@ namespace deepx::op
             this->returns.push_back(output);
         } 
  
-        void forward(mem::Mem<T> &mem) override;
-        void backward(mem::Mem<T> &mem) override;
-    };
-
-    template <>
-    class Relu<float> : public Op<float>
-    {
-    public:
-        Relu(string input,string output)
-        {
-            this->name = std::string("relu") + "_" + dtype<float>::name();
-            this->args.push_back(input);
-            this->returns.push_back(output);
-        }
         void forward(mem::Mem<float> &mem) override
         {   
             auto input = mem.get(this->args[0]).get();
@@ -46,21 +32,9 @@ namespace deepx::op
         };
     };
 
+  
     template <typename T>
     class ReluInplace : public Op<T>
-    {
-    public:
-        ReluInplace(string arg)
-        {
-            this->name = std::string("reluInplace") + "_" + dtype<T>::name();
-            this->args.push_back(arg);
-        } // 只声明构造函数
-        void forward(mem::Mem<T> &mem) override;
-        void backward(mem::Mem<T> &mem) override;
-    };
-
-    template <>
-    class ReluInplace<float> : public Op<float>
     {
     public:
         ReluInplace (string input)
