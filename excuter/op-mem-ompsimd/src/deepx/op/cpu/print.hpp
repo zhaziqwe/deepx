@@ -9,8 +9,35 @@
 namespace deepx::op::cpu
 {
     template <typename T>
-    void print(const Tensor<T> &t, const std::string &format = "%.2f")
+    void print(const Tensor<T> &t,const std::string &f="")
     {
+        std::string format=f;
+        if (f.empty()){
+            if constexpr (std::is_same_v<T, int8_t>)
+            {
+                format = "%d";
+            }
+            else if constexpr (std::is_same_v<T, int16_t>)
+            {
+                format = "%d";
+            }
+            else if constexpr (std::is_same_v<T, int32_t>)
+            {
+                format = "%d";
+            }
+            else if constexpr (std::is_same_v<T, int64_t>)
+            {
+                format = "%lld";
+            }
+            else if constexpr (std::is_same_v<T, float>)
+            {
+                format = "%.2f";
+            }
+            else if constexpr (std::is_same_v<T, double>)
+            {
+                format = "%.2f";    
+            }
+        }
         t.shape.print();
         if (t.shape.dim == 1)
         {

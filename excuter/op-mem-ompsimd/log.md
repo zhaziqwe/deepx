@@ -16,4 +16,10 @@ layer.Node需要仔细设计forward和backward的接口
 ### 2025-01-21
 h5模型文件，转deepx格式
 
-### 2025-01-22
+### 2025-02-06
+
+op完全重构
+
++ 输入输出用string作为key，从tensormanager中获取tensor
+
++ 对算子的精度进行了特化
