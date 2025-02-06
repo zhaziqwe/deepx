@@ -73,35 +73,61 @@ namespace deepx::op::cpu
             }
         });
     }
-    // float特化
-    // template<>
-    // void addInPlace<float>(Tensor<float> &A, const float value){
-    //     cblas_saxpy(A.shape.size,value,A.data,1,A.data,1);
-    // }
-
-    // // double特化
-    // template<>
-    // void addInPlace<double>(Tensor<double> &A, const double value){
-    //     cblas_daxpy(A.shape.size,value,A.data,1,A.data,1);
-    // }
 
     template<typename T>
     void add(const Tensor<T> &A, const Tensor<T> &B,Tensor<T> &C){
         if(A.shape == B.shape && A.shape == C.shape){           
-            C.shape.rangeParallel(C.shape.dim, [&A,&B,&C](int i){
-                
-                C.data[i] = A.data[i] + B.data[i];
+            C.shape.rangeParallel(C.shape.dim-1, [&A,&B,&C](int i){
+                int shape_last=C.shape[-1];
+                const ScalableTag<T> tag;
+                size_t j=0;
+                size_t p_size=shape_last/Lanes(tag)*Lanes(tag);
+                for (; j < p_size; j += Lanes(tag)) {
+                    auto vec1 = Load(tag, A.data + i + j);
+                    auto vec2 = Load(tag, B.data + i + j);
+                    auto vec_result = Add(vec1, vec2);
+                    Store(vec_result, tag, C.data + i + j);
+                }
+                for (;j<shape_last;j++)
+                {
+                    C.data[i+j] = A.data[i+j] + B.data[i+j];
+                }
             });
         }else{
             throw std::invalid_argument("shape mismatch");
         }
     }
 
+    // float特化
+    template<>
+    void add<float>(const Tensor<float> &A, const Tensor<float> &B,Tensor<float> &C){
+        cblas_saxpy(C.shape.size,1.0f,B.data,1,C.data,1);
+    }
+    
+    // double特化
+    template<>
+    void add<double>(const Tensor<double> &A, const Tensor<double> &B,Tensor<double> &C){
+        cblas_daxpy(C.shape.size,1.0,B.data,1,C.data,1);
+    }
+    
     template<typename T>
     void add(const Tensor<T> &input,const T value,Tensor<T> &output){
         if(input.shape == output.shape){
-            output.shape.rangeParallel(output.shape.dim, [&input,&output,&value](int i){
-                output.data[i] = input.data[i] + value;
+            output.shape.rangeParallel(output.shape.dim-1, [&input,&output,&value](int i){
+                int shape_last=output.shape[-1];
+                const ScalableTag<T> tag;
+                size_t j=0;
+                size_t p_size=shape_last/Lanes(tag)*Lanes(tag);
+                for (; j < p_size; j += Lanes(tag)) {
+                    auto vec = Load(tag, input.data + i + j);
+                    auto scalar = Set(tag, value);
+                    auto vec_result = Add(vec, scalar);
+                    Store(vec_result, tag, output.data + i + j);
+                }
+                for (;j<shape_last;j++)
+                {
+                    output.data[i+j] = input.data[i+j] + value;
+                }
             });
         }else{
             throw std::invalid_argument("shape mismatch");
@@ -111,8 +137,21 @@ namespace deepx::op::cpu
     template<typename T>
     void subInPlace(Tensor<T> &A, const Tensor<T> &B){
         if(A.shape == B.shape){
-            A.shape.rangeParallel(A.shape.dim, [&A,&B](int i){
-                A.data[i] = A.data[i] - B.data[i];
+            A.shape.rangeParallel(A.shape.dim-1, [&A,&B](int i){
+                int shape_last=A.shape[-1];
+                const ScalableTag<T> tag;
+                size_t j=0;
+                size_t p_size=shape_last/Lanes(tag)*Lanes(tag);
+                for (; j < p_size; j += Lanes(tag)) {
+                    auto vec1 = Load(tag, A.data + i + j);
+                    auto vec2 = Load(tag, B.data + i + j);
+                    auto vec_result = Sub(vec1, vec2);
+                    Store(vec_result, tag, A.data + i + j);
+                }
+                for (;j<shape_last;j++)
+                {
+                    A.data[i+j] = A.data[i+j] - B.data[i+j];
+                }
             });
         }else{
             throw std::invalid_argument("shape mismatch");
@@ -131,26 +170,43 @@ namespace deepx::op::cpu
 
     template<typename T>
     void subInPlace(Tensor<T> &tensor, const T value){
-        tensor.shape.rangeParallel(tensor.shape.dim, [&tensor,&value](int i){
-            tensor.data[i] = tensor.data[i] - value;
+        tensor.shape.rangeParallel(tensor.shape.dim-1, [&tensor,&value](int i){
+            int shape_last=tensor.shape[-1];
+            const ScalableTag<T> tag;
+            size_t j=0;
+            size_t p_size=shape_last/Lanes(tag)*Lanes(tag);
+            for (; j < p_size; j += Lanes(tag)) {
+                auto vec = Load(tag, tensor.data + i + j);
+                auto scalar = Set(tag, value);
+                auto vec_result = Sub(vec, scalar);
+                Store(vec_result, tag, tensor.data + i + j);
+            }
+            for (;j<shape_last;j++)
+            {
+                tensor.data[i+j] = tensor.data[i+j] - value;
+            }
         });
     }
-    
-    template<>
-    void subInPlace<float>(Tensor<float> &A, const float value){
-        cblas_saxpy(A.shape.size,-value,A.data,1,A.data,1);
-    }
-
-    template<>
-    void subInPlace<double>(Tensor<double> &A, const double value){
-        cblas_daxpy(A.shape.size,-value,A.data,1,A.data,1);
-    }
+ 
 
     template<typename T>
     void sub(const Tensor<T> &A, const Tensor<T> &B,Tensor<T> &C){
         if(A.shape == B.shape && A.shape == C.shape){
-            C.shape.rangeParallel(C.shape.dim, [&A,&B,&C](int i){
-                C.data[i] = A.data[i] - B.data[i];
+            C.shape.rangeParallel(C.shape.dim-1, [&A,&B,&C](int i){
+                int shape_last=C.shape[-1];
+                const ScalableTag<T> tag;
+                size_t j=0;
+                size_t p_size=shape_last/Lanes(tag)*Lanes(tag);
+                for (; j < p_size; j += Lanes(tag)) {
+                    auto vec1 = Load(tag, A.data + i + j);
+                    auto vec2 = Load(tag, B.data + i + j);
+                    auto vec_result = Sub(vec1, vec2);
+                    Store(vec_result, tag, C.data + i + j);
+                }
+                for (;j<shape_last;j++)
+                {
+                    C.data[i+j] = A.data[i+j] - B.data[i+j];
+                }
             });
         }else{
             throw std::invalid_argument("shape mismatch");
@@ -159,8 +215,21 @@ namespace deepx::op::cpu
     template<typename T>
     void sub(const Tensor<T> &input,const T value,Tensor<T> &output){
         if(input.shape == output.shape){
-            output.shape.rangeParallel(output.shape.dim, [&input,&output,&value](int i){
-                output.data[i] = input.data[i] - value;
+            output.shape.rangeParallel(output.shape.dim-1, [&input,&output,&value](int i){
+                int shape_last=output.shape[-1];
+                const ScalableTag<T> tag;
+                size_t j=0;
+                size_t p_size=shape_last/Lanes(tag)*Lanes(tag);
+                for (; j < p_size; j += Lanes(tag)) {
+                    auto vec = Load(tag, input.data + i + j);
+                    auto scalar = Set(tag, value);
+                    auto vec_result = Sub(vec, scalar);
+                    Store(vec_result, tag, output.data + i + j);
+                }
+                for (;j<shape_last;j++)
+                {
+                    output.data[i+j] = input.data[i+j] - value;
+                }
             });
         }else{
             throw std::invalid_argument("shape mismatch");
@@ -170,8 +239,21 @@ namespace deepx::op::cpu
     template<typename T>
     void mulInPlace(Tensor<T> &A, const Tensor<T> &B){
         if(A.shape == B.shape){
-            A.shape.rangeParallel(A.shape.dim, [&A,&B](int i){
-                A.data[i] = A.data[i] * B.data[i];
+            A.shape.rangeParallel(A.shape.dim-1 , [&A,&B](int i){
+                int shape_last=A.shape[-1];
+                const ScalableTag<T> tag;
+                size_t j=0;
+                size_t p_size=shape_last/Lanes(tag)*Lanes(tag);
+                for (; j < p_size; j += Lanes(tag)) {
+                    auto vec1 = Load(tag, A.data + i + j);
+                    auto vec2 = Load(tag, B.data + i + j);
+                    auto vec_result = Mul(vec1, vec2);
+                    Store(vec_result, tag, A.data + i + j);
+                }
+                for (;j<shape_last;j++)
+                {
+                    A.data[i+j] = A.data[i+j] * B.data[i+j];
+                }
             });
         }else{
             throw std::invalid_argument("shape mismatch");
@@ -180,10 +262,24 @@ namespace deepx::op::cpu
     
     template<typename T>
     void mulInPlace(Tensor<T> &tensor, const T value){
-        tensor.shape.rangeParallel(tensor.shape.dim, [&tensor,&value](int i){
-            tensor.data[i] = tensor.data[i] * value;
+        tensor.shape.rangeParallel(tensor.shape.dim-1, [&tensor,&value](int i){
+            int shape_last=tensor.shape[-1];
+            const ScalableTag<T> tag;
+            size_t j=0;
+            size_t p_size=shape_last/Lanes(tag)*Lanes(tag);
+            for (; j < p_size; j += Lanes(tag)) {
+                auto vec = Load(tag, tensor.data + i + j);
+                auto scalar = Set(tag, value);
+                auto vec_result = Mul(vec, scalar);
+                Store(vec_result, tag, tensor.data + i + j);
+            }
+            for (;j<shape_last;j++)
+            {
+                tensor.data[i+j] = tensor.data[i+j] * value;
+            }
         });
     }
+
     template<>
     void mulInPlace<float>(Tensor<float> &tensor, const float value){
         cblas_sscal(tensor.shape.size,value,tensor.data,1);
@@ -196,8 +292,21 @@ namespace deepx::op::cpu
     template<typename T>
     void mul(const Tensor<T> &A, const Tensor<T> &B,Tensor<T> &C){
         if(A.shape == B.shape && A.shape == C.shape){
-            C.shape.rangeParallel(C.shape.dim, [&A,&B,&C](int i){
-                C.data[i] = A.data[i] * B.data[i];
+            C.shape.rangeParallel(C.shape.dim-1, [&A,&B,&C](int i){
+                int shape_last=C.shape[-1];
+                const ScalableTag<T> tag;
+                size_t j=0;
+                size_t p_size=shape_last/Lanes(tag)*Lanes(tag);
+                for (; j < p_size; j += Lanes(tag)) {
+                    auto vec1 = Load(tag, A.data + i + j);
+                    auto vec2 = Load(tag, B.data + i + j);
+                    auto vec_result = Mul(vec1, vec2);
+                    Store(vec_result, tag, C.data + i + j);
+                }
+                for (;j<shape_last;j++)
+                {
+                    C.data[i+j] = A.data[i+j] * B.data[i+j];
+                }
             });
         }else{
             throw std::invalid_argument("shape mismatch");
@@ -207,8 +316,21 @@ namespace deepx::op::cpu
     template<typename T>
     void mul(const Tensor<T> &input, const T value,Tensor<T> &output){
         if(input.shape == output.shape){
-            output.shape.rangeParallel(output.shape.dim, [&input,&output,&value](int i){
-                output.data[i] = input.data[i] * value;
+            output.shape.rangeParallel(output.shape.dim-1, [&input,&output,&value](int i){
+                int shape_last=output.shape[-1];
+                const ScalableTag<T> tag;
+                size_t j=0;
+                size_t p_size=shape_last/Lanes(tag)*Lanes(tag);
+                for (; j < p_size; j += Lanes(tag)) {
+                    auto vec = Load(tag, input.data + i + j);
+                    auto scalar = Set(tag, value);
+                    auto vec_result = Mul(vec, scalar);
+                    Store(vec_result, tag, output.data + i + j);
+                }
+                for (;j<shape_last;j++)
+                {
+                    output.data[i+j] = input.data[i+j] * value;
+                }
             });
         }else{
             throw std::invalid_argument("shape mismatch");
@@ -218,8 +340,21 @@ namespace deepx::op::cpu
     template<typename T>
     void divInPlace(Tensor<T> &A, const Tensor<T> &B){
         if(A.shape == B.shape){
-            A.shape.rangeParallel(A.shape.dim, [&A,&B](int i){
-                A.data[i] = A.data[i] / B.data[i];
+            A.shape.rangeParallel(A.shape.dim-1, [&A,&B](int i){
+                int shape_last=A.shape[-1];
+                const ScalableTag<T> tag;
+                size_t j=0;
+                size_t p_size=shape_last/Lanes(tag)*Lanes(tag);
+                for (; j < p_size; j += Lanes(tag)) {
+                    auto vec1 = Load(tag, A.data + i + j);
+                    auto vec2 = Load(tag, B.data + i + j);
+                    auto vec_result = Div(vec1, vec2);
+                    Store(vec_result, tag, A.data + i + j);
+                }
+                for (;j<shape_last;j++)
+                {
+                    A.data[i+j] = A.data[i+j] / B.data[i+j];
+                }
             }); 
         }else{
             throw std::invalid_argument("shape mismatch");
@@ -228,17 +363,43 @@ namespace deepx::op::cpu
     
     template<typename T>
     void divInPlace(Tensor<T> &tensor, const T value){
-        tensor.shape.rangeParallel(tensor.shape.dim, [&tensor,&value](int i){
-            tensor.data[i] = tensor.data[i] / value;
+        tensor.shape.rangeParallel(tensor.shape.dim-1, [&tensor,&value](int i){
+            int shape_last=tensor.shape[-1];
+            const ScalableTag<T> tag;
+            size_t j=0;
+            size_t p_size=shape_last/Lanes(tag)*Lanes(tag);
+            for (; j < p_size; j += Lanes(tag)) {
+                auto vec = Load(tag, tensor.data + i + j);
+                auto scalar = Set(tag, value);
+                auto vec_result = Div(vec, scalar);
+                Store(vec_result, tag, tensor.data + i + j);
+            }
+            for (;j<shape_last;j++)
+            {
+                tensor.data[i+j] = tensor.data[i+j] / value;
+            }
         });
     }
     
     template<typename T>
     void div(const Tensor<T> &A, const Tensor<T> &B,Tensor<T> &C){
         if(A.shape == B.shape && A.shape == C.shape){
-            C.shape.rangeParallel(C.shape.dim, [&A,&B,&C](int i){
-                C.data[i] = A.data[i] / B.data[i];
-            });
+            C.shape.rangeParallel(C.shape.dim-1 , [&A,&B,&C](int i){
+                int shape_last=C.shape[-1];
+                const ScalableTag<T> tag;
+                size_t j=0;
+                size_t p_size=shape_last/Lanes(tag)*Lanes(tag);
+                for (; j < p_size; j += Lanes(tag)) {
+                    auto vec1 = Load(tag, A.data + i + j);
+                    auto vec2 = Load(tag, B.data + i + j);
+                    auto vec_result = Div(vec1, vec2);
+                    Store(vec_result, tag, C.data + i + j);
+                }
+                for (;j<shape_last;j++)
+                {
+                    C.data[i+j] = A.data[i+j] / B.data[i+j];
+                }
+            }); 
         }else{
             throw std::invalid_argument("shape mismatch");
         }
@@ -247,8 +408,21 @@ namespace deepx::op::cpu
     template<typename T>
     void div(const Tensor<T> &input, const T value,Tensor<T> &output){
         if(input.shape == output.shape){
-            output.shape.rangeParallel(output.shape.dim, [&input,&output,&value](int i){
-                output.data[i] = input.data[i] / value;
+            output.shape.rangeParallel(output.shape.dim-1, [&input,&output,&value](int i){
+                int shape_last=output.shape[-1];
+                const ScalableTag<T> tag;
+                size_t j=0;
+                size_t p_size=shape_last/Lanes(tag)*Lanes(tag);
+                for (; j < p_size; j += Lanes(tag)) {
+                    auto vec = Load(tag, input.data + i + j);
+                    auto scalar = Set(tag, value);
+                    auto vec_result = Div(vec, scalar);
+                    Store(vec_result, tag, output.data + i + j);
+                }
+                for (;j<shape_last;j++)
+                {
+                    output.data[i+j] = input.data[i+j] / value;
+                }
             });
         }else{
             throw std::invalid_argument("shape mismatch");
@@ -257,16 +431,42 @@ namespace deepx::op::cpu
     
     template<typename T>
     void powInPlace(Tensor<T> &tensor, const T value){
-        tensor.shape.rangeParallel(tensor.shape.dim, [&tensor,&value](int i){
-            tensor.data[i] = std::pow(tensor.data[i], value);
+        tensor.shape.rangeParallel(tensor.shape.dim-1, [&tensor,&value](int i){
+            int shape_last=tensor.shape[-1];
+            const ScalableTag<T> tag;
+            size_t j=0;
+            size_t p_size=shape_last/Lanes(tag)*Lanes(tag);
+            for (; j < p_size; j += Lanes(tag)) {
+                auto vec = Load(tag, tensor.data + i + j);
+                auto scalar = Set(tag, value);
+                auto vec_result = Pow(vec, scalar);
+                Store(vec_result, tag, tensor.data + i + j);
+            }
+            for (;j<shape_last;j++)
+            {
+                tensor.data[i+j] = std::pow(tensor.data[i+j], value);
+            }
         });
     }
     
     template<typename T>
     void pow(const Tensor<T> &input, const T value,Tensor<T> &output){
         if(input.shape == output.shape){
-            output.shape.rangeParallel(output.shape.dim, [&input,&output,&value](int i){
-                output.data[i] = std::pow(input.data[i], value);
+            output.shape.rangeParallel(output.shape.dim-1, [&input,&output,&value](int i){
+                int shape_last=output.shape[-1];
+                const ScalableTag<T> tag;
+                size_t j=0;
+                size_t p_size=shape_last/Lanes(tag)*Lanes(tag);
+                for (; j < p_size; j += Lanes(tag)) {
+                    auto vec = Load(tag, input.data + i + j);
+                    auto scalar = Set(tag, value);
+                    auto vec_result = Pow(vec, scalar);
+                    Store(vec_result, tag, output.data + i + j);
+                }
+                for (;j<shape_last;j++)
+                {
+                    output.data[i+j] = std::pow(input.data[i+j], value);
+                }
             });
         }else{
             throw std::invalid_argument("shape mismatch");
