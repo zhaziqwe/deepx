@@ -16,6 +16,9 @@ target_link_libraries(2_tensor_equal deepx  )
 add_executable(3_tensor_print 3_tensor_print.cpp)
 target_link_libraries(3_tensor_print deepx  )
 
+add_executable(4_tensor_max 4_tensor_max.cpp)
+target_link_libraries(4_tensor_max deepx  )
+
 add_executable(4_tensor_matmul 4_tensor_matmul.cpp)
 target_link_libraries(4_tensor_matmul deepx  )
 

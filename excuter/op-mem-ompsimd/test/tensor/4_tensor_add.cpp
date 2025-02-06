@@ -12,8 +12,8 @@ using namespace deepx::op::cpu;
 
 
 void test_add_inplace(){
-    Tensor<int16_t> a_int16=New<int16_t>({2,3});
-    Tensor<int16_t> b_int16=New<int16_t>({2,3});
+    Tensor<int16_t> a_int16=New<int16_t>({2,33});
+    Tensor<int16_t> b_int16=New<int16_t>({2,33});
     std::iota(a_int16.data,a_int16.data+a_int16.shape.size,1);
     std::iota(b_int16.data,b_int16.data+b_int16.shape.size,2);
     print(a_int16,"%d");
@@ -21,18 +21,18 @@ void test_add_inplace(){
     addInPlace(a_int16, b_int16);  
     print(a_int16,"%d");
 
-    Tensor<float> a_float=New<float>({2,3});
-    Tensor<float> b_float=New<float>({2,3});
-    std::iota(a_float.data,a_float.data+a_float.shape.size,1.0f);
-    std::iota(b_float.data,b_float.data+b_float.shape.size,2.0f);
-    print(a_float);
-    print(b_float);
-    addInPlace(a_float, b_float);  
-    print(a_float);
+    Tensor<int8_t> a_int8=New<int8_t>({2,3});
+    Tensor<int8_t> b_int8=New<int8_t>({2,3});
+    std::iota(a_int8.data,a_int8.data+a_int8.shape.size,1);
+    std::iota(b_int8.data,b_int8.data+b_int8.shape.size,2);
+    print(a_int8,"%d");
+    print(b_int8,"%d");
+    addInPlace(a_int8, b_int8);
+    print(a_int8,"%d");
 }
 void test_add_inplace_1(){
-    Tensor<float> a=New<float>({100});
-    Tensor<float> b=New<float>({100});
+    Tensor<float> a=New<float>({101});
+    Tensor<float> b=New<float>({101});
     std::iota(a.data,a.data+a.shape.size,1.0f);
     std::iota(b.data,b.data+b.shape.size,101.0f);
     print(a);
@@ -41,7 +41,7 @@ void test_add_inplace_1(){
     print(a);
 }
 void test_add_inplace_scalar(){
-    Tensor<float> a=New<float>({100});
+    Tensor<float> a=New<float>({101});
     std::iota(a.data,a.data+a.shape.size,1.0f);
     print(a);
     addInPlace(a, 100.0f);

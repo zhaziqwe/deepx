@@ -11,33 +11,47 @@ namespace deepx::op
     class Relu : public Op<T>
     {
     public:
-        Relu(string input,string output)
+        Relu(string input, string output, bool require_grad = false, string grad_input = "", string grad_output = "")
         {
             this->name = std::string("relu") + "_" + dtype<T>::name();
             this->args.push_back(input);
             this->returns.push_back(output);
-        } 
- 
+            if (require_grad)
+            {
+                if (grad_input != "")
+                {
+                    this->args.push_back(grad_input);
+                }else{
+                    grad_input=input+".grad";
+                }
+                if (grad_output != "")
+                {
+                    this->returns.push_back(grad_output);
+                }else{
+                    grad_output=output+".grad";
+                }
+            }
+        }
+
         void forward(mem::Mem<float> &mem) override
-        {   
+        {
             auto input = mem.get(this->args[0]).get();
             auto output = mem.get(this->returns[0]).get();
-            cpu::relu(*input,*output);
+            cpu::relu(*input, *output);
         };
         void backward(mem::Mem<float> &mem) override
         {
             auto input = mem.get(this->args[0]).get();
             auto output = mem.get(this->returns[0]).get();
-            cpu::reluGrad(*input,*output);
+            cpu::reluGrad(*input, *output);
         };
     };
 
-  
     template <typename T>
     class ReluInplace : public Op<T>
     {
     public:
-        ReluInplace (string input)
+        ReluInplace(string input)
         {
             this->name = std::string("reluInplace") + "_" + dtype<float>::name();
             this->args.push_back(input);

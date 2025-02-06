@@ -23,3 +23,28 @@ op完全重构
 + 输入输出用string作为key，从tensormanager中获取tensor
 
 + 对算子的精度进行了特化
+
+
+### 2025-02-07
+
++  关于simd对齐的3段式对齐
+ ```
+    头部未对齐：通过标量运算处理直到对齐边界
+
+      const size_t adjust = (alignment - misalign) / sizeof(T);
+   for (; j < adjust...)
+
+
+    主体对齐部分：使用对齐加载/存储指令
+
+
+      Load(tag, a_start + j);  // 对齐加载
+   Store(...);  // 对齐存储
+
+
+    尾部剩余元素：处理最后不足一个向量宽度的元素
+
+    
+      for (; j < len; ++j)
+ ```
+
