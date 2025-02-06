@@ -1,6 +1,7 @@
 #ifndef DEEPX_MEM_HPP
 #define DEEPX_MEM_HPP
 
+#include <memory>
 #include <vector>
 #include <unordered_map>
 #include <string>
@@ -8,6 +9,7 @@ namespace deepx::mem
 {
     using std::shared_ptr;
     using std::string;
+    using std::vector;
     template <typename T>
     class Mem
     {
@@ -63,6 +65,19 @@ namespace deepx::mem
                 throw std::runtime_error("tensor " + name + " not found");
             }
             return mem[name];
+        }
+
+        std::vector<Tensor<T>*> gettensors( const std::vector<string> &names){
+           std::vector<Tensor<T>*> tensors;
+            tensors.reserve(names.size());
+            for (const auto &name : names) {
+                auto it = mem.find(name);
+                if (it == mem.end()) {
+                    throw std::runtime_error("tensor " + name + " not found");
+                }
+                tensors.push_back(it->second.get());
+            }
+            return tensors;
         }
 
         void remove(const string &name)

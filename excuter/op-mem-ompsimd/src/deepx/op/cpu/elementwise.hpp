@@ -1,6 +1,7 @@
 #ifndef DEEPX_OP_CPU_ELEMENTWISE_HPP
 #define DEEPX_OP_CPU_ELEMENTWISE_HPP
 
+#include <cblas.h>
 #include "deepx/tensor.hpp"
 
 namespace deepx::op::cpu

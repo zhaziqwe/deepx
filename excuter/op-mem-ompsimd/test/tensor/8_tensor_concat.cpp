@@ -11,25 +11,34 @@
 #include "deepx/op/cpu/init.hpp"
 #include "deepx/op/cpu/print.hpp"
 #include "stdutil/vector.hpp"
+#include "deepx/mem/mem.hpp"
+
 using namespace deepx;
 using namespace deepx::op::cpu;
+using namespace deepx::mem;
 
-std::vector<Tensor<float>> maketensors(int i,std::vector<int> shape){
-    std::vector<Tensor<float>> tensors(i);
-    for (int j=0;j<i;j++){
-        tensors[j] =New<float>(shape);
-        constant<float>(tensors[j],  0.0+j);
+Mem<float> makeMem(int cnt,std::vector<int> shape){
+    Mem<float> mem; // 使用模板参数
+
+    for (int j=0; j<cnt; j++){
+        auto ptr = std::make_shared<Tensor<float>>(New<float>(shape));
+        mem.add("tensor"+std::to_string(j), ptr);
     }
-    return tensors;
+    return mem;
 }
+ 
+
 void test_concat(){
     std::vector<int> shape={2,3,4};
-    std::vector<Tensor<float>> tensors=maketensors(4,shape);
+    Mem<float> mem=makeMem(4,shape);
+    std::vector<Tensor<float>*> tensors=mem.gettensors(std::vector<std::string>{"tensor0","tensor1","tensor2","tensor3"});
  
      
     std::cout<<"================"<<std::endl;
-    for (int i=0;i<tensors[0].shape.dim;i++){
-        Tensor<float> result=concat(tensors,i);
+    for (int i=0;i<tensors[0]->shape.dim;i++){
+        Shape shape=concatShape(tensors,i);
+        Tensor<float> result=New<float>(shape.shape);
+        concat(tensors,i,result);
         print(result);
     }
     std::cout<<"================"<<std::endl;
