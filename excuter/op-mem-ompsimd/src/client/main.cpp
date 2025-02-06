@@ -11,7 +11,7 @@
 #include "deepx/op/op.hpp"
 #include "deepx/op/activite.hpp"
 #include "deepx/mem/mem.hpp"
-#include "client/server.hpp"
+#include "client/udpserver.hpp"
 using namespace deepx::op;
 using namespace deepx::mem;
 
@@ -26,7 +26,7 @@ int main()
 
     mem.add("result", std::make_shared<deepx::Tensor<float>>(result));
 
-    client::server server(8080);
+    client::udpserver server(8080);
     server.func = [&mem](char *buffer)
     {
         YAML::Node config = YAML::Load(buffer);

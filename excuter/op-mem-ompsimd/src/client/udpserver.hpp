@@ -3,11 +3,12 @@
 #include <iostream>
 #include <string.h>
 #include <arpa/inet.h>
+#include <sys/un.h>
 #include <unistd.h>
 #include <functional>
  
 namespace client{
-    class server
+    class udpserver
     {
     private:
         int port;
@@ -17,14 +18,13 @@ namespace client{
         socklen_t len;
         ssize_t n;
     public:
-        server(int port);
-        ~server();
+        udpserver(int port);
+        ~udpserver();
         void start();
         using handlefunc = std::function<void(char *buffer)>;
         handlefunc func;
-        
     };
- 
+   
 }
 
 #endif

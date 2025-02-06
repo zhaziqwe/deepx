@@ -1,19 +1,19 @@
-#include "server.hpp"
+#include "udpserver.hpp"
 
 namespace client
 {
-    server::server(int port)
+    udpserver::udpserver(int port)
     {
         this->port = port;
     };
-    server::~server()
+    udpserver::~udpserver()
     {
         if (sockfd > 0)
         {
             close(sockfd);
         }
     }
-    void server::start()
+    void udpserver::start()
     {
         // 创建UDP套接字
         if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -50,5 +50,4 @@ namespace client
 
         close(sockfd);
     }
-
 }
