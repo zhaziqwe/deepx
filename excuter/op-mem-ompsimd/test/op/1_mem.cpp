@@ -17,7 +17,7 @@ int main()
     for (int i = 0; i < 10; i++)
     {
         Tensor<float> tensor = New<float>({1, 2, 3});
-        uniform(tensor,0,1);
+        uniform(tensor,0.0f,1.0f);
         mem.add("tensor" + std::to_string(i), std::make_shared<Tensor<float>>(tensor));
     }
     cout << mem.size() << endl;

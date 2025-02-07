@@ -3,7 +3,6 @@
 #include "deepx/op/cpu/matmul.hpp"
 namespace deepx::op::cpu
 {
-
     void matmul_basic(const Tensor<float> &a, const Tensor<float> &b, Tensor<float> &c){
          c.shape.rangeParallel(c.shape.dim - 2, [&](const std::vector<int> &indices)
                       {

@@ -6,14 +6,15 @@
 #include "deepx/op/cpu/print.hpp"
 #include "deepx/op/cpu/new.hpp"
 #include "deepx/op/cpu/init.hpp"
-
+#include "tensorutil.hpp"
 using namespace deepx;
 using namespace deepx::op::cpu;
 
 
 void test_sub(){
-    Tensor<int16_t> a_int16=New<int16_t>({2,3});
-    Tensor<int16_t> b_int16=New<int16_t>({2,3});
+    std::vector<int> shape=randomshape(1,3,1,10);
+    Tensor<int16_t> a_int16=New<int16_t>(shape);
+    Tensor<int16_t> b_int16=New<int16_t>(shape);
     std::iota(a_int16.data,a_int16.data+a_int16.shape.size,1);
     std::iota(b_int16.data,b_int16.data+b_int16.shape.size,2);
     print(a_int16,"%d");
@@ -21,8 +22,8 @@ void test_sub(){
     subInPlace(a_int16, b_int16);  
     print(a_int16,"%d");
 
-    Tensor<float> a_float=New<float>({2,3});
-    Tensor<float> b_float=New<float>({2,3});
+    Tensor<float> a_float=New<float>(shape);
+    Tensor<float> b_float=New<float>(shape);
     std::iota(a_float.data,a_float.data+a_float.shape.size,1.0f);
     std::iota(b_float.data,b_float.data+b_float.shape.size,2.0f);
     print(a_float);
@@ -31,8 +32,9 @@ void test_sub(){
     print(a_float);
 }
 void test_sub_1(){
-    Tensor<float> a=New<float>({100});
-    Tensor<float> b=New<float>({100});
+    std::vector<int> shape=randomshape(1,1,1,100);
+    Tensor<float> a=New<float>(shape);
+    Tensor<float> b=New<float>(shape);
     std::iota(a.data,a.data+a.shape.size,1.0f);
     std::iota(b.data,b.data+b.shape.size,101.0f);
     print(a);
@@ -41,7 +43,8 @@ void test_sub_1(){
     print(a);
 }
 void test_sub_scalar(){
-    Tensor<float> a=New<float>({100});
+    std::vector<int> shape=randomshape(1,1,1,100);
+    Tensor<float> a=New<float>(shape);
     std::iota(a.data,a.data+a.shape.size,1.0f);
     print(a);
     subInPlace(a, 100.0f);

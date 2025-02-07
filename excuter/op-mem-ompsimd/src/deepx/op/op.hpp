@@ -19,16 +19,17 @@ namespace deepx::op
     protected:
         string name;
         vector<string> args;
+        vector<string> args_grad;
         vector<string> returns;
-
+        vector<string> returns_grad;
     public:
-        Op() = default;
+        Op() = default; 
         void load(const YAML::Node &node)
         {
             name = node["name"].as<std::string>();
             args = node["args"].as<std::vector<std::string>>();
             returns = node["returns"].as<std::vector<std::string>>();
-        }
+        }   
 
         // 前向传播
         virtual void forward(mem::Mem<T> &mem)

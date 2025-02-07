@@ -20,15 +20,17 @@ namespace deepx::op
             {
                 if (grad_input != "")
                 {
-                    this->args.push_back(grad_input);
+                    this->args_grad.push_back(grad_input);
                 }else{
                     grad_input=input+".grad";
+                    this->args_grad.push_back(grad_input);
                 }
                 if (grad_output != "")
                 {
-                    this->returns.push_back(grad_output);
+                    this->returns_grad.push_back(grad_output);
                 }else{
                     grad_output=output+".grad";
+                    this->returns_grad.push_back(grad_output);
                 }
             }
         }

@@ -19,7 +19,7 @@ int main()
 {
     Mem<float> mem;
     deepx::Tensor<float> tensor = cpu::New<float>({1, 2, 3});
-    cpu::uniform(tensor,-1,1);
+    cpu::uniform(tensor,-1.0f,1.0f);
     mem.add("tensor", std::make_shared<deepx::Tensor<float>>(tensor));
 
     deepx::Tensor<float> result = cpu::New<float>({1, 2, 3});

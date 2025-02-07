@@ -1,118 +1,109 @@
-#ifndef DEEPX_MEM_HPP
-#define DEEPX_MEM_HPP
+#ifndef DEEPX_MEM_MEM_HPP
+#define DEEPX_MEM_MEM_HPP
 
-#include <memory>
-#include <vector>
-#include <unordered_map>
-#include <string>
-namespace deepx::mem
-{
-    using std::shared_ptr;
-    using std::string;
-    using std::vector;
-    template <typename T>
-    class Mem
-    {
-    private:
-        std::unordered_map<string, shared_ptr<Tensor<T>>> mem;
+ 
+#include "tensormap.hpp"
 
-    public:
-        // 默认构造函数
-        Mem() = default;
-
-        // 拷贝构造函数
-        Mem(const Mem& other) : mem(other.mem) {
-            // shared_ptr 会自动处理引用计数
-        }
-
-        // 移动构造函数
-        Mem(Mem&& other) noexcept : mem(std::move(other.mem)) {
-            // 移动后 other.mem 为空
-        }
-
-        // 拷贝赋值运算符
-        Mem& operator=(const Mem& other) {
-            if (this != &other) {
-                mem = other.mem; // shared_ptr 会自动处理引用计数
+namespace deepx::mem{
+    template<typename T>
+    class Mem{
+        private:
+            unordered_map<string, std::any> args;
+            TensorMap<T> tensor_map;
+        public:
+            Mem() = default;
+            ~Mem() = default;
+            Mem(const Mem& other) : arg(other.arg), args(other.args), tensor_map(other.tensor_map) {}
+            Mem(Mem&& other) noexcept : arg(std::move(other.arg)), args(std::move(other.args)), tensor_map(std::move(other.tensor_map)) {}
+            Mem& operator=(const Mem& other) {
+                arg = other.arg;
+                args = other.args;
+                tensor_map = other.tensor_map;
+                return *this;
             }
-            return *this;
-        }
-
-        // 移动赋值运算符
-        Mem& operator=(Mem&& other) noexcept {
-            if (this != &other) {
-                mem = std::move(other.mem);
+            Mem& operator=(Mem&& other) noexcept {
+                arg = std::move(other.arg);
+                args = std::move(other.args);
+                tensor_map = std::move(other.tensor_map);
+                return *this;
             }
-            return *this;
-        }
-
-        // 析构函数
-        ~Mem() = default; // shared_ptr 会自动处理内存释放
-
-        void add(const string &name, shared_ptr<Tensor<T>> tensor)
-        {
-            if (mem.find(name) != mem.end())
-            {
-                throw std::runtime_error("tensor " + name + " already exists");
+            void add(const string& name, const A& value) {
+                arg.add(name, value);
             }
-            mem[name] = tensor;
-        }
-
-        shared_ptr<Tensor<T>> get(const string &name)
-        {
-            if (mem.find(name) == mem.end())
-            {
-                throw std::runtime_error("tensor " + name + " not found");
+            void add(const string& name, const vector<AS>& value) {
+                args.add(name, value);
             }
-            return mem[name];
-        }
-
-        std::vector<Tensor<T>*> gettensors( const std::vector<string> &names){
-           std::vector<Tensor<T>*> tensors;
-            tensors.reserve(names.size());
-            for (const auto &name : names) {
-                auto it = mem.find(name);
-                if (it == mem.end()) {
-                    throw std::runtime_error("tensor " + name + " not found");
-                }
-                tensors.push_back(it->second.get());
+            void add(const string& name, const shared_ptr<Tensor<T>>& tensor) {
+                tensor_map.add(name, tensor);
             }
-            return tensors;
-        }
-
-        void remove(const string &name)
-        {
-            if (mem.find(name) == mem.end())
-            {
-                throw std::runtime_error("tensor " + name + " not found");
+            A getArg(const string& name) const {
+                return arg.get(name);
             }
-            mem.erase(name);
-        }
-
-        // 新增：检查是否存在某个张量
-        bool exists(const string &name) const {
-            return mem.find(name) != mem.end();
-        }
-
-        // 新增：获取所有张量名称
-        std::vector<string> get_names() const {
-            std::vector<string> names;
-            names.reserve(mem.size());
-            for (const auto& pair : mem) {
-                names.push_back(pair.first);
+            vector<A> getArgs(const vector<string>& names) const {
+                return args.get(names);
+            }   
+            shared_ptr<Tensor<T>> getTensor(const string& name) const {
+                return tensor_map.get(name);
             }
-            return names;
-        }
+            
+            vector<Tensor<T>*> getTensors(const vector<string>& names) const {
+                return tensor_map.gettensors(names);
+            }
+            vector<A> getargs(const vector<string>& names) const {
+                return arg.getargs(names);
+            }
+            vector<vector<AS>> getargss(const vector<string>& names) const {
+                return args.getargs(names);
+            }
+ 
+        
+            
+            void removetensor(const string& name) {
+                tensor_map.remove(name);
+            }
+            void removearg(const string& name) {
+                arg.remove(name);
+            }
+            void removeargs(const  string & name ) {
+                args.remove(name);
+            }
 
-        // 新增：清空所有张量
-        void clear() {
-            mem.clear();
-        }
+            bool existstensor(const string& name) const {
+                return tensor_map.exists(name);
+            }
+            bool existsarg(const string& name) const {
+                return arg.exists(name);
+            }
+            bool existsargs(const string& name) const {
+                return args.exists(name);
+            }
 
-        // 新增：获取张量数量
-        size_t size() const {
-            return mem.size();
-        }
+            vector<string> gettensornames() const {
+                return tensor_map.get_names();
+            }
+            vector<string> getargsnames() const {
+                return args.get_names();
+            }
+            vector<string> getargnames() const {
+                return arg.get_names();
+            }
+
+            
+            void clear() {
+                arg.clear();
+                args.clear();
+                tensor_map.clear();
+            }
+
+            size_t tensorsize() const {
+                return tensor_map.size();
+            }
+            size_t argssize() const {
+                return args.size();
+            }
+            size_t argsize() const {
+                return arg.size();
+            }
     };
 }
-#endif
+#endif // DEEPX_MEM_MEM_HPP

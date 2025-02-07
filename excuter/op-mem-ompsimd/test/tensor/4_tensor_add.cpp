@@ -7,13 +7,15 @@
 #include "deepx/op/cpu/new.hpp"
 #include "deepx/op/cpu/init.hpp"
 
+#include "tensorutil.hpp"
 using namespace deepx;
 using namespace deepx::op::cpu;
 
 
 void test_add_inplace(){
-    Tensor<int16_t> a_int16=New<int16_t>({2,33});
-    Tensor<int16_t> b_int16=New<int16_t>({2,33});
+    std::vector<int> shape=randomshape(1,3,1,55);
+    Tensor<int16_t> a_int16=New<int16_t>(shape);
+    Tensor<int16_t> b_int16=New<int16_t>(shape);
     std::iota(a_int16.data,a_int16.data+a_int16.shape.size,1);
     std::iota(b_int16.data,b_int16.data+b_int16.shape.size,2);
     print(a_int16,"%d");
@@ -21,8 +23,8 @@ void test_add_inplace(){
     addInPlace(a_int16, b_int16);  
     print(a_int16,"%d");
 
-    Tensor<int8_t> a_int8=New<int8_t>({2,3});
-    Tensor<int8_t> b_int8=New<int8_t>({2,3});
+    Tensor<int8_t> a_int8=New<int8_t>(shape);   
+    Tensor<int8_t> b_int8=New<int8_t>(shape);
     std::iota(a_int8.data,a_int8.data+a_int8.shape.size,1);
     std::iota(b_int8.data,b_int8.data+b_int8.shape.size,2);
     print(a_int8,"%d");

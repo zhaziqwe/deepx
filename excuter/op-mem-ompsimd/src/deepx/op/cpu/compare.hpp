@@ -12,9 +12,10 @@ namespace deepx::op::cpu
     template <typename T>
     void max(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
     {
-        if (A.shape == B.shape && A.shape == C.shape){
-        C.shape.rangeParallel(C.shape.dim - 1, [&A, &B, &C](int idx)
-                              {
+        if (A.shape == B.shape && A.shape == C.shape)
+        {
+            C.shape.rangeParallel(C.shape.dim - 1, [&A, &B, &C](int idx)
+                                  {
                 int shape_last=C.shape[-1];
                 const ScalableTag<T> tag;
                 const size_t lanes = Lanes(tag);
@@ -40,9 +41,34 @@ namespace deepx::op::cpu
                 for (;j<shape_last;j++)
                 {
                     C.data[idx+j]=std::max(A.data[idx+j],B.data[idx+j]);
-                }
-                            });
-        }else{
+                } });
+        }
+        else
+        {
+            throw std::invalid_argument("shape mismatch");
+        }
+    }
+
+    template <typename T>
+    void max_grad(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &A_grad, Tensor<T> &B_grad, Tensor<T> &output_grad)
+    {
+        if (A.shape == B.shape && A.shape == output.shape && A.shape == A_grad.shape && A.shape == B_grad.shape && A.shape == output_grad.shape)
+        {
+            A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &B, &output, &A_grad, &B_grad, &output_grad](int idx)
+                                       {
+                if (A.data[idx]>B.data[idx]){
+                    A_grad.data[idx]=output_grad.data[idx];
+                    B_grad.data[idx]=0;
+                }else if (A.data[idx]<B.data[idx]){
+                    A_grad.data[idx]=0;
+                    B_grad.data[idx]=output_grad.data[idx];
+                }else{
+                    A_grad.data[idx]=output_grad.data[idx]/2;   
+                    B_grad.data[idx]=output_grad.data[idx]/2;
+                } });
+        }
+        else
+        {
             throw std::invalid_argument("shape mismatch");
         }
     }
@@ -50,9 +76,10 @@ namespace deepx::op::cpu
     template <typename T>
     void max(const Tensor<T> &A, T b, Tensor<T> &C)
     {
-        if (A.shape == C.shape){
-            C.shape.rangeParallel(C.shape.dim - 1, [&A, &C](int idx)
-            {
+        if (A.shape == C.shape)
+        {
+            C.shape.rangeParallel(C.shape.dim - 1, [&A, b, &C](int idx)
+                                  {
                 int shape_last=C.shape[-1];
                 const ScalableTag<T> tag;
                 const size_t lanes = Lanes(tag);
@@ -78,9 +105,31 @@ namespace deepx::op::cpu
                 for (;j<shape_last;j++)
                 {
                     C.data[idx+j]=std::max(A.data[idx+j],b);
-                }
-            }); 
-        }else{
+                } });
+        }
+        else
+        {
+            throw std::invalid_argument("shape mismatch");
+        }
+    }
+
+    template <typename T>
+    void max_grad(const Tensor<T> &A, const T b, Tensor<T> &A_grad, Tensor<T> &output_grad)
+    {
+        if (A.shape == A_grad.shape && A.shape == output_grad.shape)
+        {
+            A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &b, &output_grad](int idx)
+                                       {
+                if (A.data[idx]>b){
+                    A_grad.data[idx]=output_grad.data[idx];
+                }else if (A.data[idx]<b){
+                    A_grad.data[idx]=0;
+                }else{
+                    A_grad.data[idx]=output_grad.data[idx]/2;   
+                } });
+        }
+        else
+        {
             throw std::invalid_argument("shape mismatch");
         }
     }
@@ -88,9 +137,10 @@ namespace deepx::op::cpu
     template <typename T>
     void min(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
     {
-        if (A.shape == B.shape && A.shape == C.shape){
+        if (A.shape == B.shape && A.shape == C.shape)
+        {
             C.shape.rangeParallel(C.shape.dim - 1, [&A, &B, &C](int idx)
-            {
+                                  {
                 int shape_last=C.shape[-1];
                 const ScalableTag<T> tag;
                 const size_t lanes = Lanes(tag);
@@ -116,19 +166,49 @@ namespace deepx::op::cpu
                 for (;j<shape_last;j++)
                 {
                     C.data[idx+j]=std::min(A.data[idx+j],B.data[idx+j]);
-                }
-            });
-        }else{
+                } });
+        }
+        else
+        {
             throw std::invalid_argument("shape mismatch");
         }
     }
 
+
+    
+    template <typename T>
+    void min_grad(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &A_grad, Tensor<T> &B_grad, Tensor<T> &output_grad)
+    {
+        if (A.shape == B.shape && A.shape == output.shape && A.shape == A_grad.shape && A.shape == B_grad.shape && A.shape == output_grad.shape)
+        {
+            A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &B, &output, &A_grad, &B_grad, &output_grad](int idx)
+                                       {
+                if (A.data[idx]<B.data[idx]){
+                    A_grad.data[idx]=output_grad.data[idx];
+                    B_grad.data[idx]=0;
+                }else if (A.data[idx]>B.data[idx]){
+                    A_grad.data[idx]=0;
+                    B_grad.data[idx]=output_grad.data[idx];
+                }else{
+                    A_grad.data[idx]=output_grad.data[idx]/2;   
+                    B_grad.data[idx]=output_grad.data[idx]/2;
+                } });
+        }
+        else
+        {
+            throw std::invalid_argument("shape mismatch");
+        }
+    }
+
+
+
     template <typename T>
     void min(const Tensor<T> &A, T b, Tensor<T> &C)
     {
-        if (A.shape == C.shape){
-            C.shape.rangeParallel(C.shape.dim - 1, [&A, &C](int idx)
-            {   
+        if (A.shape == C.shape)
+        {
+            C.shape.rangeParallel(C.shape.dim - 1, [&A, b, &C](int idx)
+                                  {   
                 int shape_last=C.shape[-1];
                 const ScalableTag<T> tag;
                 const size_t lanes = Lanes(tag);
@@ -153,9 +233,31 @@ namespace deepx::op::cpu
                 // 3. 处理尾部剩余元素
                 for (;j<shape_last;j++){
                     C.data[idx+j]=std::min(A.data[idx+j],b);
-                }
-            });
-        }else{
+                } });
+        }
+        else
+        {
+            throw std::invalid_argument("shape mismatch");
+        }
+    }
+
+    template <typename T>
+    void min_grad(const Tensor<T> &A, const T b, Tensor<T> &A_grad, Tensor<T> &output_grad)
+    {
+        if (A.shape == A_grad.shape && A.shape == output_grad.shape)
+        {
+            A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &b, &output_grad](int idx)
+                                       {
+                if (A.data[idx]<b){
+                    A_grad.data[idx]=output_grad.data[idx];
+                }else if (A.data[idx]>b){
+                    A_grad.data[idx]=0;
+                }else{
+                    A_grad.data[idx]=output_grad.data[idx]/2;   
+                } });
+        }
+        else
+        {
             throw std::invalid_argument("shape mismatch");
         }
     }

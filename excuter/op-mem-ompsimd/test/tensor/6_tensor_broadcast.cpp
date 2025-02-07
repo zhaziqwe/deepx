@@ -28,9 +28,9 @@ void bench_broadcast(int i)
 
 void bench_broadcast_add(int i){
     Tensor tensor = New<float>({i,i});
-    uniform(tensor,0,1);
+    uniform(tensor,0.0f,1.0f);
     Tensor other = New<float>({i,i});
-    uniform(other,0,1);
+    uniform(other,0.0f,1.0f);
     std::cout <<  "broadcast add "<<tensor.shape.shape<<std::endl;
     auto start = std::chrono::high_resolution_clock::now();
     addInPlace(tensor, other);
@@ -40,9 +40,9 @@ void bench_broadcast_add(int i){
 }
 void bench_broadcast_mul(int i){
     Tensor tensor = New<float>({i,i});
-    uniform(tensor,0,1);
+    uniform(tensor,0.0f,1.0f);
     Tensor other = New<float>({i,i});
-    uniform(other,0,1);
+    uniform(other,0.0f,1.0f);
     std::cout <<  "broadcast mul "<<tensor.shape.shape<<std::endl;
     auto start = std::chrono::high_resolution_clock::now();
     mulInPlace(tensor, other);
