@@ -29,6 +29,8 @@ namespace deepx::op
             name = node["name"].as<std::string>();
             args = node["args"].as<std::vector<std::string>>();
             returns = node["returns"].as<std::vector<std::string>>();
+            args_grad = node["args_grad"].as<std::vector<std::string>>();
+            returns_grad = node["returns_grad"].as<std::vector<std::string>>();
         }   
 
         // 前向传播
