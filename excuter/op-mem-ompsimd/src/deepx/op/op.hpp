@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <yaml-cpp/yaml.h>
-
 #include "deepx/tensor.hpp"
 #include "deepx/mem/mem.hpp"
 namespace deepx::op

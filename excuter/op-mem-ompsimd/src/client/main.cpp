@@ -2,27 +2,29 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <deepx/op/cpu/init.hpp>
-#include <deepx/op/cpu/new.hpp>
-#include <deepx/op/cpu/print.hpp>
 
 #include <stdutil/vector.hpp>
+ 
+#include <deepx/tensorfunc/init.hpp>
+#include <deepx/tensorfunc/new.hpp>
+#include <deepx/tensorfunc/print.hpp>
 
 #include "deepx/op/op.hpp"
 #include "deepx/op/activite.hpp"
+
 #include "deepx/mem/mem.hpp"
 #include "client/udpserver.hpp"
-using namespace deepx::op;
+using namespace deepx::tensorfunc;
 using namespace deepx::mem;
 
 int main()
 {
     Mem  mem;   
-    deepx::Tensor<float> tensor = cpu::New<float>({1, 2, 3});
-    cpu::uniform(tensor,-1.0f,1.0f);
+    deepx::Tensor<float> tensor =  New<float>({1, 2, 3});
+     uniform(tensor,-1.0f,1.0f);
     mem.add("tensor", std::make_shared<deepx::Tensor<float>>(tensor));
 
-    deepx::Tensor<float> result = cpu::New<float>({1, 2, 3});
+    deepx::Tensor<float> result = New<float>({1, 2, 3});
 
     mem.add("result", std::make_shared<deepx::Tensor<float>>(result));
 
@@ -36,10 +38,10 @@ int main()
             std::string input = config["args"][0].as<std::string>();
             std::string output = config["returns"][0].as<std::string>();
 
-            Relu<float> relu(input, output);
+            deepx::op::Relu<float> relu(input, output);
             relu.forward(mem);
 
-            cpu::print(*mem.gettensor<float>("result"));
+            print(*mem.gettensor<float>("result"));
         }
     };
     server.start();

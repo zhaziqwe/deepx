@@ -2,7 +2,7 @@
 #define DEEPX_OP_CONCAT_HPP
 
 #include "deepx/op/op.hpp"
-#include "deepx/op/cpu/concat.hpp"
+#include "deepx/tensorfunc/concat.hpp"
 #include "deepx/dtype.hpp"
 namespace deepx::op
 {
@@ -24,9 +24,6 @@ namespace deepx::op
             for (int i=0;i<this->args.size()-1;i++){
                 input.push_back(mem.get(this->args[i]).get());
             }
- 
-
-
             auto output = mem.get(this->returns[0]).get();
             int axis = std::stoi(this->args.back());
             cpu::concat(input,axis,*output);
@@ -41,6 +38,6 @@ namespace deepx::op
             auto output = mem.get(this->returns[0]).get();
             cpu::split(output,axis,input);
         };
-    }
+    };
 }
-#endif
+#endif  // DEEPX_OP_CONCAT_HPP

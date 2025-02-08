@@ -1,5 +1,5 @@
-#ifndef DEEPX_OP_CPU_INIT_HPP
-#define DEEPX_OP_CPU_INIT_HPP
+#ifndef DEEPX_TENSORFUNC_INIT_HPP
+#define DEEPX_TENSORFUNC_INIT_HPP
 
 #include <cmath>
 #include <random>
@@ -7,7 +7,7 @@
 
 #include "deepx/tensor.hpp"
 
-namespace deepx::op::cpu {
+namespace deepx::tensorfunc {
     template<typename T>
     void uniform(Tensor<T> &tensor, T low=0, T high=1)
     {

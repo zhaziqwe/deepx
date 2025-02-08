@@ -1,12 +1,12 @@
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
-#include "deepx/op/cpu/reduce.hpp"
+#include "deepx/tensorfunc/reduce.hpp"
 
 #include "init.hpp"
-#include "deepx/op/cpu/new.hpp"
+#include "deepx/tensorfunc/new.hpp"
 #include "deepx/shape_reduce.hpp"
-namespace deepx::op::cpu
+namespace deepx::tensorfunc
 {
 
     Tensor<float> sum(const Tensor<float> &tensor, const std::vector<int> &dims)

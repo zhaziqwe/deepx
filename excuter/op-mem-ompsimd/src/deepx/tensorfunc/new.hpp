@@ -1,11 +1,11 @@
-#ifndef DEEPX_OP_CPU_NEW_HPP
-#define DEEPX_OP_CPU_NEW_HPP
+#ifndef DEEPX_TENSORFUNC_NEW_HPP
+#define DEEPX_TENSORFUNC_NEW_HPP
 
 #include "deepx/tensor.hpp"
-#include "deepx/op/cpu/new_mempool.hpp"
+#include "deepx/tensorfunc/new_mempool.hpp"
 
 // 具体的张量类
-namespace deepx::op::cpu
+namespace deepx::tensorfunc
 {
     template <typename T>
     static T* dataNew(int size)
@@ -75,4 +75,4 @@ namespace deepx::op::cpu
         return result;
     }
 }
-#endif // DEEPX_OP_CPU_NEW_HPP
+#endif // DEEPX_TENSORFUNC_NEW_HPP

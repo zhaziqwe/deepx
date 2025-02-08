@@ -3,18 +3,18 @@
 #include <iostream>
 
 
-#include "deepx/op/cpu/concat.hpp"
+#include "deepx/tensorfunc/concat.hpp"
 #include "deepx/tensor.hpp"
 #include "deepx/shape.hpp"
 #include "deepx/shape_concat.hpp"
-#include "deepx/op/cpu/new.hpp"
-#include "deepx/op/cpu/init.hpp"
-#include "deepx/op/cpu/print.hpp"
+#include "deepx/tensorfunc/new.hpp"
+#include "deepx/tensorfunc/init.hpp"
+#include "deepx/tensorfunc/print.hpp"
 #include "stdutil/vector.hpp"
 #include "deepx/mem/mem.hpp"
 
 using namespace deepx;
-using namespace deepx::op::cpu;
+using namespace deepx::tensorfunc;
 using namespace deepx::mem;
 
 Mem  makeMem(int cnt,std::vector<int> shape){

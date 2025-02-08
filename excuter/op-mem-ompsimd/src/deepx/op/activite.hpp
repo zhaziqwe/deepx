@@ -2,7 +2,7 @@
 #define DEEPX_OP_ACTIVITE_HPP
 
 #include "deepx/op/op.hpp"
-#include "deepx/op/cpu/activite.hpp"
+#include "deepx/tensorfunc/activite.hpp"
 #include "deepx/dtype.hpp"
 #include "deepx/op/minmax.hpp"
 
@@ -12,65 +12,52 @@ namespace deepx::op
     template <typename T>
     class Relu : public Op<T>
     {
+    private:
+        Op<T> max_scalar;
     public:
+        const string const_name() {
+            return "const_"+dtype<T>::name()+"_0";
+        }
         Relu(string input, string output, bool require_grad = false, string grad_input = "", string grad_output = "")
         {
             this->name = std::string("relu") + "_" + dtype<T>::name();
-            this->args.push_back(input);
-            this->returns.push_back(output);
-            if (require_grad)
-            {
-                if (grad_input != "")
-                {
-                    this->args_grad.push_back(grad_input);
-                }else{
-                    grad_input=input+".grad";
-                    this->args_grad.push_back(grad_input);
-                }
-                if (grad_output != "")
-                {
-                    this->returns_grad.push_back(grad_output);
-                }else{
-                    grad_output=output+".grad";
-                    this->returns_grad.push_back(grad_output);
-                }
-            }
+            max_scalar=Max_scalar<T>(input,const_name(),output,true, grad_input, grad_output);
         }
 
         void forward(mem::Mem  &mem) override
         {
-            auto input = mem.gettensor<T>(this->args[0]);
-            auto output = mem.gettensor<T>(this->returns[0]);
-            
+            mem.set<T>(const_name(), cast<T>(0));
+            max_scalar.forward(mem);
         };
         void backward(mem::Mem &mem) override
         {
-            auto input = mem.gettensor<T>(this->args[0]);
-            auto output = mem.gettensor<T>(this->returns[0]);
-            cpu::reluGrad(*input, *output);
+            max_scalar.backward(mem);
         };
     };
 
     template <typename T>
     class ReluInplace : public Op<T>
     {
+        private:
+        Op<T> max_scalar;
     public:
-        ReluInplace(string input)
+        const string const_name() {
+            return "const_"+dtype<T>::name()+"_0";
+        }
+        ReluInplace(string input,bool require_grad = false, string grad_input = "")
         {
             this->name = std::string("reluInplace") + "_" + dtype<float>::name();
-            this->args.push_back(input);
+             max_scalar=Max_scalar<T>(input,const_name(),input,true, grad_input,grad_input);
         }
         void forward(mem::Mem &mem) override
         {
-            auto tensor = mem.gettensor<T>(this->args[0]);
-           //todo
+            mem.set<T>(const_name(), cast<T>(0));
+            max_scalar.forward(mem);
         };
         void backward(mem::Mem &mem) override
         {
-            auto tensor = mem.gettensor<T>(this->args[0]);
-            //todo
+            max_scalar.backward(mem);
         };
     };
-
 }
 #endif

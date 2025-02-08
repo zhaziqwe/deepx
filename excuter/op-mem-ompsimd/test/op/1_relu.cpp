@@ -2,15 +2,15 @@
 
 #include "deepx/op/op.hpp"
 
-#include "deepx/op/cpu/print.hpp"
-#include "deepx/op/cpu/new.hpp"
-#include "deepx/op/cpu/init.hpp"
+#include "deepx/tensorfunc/print.hpp"
+#include "deepx/tensorfunc/new.hpp"
+#include "deepx/tensorfunc/init.hpp"
 #include "deepx/tensor.hpp"
-#include "deepx/op/activite.hpp"
+#include "deepx/tensorfunc/activite.hpp"
  
 using namespace deepx::op;
 using namespace deepx;
-using namespace deepx::op::cpu;
+using namespace deepx::tensorfunc;
 using namespace std;
 
 void test_max()

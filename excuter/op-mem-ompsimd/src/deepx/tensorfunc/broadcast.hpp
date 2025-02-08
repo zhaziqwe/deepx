@@ -1,10 +1,10 @@
-#ifndef DEEPX_OP_CPU_BROADCAST_HPP
-#define DEEPX_OP_CPU_BROADCAST_HPP
+#ifndef DEEPX_TENSORFUNC_BROADCAST_HPP
+#define DEEPX_TENSORFUNC_BROADCAST_HPP
 
 #include "deepx/tensor.hpp"
-#include "deepx/op/cpu/new.hpp"
+#include "deepx/tensorfunc/new.hpp"
 #include "deepx/shape_broadcast.hpp"
-namespace deepx::op::cpu
+namespace deepx::tensorfunc
 {
     template <typename T>
     Tensor<T> broadcast(const Tensor<T> &tensor, const std::vector<int> &broadcastShape)

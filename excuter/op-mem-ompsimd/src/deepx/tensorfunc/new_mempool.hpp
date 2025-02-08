@@ -1,13 +1,16 @@
-#pragma once
+#ifndef DEEPX_TENSORFUNC_NEW_MEMPOOL_HPP
+#define DEEPX_TENSORFUNC_NEW_MEMPOOL_HPP
+
 #include <jemalloc/jemalloc.h>
 
-namespace deepx {
-
-class MemoryPool {
-public:
+namespace deepx::tensorfunc
+{
+    class MemoryPool
+    {
+    public:
     static void* Malloc(size_t size) {
         return mallocx(size, MALLOCX_ALIGN(64));  // 64字节对齐，适合SIMD
-    }
+    }   
 
     static void Free(void* ptr) {
         dallocx(ptr, 0);
@@ -35,4 +38,5 @@ public:
     }
 };
 
-} // namespace deepx
+}  // namespace deepx::tensorfunc
+#endif  // DEEPX_TENSORFUNC_NEW_MEMPOOL_HPP

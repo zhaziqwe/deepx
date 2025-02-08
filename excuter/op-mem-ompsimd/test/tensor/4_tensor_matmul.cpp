@@ -3,17 +3,17 @@
 #include <numeric>
 #include <chrono>
 
-#include <deepx/op/cpu/print.hpp>
+#include "deepx/tensorfunc/print.hpp"
 #include "deepx/tensor.hpp"
-#include "deepx/op/cpu/new.hpp"
- 
-#include "deepx/op/cpu/matmul.hpp"
-#include "deepx/op/cpu/init.hpp"
+#include "deepx/tensorfunc/new.hpp"
+    
+#include "deepx/tensorfunc/matmul.hpp"
+#include "deepx/tensorfunc/init.hpp"
 #include "deepx/shape_matmul.hpp"
-#include "deepx/op/cpu/file.hpp"
+#include "deepx/tensorfunc/file.hpp"
 
 using namespace deepx;
-using namespace deepx::op::cpu;
+using namespace deepx::tensorfunc;
 /*
 import torch
 

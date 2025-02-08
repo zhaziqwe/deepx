@@ -1,10 +1,10 @@
-#ifndef DEEPX_OP_CPU_ACTIVITE_HPP
-#define DEEPX_OP_CPU_ACTIVITE_HPP
+#ifndef DEEPX_TENSORFUNC_ACTIVITE_HPP
+#define DEEPX_TENSORFUNC_ACTIVITE_HPP
 
 #include "deepx/tensor.hpp"
 #include "deepx/shape.hpp"
 
-namespace deepx::op::cpu
+namespace deepx::tensorfunc
 {   
     template<typename T>
     void reluInplace(Tensor<T> &tensor){

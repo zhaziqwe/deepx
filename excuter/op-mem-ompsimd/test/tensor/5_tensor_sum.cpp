@@ -4,15 +4,15 @@
 #include <chrono>
 
 #include "deepx/tensor.hpp"
-#include "deepx/op/cpu/reduce.hpp"
+#include "deepx/tensorfunc/reduce.hpp"
 #include "stdutil/vector.hpp"
 #include "deepx/shape_combination.hpp"
 #include "deepx/shape_reduce.hpp"
-#include "deepx/op/cpu/new.hpp"
-#include "deepx/op/cpu/print.hpp"
-#include "deepx/op/cpu/file.hpp"
+#include "deepx/tensorfunc/new.hpp"
+#include "deepx/tensorfunc/print.hpp"
+#include "deepx/tensorfunc/file.hpp"
 using namespace deepx;
-using namespace deepx::op::cpu;
+using namespace deepx::tensorfunc;
 void test_sum()
 {
     Shape shape({2, 3, 4});

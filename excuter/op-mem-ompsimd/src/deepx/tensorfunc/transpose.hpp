@@ -1,12 +1,12 @@
-#ifndef DEEPX_OP_CPU_TRANSPOSE_HPP
-#define DEEPX_OP_CPU_TRANSPOSE_HPP
+#ifndef DEEPX_TENSORFUNC_TRANSPOSE_HPP
+#define DEEPX_TENSORFUNC_TRANSPOSE_HPP
 
 #include <stdexcept>
 #include <vector>
 
 #include "deepx/tensor.hpp"
-#include "deepx/op/cpu/new.hpp"
-namespace deepx::op::cpu
+#include "deepx/tensorfunc/new.hpp"
+namespace deepx::tensorfunc
 {
     template <typename T>
     Tensor<T> transpose(const Tensor<T> &tensor, const std::vector<int> &dimOrder)
@@ -37,4 +37,4 @@ namespace deepx::op::cpu
     }
 }
 
-#endif
+#endif // DEEPX_TENSORFUNC_TRANSPOSE_HPP

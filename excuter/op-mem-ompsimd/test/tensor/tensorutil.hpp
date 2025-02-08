@@ -10,8 +10,7 @@
 #include "deepx/tensor.hpp"
 
 using namespace deepx;
-using namespace deepx::op::cpu;
-
+ 
 /*
     dimlen_min:shape.size()的最小维度长度
     dimlen_max:shape.size()的最大维度长度

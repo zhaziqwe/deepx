@@ -1,8 +1,7 @@
 #include <cmath>
+#include "deepx/tensorfunc/activite.hpp"
 
-#include "deepx/op/cpu/activite.hpp"
-
-namespace deepx::op::cpu {
+namespace deepx::tensorfunc {
 
     // todo 用highway实现simd加速
   

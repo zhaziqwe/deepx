@@ -2,7 +2,7 @@
 #define DEEPX_OP_ELEMENTWISE_HPP
 
 #include "deepx/op/op.hpp"
-#include "deepx/op/cpu/elementwise.hpp"
+#include "deepx/tensorfunc/elementwise.hpp"
 #include "deepx/dtype.hpp"
 
 namespace deepx::op
@@ -29,5 +29,5 @@ namespace deepx::op
             }
     }; 
 }
-#endif
+#endif  // DEEPX_OP_ELEMENTWISE_HPP
     

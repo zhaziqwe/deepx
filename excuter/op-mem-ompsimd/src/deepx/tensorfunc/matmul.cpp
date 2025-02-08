@@ -1,7 +1,7 @@
 #include <cblas.h> // 如果使用 OpenBLAS
 #include <stdexcept>
-#include "deepx/op/cpu/matmul.hpp"
-namespace deepx::op::cpu
+#include "deepx/tensorfunc/matmul.hpp"
+namespace deepx::tensorfunc
 {
     void matmul_basic(const Tensor<float> &a, const Tensor<float> &b, Tensor<float> &c){
          c.shape.rangeParallel(c.shape.dim - 2, [&](const std::vector<int> &indices)

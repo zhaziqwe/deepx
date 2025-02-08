@@ -2,12 +2,12 @@
 #include <numeric>
 
 #include "deepx/tensor.hpp"
-#include "deepx/op/cpu/transpose.hpp"
-#include "deepx/op/cpu/new.hpp"
-#include "deepx/op/cpu/print.hpp"
+#include "deepx/tensorfunc/transpose.hpp"
+#include "deepx/tensorfunc/new.hpp"
+#include "deepx/tensorfunc/print.hpp"
 #include "stdutil/vector.hpp"
 
-using namespace deepx::op::cpu;
+using namespace deepx::tensorfunc;
 using namespace deepx;
 void test_transpose()
 {

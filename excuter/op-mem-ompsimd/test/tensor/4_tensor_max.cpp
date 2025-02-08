@@ -1,14 +1,14 @@
 #include <numeric>
-#include <deepx/op/cpu/elementwise.hpp>
+#include "deepx/tensorfunc/elementwise.hpp"
 
 #include "deepx/tensor.hpp"
-#include "deepx/op/cpu/compare.hpp"
-#include "deepx/op/cpu/init.hpp"
-#include "deepx/op/cpu/print.hpp"
-#include "deepx/op/cpu/new.hpp"
+#include "deepx/tensorfunc/compare.hpp"
+#include "deepx/tensorfunc/init.hpp"
+#include "deepx/tensorfunc/print.hpp"
+#include "deepx/tensorfunc/new.hpp"
 #include "tensorutil.hpp"
 using namespace deepx;
-using namespace deepx::op::cpu;
+using namespace deepx::tensorfunc;
 
 void test_max(){
     std::vector<int> shape=randomshape(1,3,1,19);

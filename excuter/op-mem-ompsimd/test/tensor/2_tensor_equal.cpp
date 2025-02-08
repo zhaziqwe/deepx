@@ -1,12 +1,12 @@
 #include <iostream>
 #include <numeric>
 
-#include "deepx/op/cpu/equal.hpp"
+#include "deepx/tensorfunc/equal.hpp"
 #include "deepx/tensor.hpp"
-#include "deepx/op/cpu/new.hpp"
+#include "deepx/tensorfunc/new.hpp"
 
 using namespace deepx;
-using namespace deepx::op::cpu;
+using namespace deepx::tensorfunc;
 void test_equal(){
     Tensor<float> tensor1=New<float>({4096,4096});
     std::iota(tensor1.data,tensor1.data+tensor1.shape.size,0);

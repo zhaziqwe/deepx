@@ -1,12 +1,12 @@
-#ifndef DEEPX_OP_CPU_PRINT_HPP
-#define DEEPX_OP_CPU_PRINT_HPP
+#ifndef DEEPX_TENSORFUNC_PRINT_HPP
+#define DEEPX_TENSORFUNC_PRINT_HPP
 
 #include <iostream>
 
 #include "deepx/tensor.hpp"
 #include "stdutil/vector.hpp"
 
-namespace deepx::op::cpu
+namespace deepx::tensorfunc
 {
     template <typename T>
     void print(const Tensor<T> &t,const std::string &f="")
@@ -77,4 +77,4 @@ namespace deepx::op::cpu
     }
 }
 
-#endif // DEEPX_OP_CPU_PRINT_HPP
+#endif // DEEPX_TENSORFUNC_PRINT_HPP

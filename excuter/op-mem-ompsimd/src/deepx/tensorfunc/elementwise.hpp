@@ -1,12 +1,12 @@
-#ifndef DEEPX_OP_CPU_ELEMENTWISE_HPP
-#define DEEPX_OP_CPU_ELEMENTWISE_HPP
+#ifndef DEEPX_TENSORFUNC_ELEMENTWISE_HPP
+#define DEEPX_TENSORFUNC_ELEMENTWISE_HPP
 
 #include <cblas.h>
 #include <cmath>
 #include <hwy/highway.h>
 #include "deepx/tensor.hpp"
 
-namespace deepx::op::cpu
+namespace deepx::tensorfunc
 {
     using namespace hwy::HWY_NAMESPACE;
 

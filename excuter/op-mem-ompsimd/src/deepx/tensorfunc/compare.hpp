@@ -1,12 +1,11 @@
-#ifndef DEEPX_OP_CPU_COMPARE_HPP
-#define DEEPX_OP_CPU_COMPARE_HPP
+#ifndef DEEPX_TENSORFUNC_COMPARE_HPP
+#define DEEPX_TENSORFUNC_COMPARE_HPP
 
 #include "hwy/highway.h"
 #include "deepx/tensor.hpp"
 
-namespace deepx::op::cpu
+namespace deepx::tensorfunc
 {
-
     using namespace hwy::HWY_NAMESPACE;
 
     template <typename T>

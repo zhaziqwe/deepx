@@ -1,11 +1,11 @@
-#ifndef DEEPX_OP_CPU_FILE_HPP
-#define DEEPX_OP_CPU_FILE_HPP
+#ifndef DEEPX_TENSORFUNC_FILE_HPP
+#define DEEPX_TENSORFUNC_FILE_HPP
 
 #include <string>
 #include <fstream>
 
 #include <deepx/tensor.hpp>
-namespace deepx::op::cpu
+namespace deepx::tensorfunc
 {
     template <typename T>
     void save(Tensor<T> &tensor,const std::string &path)
