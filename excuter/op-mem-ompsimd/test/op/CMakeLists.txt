@@ -5,4 +5,5 @@ add_executable(1_relu 1_relu.cpp)
 target_link_libraries(1_relu deepx)
 
 
- 
+add_executable(2_add 2_add.cpp)
+target_link_libraries(2_add deepx)

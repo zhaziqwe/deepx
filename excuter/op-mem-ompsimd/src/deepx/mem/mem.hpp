@@ -79,12 +79,21 @@ namespace deepx::mem
         }
 
         template <typename T>
-        void add(const string &name, const Tensor<T> &tensor)
+        void add(const string &name, Tensor<T> && tensor)
         {
             constexpr int type_code = dtype<T>::value;
-            auto ptr = std::make_shared<Tensor<T>>(tensor);
+            auto ptr = std::make_shared<Tensor<T>>(std::move(tensor));
             mem[type_code][name] = type_erase(ptr);
         }
+
+        template <typename T>
+        void add(const string &name,const Tensor<T> &tensor)
+        {
+            constexpr int type_code = dtype<T>::value;
+            auto ptr = std::make_shared<Tensor<T>>( tensor);
+            mem[type_code][name] = type_erase(ptr);
+        }
+
         template <typename T>
         bool exists(const string &name) const
         {

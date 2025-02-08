@@ -22,7 +22,7 @@ void test_max()
     std::vector<int> shape = { 2, 3};
     Tensor<float> a = New<float>(shape);
     uniform(a, -1.0f, 1.0f);
-    mem.add("a", a );   
+    mem.add("a", a);   
 
     Tensor<float> b = New<float>(shape);
     constant(b, 0.5f);
