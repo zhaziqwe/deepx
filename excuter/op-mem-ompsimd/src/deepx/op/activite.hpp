@@ -4,6 +4,8 @@
 #include "deepx/op/op.hpp"
 #include "deepx/op/cpu/activite.hpp"
 #include "deepx/dtype.hpp"
+#include "deepx/op/minmax.hpp"
+
 namespace deepx::op
 {
     // 基类模板声明
@@ -35,16 +37,16 @@ namespace deepx::op
             }
         }
 
-        void forward(mem::Mem<float> &mem) override
+        void forward(mem::Mem  &mem) override
         {
-            auto input = mem.get(this->args[0]).get();
-            auto output = mem.get(this->returns[0]).get();
-            cpu::relu(*input, *output);
+            auto input = mem.gettensor<T>(this->args[0]);
+            auto output = mem.gettensor<T>(this->returns[0]);
+            
         };
-        void backward(mem::Mem<float> &mem) override
+        void backward(mem::Mem &mem) override
         {
-            auto input = mem.get(this->args[0]).get();
-            auto output = mem.get(this->returns[0]).get();
+            auto input = mem.gettensor<T>(this->args[0]);
+            auto output = mem.gettensor<T>(this->returns[0]);
             cpu::reluGrad(*input, *output);
         };
     };
@@ -58,15 +60,15 @@ namespace deepx::op
             this->name = std::string("reluInplace") + "_" + dtype<float>::name();
             this->args.push_back(input);
         }
-        void forward(mem::Mem<float> &mem) override
+        void forward(mem::Mem &mem) override
         {
-            auto tensor = mem.get(this->args[0]).get();
-            cpu::reluInplace(*tensor);
+            auto tensor = mem.gettensor<T>(this->args[0]);
+           //todo
         };
-        void backward(mem::Mem<float> &mem) override
+        void backward(mem::Mem &mem) override
         {
-            auto tensor = mem.get(this->args[0]).get();
-            cpu::reluGradInplace(*tensor);
+            auto tensor = mem.gettensor<T>(this->args[0]);
+            //todo
         };
     };
 

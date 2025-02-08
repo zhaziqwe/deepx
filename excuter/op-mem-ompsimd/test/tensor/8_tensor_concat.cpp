@@ -17,8 +17,8 @@ using namespace deepx;
 using namespace deepx::op::cpu;
 using namespace deepx::mem;
 
-Mem<float> makeMem(int cnt,std::vector<int> shape){
-    Mem<float> mem; // 使用模板参数
+Mem  makeMem(int cnt,std::vector<int> shape){
+    Mem  mem; // 使用模板参数
 
     for (int j=0; j<cnt; j++){
         auto ptr = std::make_shared<Tensor<float>>(New<float>(shape));
@@ -30,8 +30,9 @@ Mem<float> makeMem(int cnt,std::vector<int> shape){
 
 void test_concat(){
     std::vector<int> shape={2,3,4};
-    Mem<float> mem=makeMem(4,shape);
-    std::vector<Tensor<float>*> tensors=mem.gettensors(std::vector<std::string>{"tensor0","tensor1","tensor2","tensor3"});
+    Mem mem=makeMem(4,shape);
+    
+    std::vector<Tensor<float>*> tensors=mem.gettensors<float>(std::vector<std::string>{"tensor0","tensor1","tensor2","tensor3"});
  
      
     std::cout<<"================"<<std::endl;

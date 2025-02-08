@@ -52,9 +52,9 @@ namespace deepx::op::cpu
     template <typename T>
     void max_grad(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &A_grad, Tensor<T> &B_grad, Tensor<T> &output_grad)
     {
-        if (A.shape == B.shape && A.shape == output.shape && A.shape == A_grad.shape && A.shape == B_grad.shape && A.shape == output_grad.shape)
+        if (A.shape == B.shape && A.shape == output_grad.shape && A.shape == A_grad.shape && A.shape == B_grad.shape)
         {
-            A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &B, &output, &A_grad, &B_grad, &output_grad](int idx)
+            A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &B, &output_grad, &A_grad, &B_grad](int idx)
                                        {
                 if (A.data[idx]>B.data[idx]){
                     A_grad.data[idx]=output_grad.data[idx];
@@ -118,7 +118,7 @@ namespace deepx::op::cpu
     {
         if (A.shape == A_grad.shape && A.shape == output_grad.shape)
         {
-            A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &b, &output_grad](int idx)
+            A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &b, &A_grad, &output_grad](int idx)
                                        {
                 if (A.data[idx]>b){
                     A_grad.data[idx]=output_grad.data[idx];
@@ -179,9 +179,9 @@ namespace deepx::op::cpu
     template <typename T>
     void min_grad(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &A_grad, Tensor<T> &B_grad, Tensor<T> &output_grad)
     {
-        if (A.shape == B.shape && A.shape == output.shape && A.shape == A_grad.shape && A.shape == B_grad.shape && A.shape == output_grad.shape)
+        if (A.shape == B.shape && A.shape == output_grad.shape && A.shape == A_grad.shape && A.shape == B_grad.shape)
         {
-            A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &B, &output, &A_grad, &B_grad, &output_grad](int idx)
+            A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &B, &output_grad, &A_grad, &B_grad](int idx)
                                        {
                 if (A.data[idx]<B.data[idx]){
                     A_grad.data[idx]=output_grad.data[idx];
@@ -246,7 +246,7 @@ namespace deepx::op::cpu
     {
         if (A.shape == A_grad.shape && A.shape == output_grad.shape)
         {
-            A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &b, &output_grad](int idx)
+            A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &b, &A_grad, &output_grad](int idx)
                                        {
                 if (A.data[idx]<b){
                     A_grad.data[idx]=output_grad.data[idx];

@@ -13,13 +13,13 @@ using namespace deepx;
 using namespace deepx::op::cpu;
 void test_relu()
 {
-    Mem<float> mem;
+    Mem mem;
     Tensor<float> tensor = New<float>({1, 2, 3});
     uniform(tensor, -1.0f, 1.0f);
     mem.add("tensor", std::make_shared<Tensor<float>>(tensor));
     ReluInplace<float> reluInplace("tensor");
     reluInplace.forward(mem);
-    print(*mem.get("tensor").get());
+    print(*mem.gettensor<float>("tensor").get());
 }
 
 int main()

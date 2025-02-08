@@ -32,13 +32,13 @@ namespace deepx::op
         }   
 
         // 前向传播
-        virtual void forward(mem::Mem<T> &mem)
+        virtual void forward(mem::Mem  &mem)
         {
             std::cout << "forward op: " << name << std::endl;
         }
 
         // 反向传播
-        virtual void backward(mem::Mem<T> &mem)
+        virtual void backward(mem::Mem  &mem)
         {
             std::cout << "backward op: " << name << std::endl;
         }

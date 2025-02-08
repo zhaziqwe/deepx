@@ -17,7 +17,7 @@ using namespace deepx::mem;
 
 int main()
 {
-    Mem<float> mem;
+    Mem  mem;   
     deepx::Tensor<float> tensor = cpu::New<float>({1, 2, 3});
     cpu::uniform(tensor,-1.0f,1.0f);
     mem.add("tensor", std::make_shared<deepx::Tensor<float>>(tensor));
@@ -39,7 +39,7 @@ int main()
             Relu<float> relu(input, output);
             relu.forward(mem);
 
-            cpu::print(*mem.get("result").get());
+            cpu::print(*mem.gettensor<float>("result"));
         }
     };
     server.start();

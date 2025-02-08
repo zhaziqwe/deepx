@@ -15,21 +15,21 @@ namespace deepx::op{
                 this->returns.push_back(output);
             }
 
-            void forward(mem::Mem<T> &mem) override
+            void forward(mem::Mem  &mem) override
             {
-                auto A = mem.get(this->args[0]).get();
-                auto B = mem.get(this->args[1]).get();
-                auto output = mem.get(this->returns[0]).get();
+                auto A = mem.gettensor<T>(this->args[0]);
+                auto B = mem.gettensor<T>(this->args[1]);
+                auto output = mem.gettensor<T>(this->returns[0]);
                 cpu::max(*A, *B, *output);
             }
 
-            void backward(mem::Mem<T> &mem) override
+            void backward(mem::Mem &mem) override
             {
-                auto A=mem.get(this->args[0]).get();
-                auto B=mem.get(this->args[1]).get();
-                auto A_grad=mem.get(this->returns_grad[0]).get();
-                auto B_grad=mem.get(this->returns_grad[1]).get();
-                auto output_grad=mem.get(this->args_grad[0]).get();
+                auto A=mem.gettensor<T>(this->args[0]);
+                auto B=mem.gettensor<T>(this->args[1]);
+                auto A_grad=mem.gettensor<T>(this->returns_grad[0]);
+                auto B_grad=mem.gettensor<T>(this->returns_grad[1]);
+                auto output_grad=mem.gettensor<T>(this->args_grad[0]);
                 cpu::max_grad(*A, *B,  *A_grad, *B_grad, *output_grad);
             }
     };
@@ -45,15 +45,19 @@ namespace deepx::op{
                 this->returns.push_back(output);
             }
 
-            void forward(mem::Mem<T> &mem) override{
-                auto A=mem.get(this->args[0]).get();
-                auto b=mem.get(this->args[1]).get();
-                auto output=mem.get(this->returns[0]).get();
-                cpu::max_scalar(*A, *b, *output);
+            void forward(mem::Mem &mem) override{
+                auto A=mem.gettensor<T>(this->args[0]);
+                auto b=mem.get<T>(this->args[1]);
+                auto output=mem.gettensor<T>(this->returns[0]);
+                cpu::max(*A, b, *output);
             }
 
-            void backward(mem::Mem<T> &mem) override{
-                
+            void backward(mem::Mem &mem) override{
+                auto A=mem.gettensor<T>(this->args[0]);
+                auto b=mem.gettensor<T>(this->args[1]);
+                auto A_grad=mem.gettensor<T>(this->returns_grad[0]);
+                auto output_grad=mem.gettensor<T>(this->args_grad[0]);
+                cpu::max_grad(*A, *b, *A_grad, *output_grad);
             }
     };
 }
