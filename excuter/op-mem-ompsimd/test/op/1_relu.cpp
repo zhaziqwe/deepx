@@ -1,13 +1,16 @@
 #include <functional>
 
-#include "deepx/op/op.hpp"
 
 #include "deepx/tensorfunc/print.hpp"
 #include "deepx/tensorfunc/new.hpp"
 #include "deepx/tensorfunc/init.hpp"
 #include "deepx/tensor.hpp"
 #include "deepx/tensorfunc/activite.hpp"
- 
+
+#include "deepx/op/op.hpp"
+#include "deepx/op/minmax.hpp"
+#include "deepx/op/activite.hpp"
+
 using namespace deepx::op;
 using namespace deepx;
 using namespace deepx::tensorfunc;
@@ -88,7 +91,7 @@ void test_relu()
     Tensor<float> tensor = New<float>({1, 2, 3});
     uniform(tensor, -1.0f, 1.0f);
     mem.add("tensor", std::make_shared<Tensor<float>>(tensor));
-    ReluInplace<float> reluInplace("tensor");
+    op::ReluInplace<float> reluInplace("tensor");
     reluInplace.forward(mem);
     print(*mem.gettensor<float>("tensor").get());
 }

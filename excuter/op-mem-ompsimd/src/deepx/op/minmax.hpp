@@ -37,7 +37,7 @@ namespace deepx::op{
                 auto A = mem.gettensor<T>(this->args[0]);
                 auto B = mem.gettensor<T>(this->args[1]);
                 auto output = mem.gettensor<T>(this->returns[0]);
-                max(*A, *B, *output);
+                deepx::tensorfunc::max(*A, *B, *output);
             }
 
             void backward(mem::Mem &mem) override
@@ -47,7 +47,7 @@ namespace deepx::op{
                 auto A_grad=mem.gettensor<T>(this->args_grad[0]);
                 auto B_grad=mem.gettensor<T>(this->args_grad[1]);
                 auto output_grad=mem.gettensor<T>(this->returns_grad[0]);
-                max_grad(*A, *B,  *A_grad, *B_grad, *output_grad);
+                deepx::tensorfunc::max_grad(*A, *B,  *A_grad, *B_grad, *output_grad);
             }
     };
 
@@ -78,7 +78,7 @@ namespace deepx::op{
                 auto A=mem.gettensor<T>(this->args[0]);
                 auto b=mem.get<T>(this->args[1]);
                 auto output=mem.gettensor<T>(this->returns[0]);
-                max(*A, b, *output);
+                deepx::tensorfunc::max(*A, b, *output);
             }
 
             void backward(mem::Mem &mem) override{
@@ -86,7 +86,7 @@ namespace deepx::op{
                 auto b=mem.get<T>(this->args[1]);
                 auto A_grad=mem.gettensor<T>(this->args_grad [0]);
                 auto output_grad=mem.gettensor<T>(this->returns_grad[0]);
-                max_grad(*A, b, *A_grad, *output_grad);
+                deepx::tensorfunc::max_grad(*A, b, *A_grad, *output_grad);
             }
     };
 
@@ -122,7 +122,7 @@ namespace deepx::op{
                 auto A=mem.gettensor<T>(this->args[0]);
                 auto B=mem.gettensor<T>(this->args[1]);
                 auto output=mem.gettensor<T>(this->returns[0]);
-                min(*A, *B, *output);
+                deepx::tensorfunc::min(*A, *B, *output);
             }
 
             void backward(mem::Mem &mem) override{
@@ -131,7 +131,7 @@ namespace deepx::op{
                 auto A_grad=mem.gettensor<T>(this->args_grad[0]);
                 auto B_grad=mem.gettensor<T>(this->args_grad[1]);
                 auto output_grad=mem.gettensor<T>(this->returns_grad[0]);
-                min_grad(*A, *B, *A_grad, *B_grad, *output_grad);
+                deepx::tensorfunc::min_grad(*A, *B, *A_grad, *B_grad, *output_grad);
             }
     };
 
@@ -162,7 +162,7 @@ namespace deepx::op{
                 auto A=mem.gettensor<T>(this->args[0]);
                 auto b=mem.get<T>(this->args[1]);
                 auto output=mem.gettensor<T>(this->returns[0]);
-                min(*A, b, *output);
+                deepx::tensorfunc::min(*A, b, *output);
             }
 
             void backward(mem::Mem &mem) override{
@@ -170,7 +170,7 @@ namespace deepx::op{
                 auto b=mem.get<T>(this->args[1]);
                 auto A_grad=mem.gettensor<T>(this->args_grad[0]);
                 auto output_grad=mem.gettensor<T>(this->returns_grad[0]);
-                min_grad(*A, b, *A_grad, *output_grad);
+                deepx::tensorfunc::min_grad(*A, b, *A_grad, *output_grad);
             }
     };
 }

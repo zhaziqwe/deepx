@@ -26,7 +26,7 @@ namespace deepx::op
 
         void forward(mem::Mem  &mem) override
         {
-            mem.set<T>(const_name(), cast<T>(0));
+            mem.add<T>(const_name(), T(0));
             max_scalar.forward(mem);
         };
         void backward(mem::Mem &mem) override
@@ -51,7 +51,7 @@ namespace deepx::op
         }
         void forward(mem::Mem &mem) override
         {
-            mem.set<T>(const_name(), cast<T>(0));
+            mem.add<T>(const_name(), T(0));
             max_scalar.forward(mem);
         };
         void backward(mem::Mem &mem) override
