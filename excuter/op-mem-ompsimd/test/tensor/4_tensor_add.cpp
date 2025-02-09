@@ -20,7 +20,7 @@ void test_add_inplace(){
     std::iota(b_int16.data,b_int16.data+b_int16.shape.size,2);
     print(a_int16,"%d");
     print(b_int16,"%d");
-    addInPlace(a_int16, b_int16);  
+    add(a_int16, b_int16,a_int16);  
     print(a_int16,"%d");
 
     Tensor<int8_t> a_int8=New<int8_t>(shape);   
@@ -29,7 +29,7 @@ void test_add_inplace(){
     std::iota(b_int8.data,b_int8.data+b_int8.shape.size,2);
     print(a_int8,"%d");
     print(b_int8,"%d");
-    addInPlace(a_int8, b_int8);
+    add(a_int8, b_int8,a_int8);
     print(a_int8,"%d");
 }
 void test_add_inplace_1(){
@@ -39,14 +39,14 @@ void test_add_inplace_1(){
     std::iota(b.data,b.data+b.shape.size,101.0f);
     print(a);
     print(b);
-    addInPlace(a, b);  
+    add(a, b,a);  
     print(a);
 }
 void test_add_inplace_scalar(){
     Tensor<float> a=New<float>({101});
     std::iota(a.data,a.data+a.shape.size,1.0f);
     print(a);
-    addInPlace(a, 100.0f);
+    add(a, 100.0f,a);
     print(a);
 }
 int main(int argc, char** argv){

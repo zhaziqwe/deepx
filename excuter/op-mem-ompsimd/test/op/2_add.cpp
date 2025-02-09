@@ -12,9 +12,9 @@ using namespace deepx::op;
 using namespace deepx;
 using namespace deepx::tensorfunc;  
 using namespace std;
-void test_add()
-{   
-    std::vector<int> shape = { 2, 3};
+
+Mem setmem(std::vector<int> shape)
+{
     Mem mem;
  
     mem.add<float>("a",New<float>(shape));
@@ -31,6 +31,13 @@ void test_add()
     mem.add<float>("c.grad",New<float>(shape));
     constant(*mem.gettensor<float>("c.grad").get(), 3.33f);
 
+    return mem;
+}
+void test_add()
+{   
+    std::vector<int> shape = { 2, 3};
+    Mem mem = setmem(shape);
+
     op::Add<float> add("a","b","c",true,"a.grad","b.grad","c.grad");
     add.forward(mem);
  
@@ -39,6 +46,17 @@ void test_add()
     print(*mem.gettensor<float>("a.grad").get());
     print(*mem.gettensor<float>("b.grad").get());
 }   
+void test_add_inplace()
+{
+    std::vector<int> shape = { 2, 3};
+    Mem mem = setmem(shape);
+    op::Add<float> add_inplace("a","b","a",true,"a.grad","b.grad","a.grad");
+    add_inplace.forward(mem);
+    print(*mem.gettensor<float>("a").get(),"%.2f");
+    add_inplace.backward(mem);
+    print(*mem.gettensor<float>("a.grad").get());
+    print(*mem.gettensor<float>("b.grad").get());
+}
 void test_add_scalar()
 {
     Mem mem;
@@ -63,7 +81,33 @@ void test_add_scalar()
     print(*mem.gettensor<float>("a.grad").get());
     cout<<"c.grad"<<endl;
     print(*mem.gettensor<float>("c.grad").get());
-    
+}
+void test_div()
+{
+    Mem mem;
+    std::vector<int> shape = { 2, 3};
+    mem.add<float>("a",New<float>(shape));
+    uniform(*mem.gettensor<float>("a").get(), -1.0f, 1.0f);
+
+    mem.add<float>("b",New<float>(shape));
+    constant(*mem.gettensor<float>("b").get(), 0.5f);
+
+    mem.add<float>("c",New<float>(shape));  
+
+    mem.add<float>("a.grad",New<float>(shape));
+    mem.add<float>("b.grad",New<float>(shape));
+    mem.add<float>("c.grad",New<float>(shape));
+    constant(*mem.gettensor<float>("c.grad").get(), 3.33f);
+
+    op::Div<float> div("a","b","c",true,"a.grad","b.grad","c.grad");
+    div.forward(mem);
+    cout<<"c=a/b"<<endl;
+    print(*mem.gettensor<float>("c").get(),"%.2f");
+    div.backward(mem);
+    cout<<"a.grad"<<endl;
+    print(*mem.gettensor<float>("a.grad").get());
+    cout<<"b.grad"<<endl;
+    print(*mem.gettensor<float>("b.grad").get());
 }
 int main(int argc, char **argv)
 {
@@ -75,6 +119,9 @@ int main(int argc, char **argv)
         break;
     case 2:
         test_add_scalar();
+        break;
+    case 3:
+        test_div();
         break;
     }
     return 0;

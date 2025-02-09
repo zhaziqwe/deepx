@@ -34,30 +34,5 @@ namespace deepx::op
             max_scalar.backward(mem);
         };
     };
-
-    template <typename T>
-    class ReluInplace : public Op<T>
-    {
-        private:
-        Op<T> max_scalar;
-    public:
-        const string const_name() {
-            return "const_"+dtype<T>::name()+"_0";
-        }
-        ReluInplace(string input,bool require_grad = false, string grad_input = "")
-        {
-            this->name = std::string("reluInplace") + "_" + dtype<float>::name();
-             max_scalar=Max_scalar<T>(input,const_name(),input,true, grad_input,grad_input);
-        }
-        void forward(mem::Mem &mem) override
-        {
-            mem.add<T>(const_name(), T(0));
-            max_scalar.forward(mem);
-        };
-        void backward(mem::Mem &mem) override
-        {
-            max_scalar.backward(mem);
-        };
-    };
 }
 #endif

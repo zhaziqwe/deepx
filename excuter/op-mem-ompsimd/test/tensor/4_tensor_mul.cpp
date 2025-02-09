@@ -19,7 +19,7 @@ void test_mul(){
     std::iota(b_int16.data,b_int16.data+b_int16.shape.size,2);
     print(a_int16,"%d");
     print(b_int16,"%d");
-    mulInPlace(a_int16, b_int16);  
+    mul(a_int16, b_int16,a_int16);  
     print(a_int16,"%d");
 
     Tensor<float> a_float=New<float>(shape);
@@ -28,7 +28,7 @@ void test_mul(){
     std::iota(b_float.data,b_float.data+b_float.shape.size,2.0f);
     print(a_float);
     print(b_float);
-    mulInPlace(a_float, b_float);  
+    mul(a_float, b_float,a_float);  
     print(a_float);
 }
 void test_mul_1(){
@@ -39,7 +39,7 @@ void test_mul_1(){
     std::iota(b.data,b.data+b.shape.size,101.0f);
     print(a);
     print(b);
-    mulInPlace(a, b);  
+    mul(a, b,a);  
     print(a);
 }
 void test_mul_scalar(){
@@ -47,7 +47,7 @@ void test_mul_scalar(){
     Tensor<float> a=New<float>(shape);
     std::iota(a.data,a.data+a.shape.size,1.0f);
     print(a);
-    mulInPlace(a, 100.0f);
+    mul(a, 100.0f,a);
     print(a);
 }
 int main(int argc, char** argv){

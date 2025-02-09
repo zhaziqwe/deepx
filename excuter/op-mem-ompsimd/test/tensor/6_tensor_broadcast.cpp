@@ -33,7 +33,7 @@ void bench_broadcast_add(int i){
     uniform(other,0.0f,1.0f);
     std::cout <<  "broadcast add "<<tensor.shape.shape<<std::endl;
     auto start = std::chrono::high_resolution_clock::now();
-    addInPlace(tensor, other);
+    add(tensor, other,tensor);
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
     std::cout << "time:" << duration.count() << " seconds" << std::endl;
@@ -45,7 +45,7 @@ void bench_broadcast_mul(int i){
     uniform(other,0.0f,1.0f);
     std::cout <<  "broadcast mul "<<tensor.shape.shape<<std::endl;
     auto start = std::chrono::high_resolution_clock::now();
-    mulInPlace(tensor, other);
+    mul(tensor, other,tensor);
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
     std::cout << "time:" << duration.count() << " seconds" << std::endl;
