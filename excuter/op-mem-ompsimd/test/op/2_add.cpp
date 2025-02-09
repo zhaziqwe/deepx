@@ -84,26 +84,20 @@ void test_add_scalar()
 }
 void test_div()
 {
-    Mem mem;
     std::vector<int> shape = { 2, 3};
-    mem.add<float>("a",New<float>(shape));
-    uniform(*mem.gettensor<float>("a").get(), -1.0f, 1.0f);
-
-    mem.add<float>("b",New<float>(shape));
-    constant(*mem.gettensor<float>("b").get(), 0.5f);
-
-    mem.add<float>("c",New<float>(shape));  
-
-    mem.add<float>("a.grad",New<float>(shape));
-    mem.add<float>("b.grad",New<float>(shape));
-    mem.add<float>("c.grad",New<float>(shape));
-    constant(*mem.gettensor<float>("c.grad").get(), 3.33f);
+    Mem mem = setmem(shape);
 
     op::Div<float> div("a","b","c",true,"a.grad","b.grad","c.grad");
     div.forward(mem);
+    cout<<"a"<<endl;
+    print(*mem.gettensor<float>("a").get());
+    cout<<"b"<<endl;
+    print(*mem.gettensor<float>("b").get());
     cout<<"c=a/b"<<endl;
     print(*mem.gettensor<float>("c").get(),"%.2f");
     div.backward(mem);
+    cout<<"c.grad"<<endl;
+    print(*mem.gettensor<float>("c.grad").get());
     cout<<"a.grad"<<endl;
     print(*mem.gettensor<float>("a.grad").get());
     cout<<"b.grad"<<endl;

@@ -10,7 +10,7 @@
 #include "tensorutil.hpp"
 using namespace deepx;
 using namespace deepx::tensorfunc;
-
+using namespace std;
 
 void test_add_inplace(){
     std::vector<int> shape=randomshape(1,3,1,55);
@@ -45,8 +45,10 @@ void test_add_inplace_1(){
 void test_add_inplace_scalar(){
     Tensor<float> a=New<float>({101});
     std::iota(a.data,a.data+a.shape.size,1.0f);
+    cout<<"a"<<endl;
     print(a);
     add(a, 100.0f,a);
+    cout<<"a"<<endl;
     print(a);
 }
 int main(int argc, char** argv){

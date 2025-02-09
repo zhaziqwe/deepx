@@ -7,3 +7,6 @@ target_link_libraries(1_relu deepx)
 
 add_executable(2_add 2_add.cpp)
 target_link_libraries(2_add deepx)
+
+add_executable(3_matmul 3_matmul.cpp)
+target_link_libraries(3_matmul deepx)

@@ -72,17 +72,21 @@ namespace deepx
          */
         
  
-        Tensor(Tensor<T> &&tensor) noexcept {
-            shape=tensor.shape;
-            shape.dtype=dtype<T>::name();
-            device=tensor.device;
+        Tensor(Tensor<T> &&other) noexcept {
+            shape=std::move(other.shape);
+            device=other.device;
 
-            deleter=tensor.deleter;
-            copyer=tensor.copyer;
-            newer=tensor.newer;
+            deleter=other.deleter;
+            copyer=other.copyer;
+            newer=other.newer;
 
-            data=tensor.data;
-            tensor.data=nullptr;
+            data=other.data;
+
+            other.data=nullptr;
+
+            other.deleter=nullptr;
+            other.copyer=nullptr;
+            other.newer=nullptr;
         }
        
         /**
@@ -130,6 +134,9 @@ namespace deepx
             }
             data=tensor.data;
             tensor.data=nullptr;
+            tensor.deleter=nullptr;
+            tensor.copyer=nullptr;
+            tensor.newer=nullptr;
             return *this;
         }
 

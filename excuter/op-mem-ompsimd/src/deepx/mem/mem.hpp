@@ -4,8 +4,10 @@
 #include <any>
 #include <unordered_map>
 #include <vector>
+#include <atomic>
 #include <memory>
 #include "deepx/tensor.hpp"
+#include "deepx/tensorfunc/new.hpp"
 
 namespace deepx::mem
 {
@@ -16,6 +18,8 @@ namespace deepx::mem
         unordered_map<string, std::any> args;
 
         std::unordered_map<int, std::unordered_map<std::string, std::shared_ptr<void>>> mem;
+        int tempidx=0;
+
         template <typename T>
         static std::shared_ptr<void> type_erase(const std::shared_ptr<Tensor<T>> &ptr)
         {
@@ -79,7 +83,7 @@ namespace deepx::mem
         }
 
         template <typename T>
-        void add(const string &name, Tensor<T> && tensor)
+        void add(const string &name, Tensor<T> &&tensor)
         {
             constexpr int type_code = dtype<T>::value;
             auto ptr = std::make_shared<Tensor<T>>(std::move(tensor));
@@ -87,13 +91,28 @@ namespace deepx::mem
         }
 
         template <typename T>
-        void add(const string &name,const Tensor<T> &tensor)
+        void add(const string &name, const Tensor<T> &tensor)
         {
+            if (exists<T>(name))
+            {
+                throw std::runtime_error("Tensor already exists: " + name);
+            }
             constexpr int type_code = dtype<T>::value;
-            auto ptr = std::make_shared<Tensor<T>>( tensor);
+            auto ptr = std::make_shared<Tensor<T>>(tensor);
             mem[type_code][name] = type_erase(ptr);
         }
 
+        template <typename T>
+        shared_ptr<Tensor<T>> temptensor(vector<int> shape)
+        {
+            // 直接构造到shared_ptr避免移动
+            auto temp = tensorfunc::New<T>(shape);  // 临时对象
+            auto cloned = make_shared<Tensor<T>>(std::move(temp));  
+             constexpr int type_code = dtype<T>::value;
+            mem[type_code]["temp"+to_string(tempidx)]=type_erase(cloned);
+            tempidx++;
+            return cloned;
+        }
         template <typename T>
         bool exists(const string &name) const
         {

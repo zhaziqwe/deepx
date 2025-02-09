@@ -5,9 +5,13 @@
 #include "deepx/tensorfunc/elementwise.hpp"
 #include "deepx/dtype.hpp"
 
+#include "deepx/mem/mem.hpp"
+
 namespace deepx::op
 {
- 
+    using namespace std;
+    using namespace deepx::mem;
+
     template <typename T>
     class Add : public Op<T>
     {
@@ -215,6 +219,7 @@ namespace deepx::op
             auto c = mem.gettensor<T>(this->returns[0]).get();
             deepx::tensorfunc::mul(*a, *b, *c);
         }
+        // 需要累计梯度
         void backward(mem::Mem &mem) override
         {
             auto a = mem.gettensor<T>(this->args[0]).get();  // 需要用到前向传播的输入
@@ -225,13 +230,68 @@ namespace deepx::op
             
             // 乘法的反向传播：
             // 对于 c = a * b
+
+
             // ∂L/∂a = ∂L/∂c * ∂c/∂a = ∂L/∂c * b
-            deepx::tensorfunc::mul(*b, *c_grad, *a_grad);  // a_grad = b * c_grad
+            deepx::tensorfunc::muladd(*b, *c_grad,*a_grad, *a_grad);  // a_grad = b * c_grad
             
             // ∂L/∂b = ∂L/∂c * ∂c/∂b = ∂L/∂c * a
-            deepx::tensorfunc::mul(*a, *c_grad, *b_grad);  // b_grad = a * c_grad
+            deepx::tensorfunc::muladd(*a, *c_grad, *b_grad, *b_grad);  // b_grad = a * c_grad
         }
     };
+
+    template <typename T>
+    class Mul_scalar : public Op<T>
+    {
+    public:
+        Mul_scalar(string a, string b, string c, bool require_grad = false, string a_grad = "", string c_grad = "")
+        {
+            this->name = std::string("mul_scalar") + "_" + dtype<T>::name();
+            this->args.push_back(a);
+            this->args.push_back(b);
+            this->returns.push_back(c);
+            if (require_grad)
+            {
+                if (a_grad != "")
+                {
+                    this->args_grad.push_back(a_grad);
+                }
+                else
+                {
+                    this->args_grad.push_back(a + ".grad");
+                }
+                if (c_grad != "")
+                {
+                    this->returns_grad.push_back(c_grad);
+                }
+                else
+                {
+                    this->returns_grad.push_back(c + ".grad");
+                }
+            }
+        }
+        void forward(mem::Mem &mem) override    
+        {
+            auto a = mem.gettensor<T>(this->args[0]).get();
+            auto b = mem.get<T>(this->args[1]);
+            auto c = mem.gettensor<T>(this->returns[0]);
+            deepx::tensorfunc::mul(*a, b, *c);
+        }
+        void backward(mem::Mem &mem) override
+        {
+            // 需要用到前向传播的标量输入b
+            auto b = mem.get<T>(this->args[1]);  // 获取标量b
+            auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
+            auto c_grad = mem.gettensor<T>(this->returns_grad[0]).get();
+            
+            // 标量乘法的反向传播：
+            // 对于 c = a * b，其中b是标量
+            // ∂L/∂a = ∂L/∂c * ∂c/∂a = ∂L/∂c * b
+            deepx::tensorfunc::muladd(*c_grad, b, *a_grad, *a_grad);  // a_grad = c_grad * b
+            // 标量b不需要计算梯度
+        }
+    };
+
     template <typename T>
     class Div : public Op<T>
     {
@@ -290,14 +350,14 @@ namespace deepx::op
             // 对于 c = a/b
             // ∂L/∂a = ∂L/∂c * ∂c/∂a = ∂L/∂c * (1/b)
              // a_grad = c_grad / b
-            deepx::tensorfunc::div(*c_grad, *b, *a_grad); 
+            deepx::tensorfunc::divadd(*c_grad, *b, *a_grad, *a_grad); 
             
             // ∂L/∂b = ∂L/∂c * ∂c/∂b 
             // ∂L/∂b = ∂L/∂c * (-a/b²) 
             //或 ∂L/∂b= -c_grad * (c/b)
-            deepx::tensorfunc::div(*c, *b, *b_grad);      // temp = c/b
-            deepx::tensorfunc::mul(*c_grad, *b_grad, *b_grad); // b_grad = c_grad * (c/b)
-            deepx::tensorfunc::mul(*b_grad, T(-1), *b_grad);     // b_grad = -c_grad * (c/b)
+            auto temp_tensor=mem.temptensor<T>(b->shape.shape).get();
+            deepx::tensorfunc::div(*c, *b, *temp_tensor);      // temp = c/b
+            deepx::tensorfunc::muladd(*c_grad, *temp_tensor, T(-1), *b_grad,T(1), *b_grad);     // b_grad = -c_grad * temp
         }
     };
     template <typename T>
@@ -347,15 +407,91 @@ namespace deepx::op
         }
         void backward(mem::Mem &mem) override
         {
-            auto b=mem.gettensor<T>(this->args[1]).get();
+            // 需要用到前向传播的输入和输出
+            auto a = mem.gettensor<T>(this->args[0]).get();
+            auto b = mem.gettensor<T>(this->args[1]).get();
+            auto c = mem.gettensor<T>(this->returns[0]).get();  // c = a^b
             auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
             auto b_grad = mem.gettensor<T>(this->args_grad[1]).get();
             auto c_grad = mem.gettensor<T>(this->returns_grad[0]).get();
-            deepx::tensorfunc::mul(*a_grad, *c_grad, *a_grad);
-            deepx::tensorfunc::mul(*b_grad, *c_grad, *b_grad);
-            deepx::tensorfunc::mul(*b_grad, *b, *b_grad);
+            
+            // 幂运算的反向传播：
+            // 对于 c = a^b
+            
+            // 对a的偏导：
+            // ∂L/∂a = ∂L/∂c * ∂c/∂a = c_grad * b * a^(b-1)
+            // = c_grad * b * (c/a)  【因为c=a^b，所以a^(b-1)=c/a】
+            deepx::tensorfunc::div(*c, *a, *a_grad);     // temp = c/a
+            deepx::tensorfunc::mul(*a_grad, *b, *a_grad);  // temp = b * (c/a)
+            deepx::tensorfunc::mul(*a_grad, *c_grad, *a_grad);  // a_grad = c_grad * b * (c/a)
+            
+            // 对b的偏导：
+            // ∂L/∂b = ∂L/∂c * ∂c/∂b = c_grad * c * ln(a)
+            deepx::tensorfunc::log(*a, *b_grad);  // temp = ln(a)
+            deepx::tensorfunc::mul(*b_grad, *c, *b_grad);  // temp = c * ln(a)
+            deepx::tensorfunc::mul(*b_grad, *c_grad, *b_grad);  // b_grad = c_grad * c * ln(a)
         }
     };
+
+
+    template <typename T>
+    class Pow_scalar : public Op<T>
+    {
+    public:
+        Pow_scalar(string a, string b, string c, bool require_grad = false, string a_grad = "", string c_grad = "")
+        {
+            this->name = std::string("pow_scalar") + "_" + dtype<T>::name();
+            this->args.push_back(a);
+            this->args.push_back(b);
+            this->returns.push_back(c);
+            if (require_grad)
+            {   
+                if (a_grad != "")
+                {
+                    this->args_grad.push_back(a_grad);
+                }
+                else
+                {   
+                    this->args_grad.push_back(a + ".grad");
+                }
+                if (c_grad != "")
+                {
+                    this->returns_grad.push_back(c_grad);
+                }   
+                else
+                {
+                    this->returns_grad.push_back(c + ".grad");
+                }
+            }
+        }
+        void forward(mem::Mem &mem) override
+        {
+            auto a = mem.gettensor<T>(this->args[0]).get();
+            auto b = mem.get<T>(this->args[1]);
+            auto c = mem.gettensor<T>(this->returns[0]);
+            deepx::tensorfunc::pow(*a, b, *c);
+        }   
+        void backward(mem::Mem &mem) override
+        {
+            // 需要用到前向传播的输入、输出和标量指数
+            auto a = mem.gettensor<T>(this->args[0]).get();
+            auto b = mem.get<T>(this->args[1]);  // 标量指数
+            auto c = mem.gettensor<T>(this->returns[0]).get();  // c = a^b
+            auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
+            auto c_grad = mem.gettensor<T>(this->returns_grad[0]).get();
+            
+            // 标量幂运算的反向传播：
+            // 对于 c = a^b，其中b是标量
+            // ∂L/∂a = ∂L/∂c * ∂c/∂a = c_grad * b * a^(b-1)
+            // = c_grad * b * (c/a)  【因为c=a^b，所以a^(b-1)=c/a】
+            deepx::tensorfunc::div(*c, *a, *a_grad);     // temp = c/a
+            deepx::tensorfunc::mul(*a_grad, b, *a_grad);  // temp = b * (c/a)
+            deepx::tensorfunc::mul(*a_grad, *c_grad, *a_grad);  // a_grad = c_grad * b * (c/a)
+            // 标量b不需要计算梯度
+        }
+    };
+
+
     template <typename T>
     class Log : public Op<T>
     {

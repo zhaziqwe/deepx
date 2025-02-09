@@ -320,7 +320,103 @@ namespace deepx::tensorfunc
         }
     }
 
- 
+    template <typename T>
+    void muladd(const Tensor<T> &A, const Tensor<T> &B, const Tensor<T> &C,const Tensor<T> &D)
+    {
+        if (A.shape == B.shape && A.shape == C.shape && A.shape == D.shape)
+        {
+            D.shape.rangeParallel(D.shape.dim - 1, [&A, &B, &C, &D](int i)
+                                  {
+                int shape_last=D.shape[-1];
+                const ScalableTag<T> tag;
+                const size_t lanes = Lanes(tag);
+                size_t j=0;
+
+                // 1. 处理前置未对齐部分
+                while (j < shape_last && !IsAligned(tag,A.data + i + j)) {
+                    D.data[i+j] = A.data[i+j] * B.data[i+j] + C.data[i+j];
+                    ++j;
+                }
+
+                // 2. 处理中间对齐部分
+                size_t aligned_end=shape_last-(shape_last%lanes);
+                for (; j+lanes<=aligned_end; j +=  lanes  )
+                {
+                    auto vec1 = Load(tag, A.data + i + j);
+                    auto vec2 = Load(tag, B.data + i + j);
+                    auto vec3 = Load(tag, C.data + i + j);
+                    auto vec_result = MulAdd(vec1, vec2, vec3);
+                    Store(vec_result, tag, D.data + i + j);
+                }
+
+                // 3. 处理尾部剩余元素
+                for (;j<shape_last;j++)
+                {
+                    D.data[i+j] = A.data[i+j] * B.data[i+j] + C.data[i+j];
+                } });
+        }
+        else
+        {
+            throw std::invalid_argument("shape mismatch");
+        }
+    }
+
+    //muladd
+    // D = alpha*A*B + beta*C
+   template <typename T>
+    void muladd(const Tensor<T> &A, const Tensor<T> &B,const T alpha, const Tensor<T> &C,const T beta,const Tensor<T> &D)
+    {
+        if (A.shape == B.shape && A.shape == C.shape && A.shape == D.shape)
+        {
+            D.shape.rangeParallel(D.shape.dim - 1, [&A, &B, &alpha, &C, &beta, &D](int i)
+                                  {
+                int shape_last=D.shape[-1];
+                const ScalableTag<T> tag;
+                const size_t lanes = Lanes(tag);
+                size_t j=0;
+
+                // 1. 处理前置未对齐部分
+                while (j < shape_last && !IsAligned(tag,A.data + i + j)) {
+                    D.data[i+j] = alpha * A.data[i+j] * B.data[i+j] + beta * C.data[i+j];
+                    ++j;
+                }
+
+                // 2. 处理中间对齐部分
+                size_t aligned_end=shape_last-(shape_last%lanes);
+                for (; j+lanes<=aligned_end; j +=  lanes  )
+                {
+                    auto vec1 = Load(tag, A.data + i + j);
+                    auto vec2 = Load(tag, B.data + i + j);
+                    auto alpha_vec = Set(tag, alpha);
+                    auto beta_vec = Set(tag, beta);
+                    if (alpha != 1.0)
+                    {
+                        vec1 = Mul(vec1, alpha_vec);
+                    }
+                    if (beta != 0.0)
+                    {
+                        auto vec3 = Load(tag, C.data + i + j);
+                        vec3 = Mul(vec3, beta_vec);
+                        auto vec_result = MulAdd(vec1, vec2, vec3);
+                        Store(vec_result, tag, D.data + i + j);
+                    }else{
+                        auto vec_result = Mul(vec1, vec2);
+                        Store(vec_result, tag, D.data + i + j);
+                    }
+                   
+                }
+
+                // 3. 处理尾部剩余元素
+                for (;j<shape_last;j++)
+                {
+                    D.data[i+j] = alpha * A.data[i+j] * B.data[i+j] + beta * C.data[i+j];
+                } });
+        }
+        else
+        {
+            throw std::invalid_argument("shape mismatch");
+        }
+    }
     
     template <typename T>
     void mul(const Tensor<T> &input, const T value, Tensor<T> &output)
@@ -394,6 +490,47 @@ namespace deepx::tensorfunc
                 for (;j<shape_last;j++)
                 {
                     C.data[i+j] = A.data[i+j] / B.data[i+j];
+                } });
+        }
+        else
+        {
+            throw std::invalid_argument("shape mismatch");
+        }
+    }
+ 
+    template <typename T>
+    void divadd(const Tensor<T> &A, const Tensor<T> &B, const Tensor<T> &C,const Tensor<T> &D)
+    {
+        if (A.shape == B.shape && A.shape == C.shape && A.shape == D.shape)
+        {
+            D.shape.rangeParallel(D.shape.dim - 1, [&A, &B, &C, &D](int i)
+                                  {
+                int shape_last=D.shape[-1];
+                const ScalableTag<T> tag;
+                const size_t lanes = Lanes(tag);
+                size_t j=0;
+
+                // 1. 处理前置未对齐部分
+                while (j < shape_last && !IsAligned(tag,A.data + i + j)) {
+                    D.data[i+j] = A.data[i+j] / B.data[i+j] + C.data[i+j];
+                    ++j;
+                }
+
+                // 2. 处理中间对齐部分
+                size_t aligned_end=shape_last-(shape_last%lanes);
+                for (; j+lanes<=aligned_end; j +=  lanes  )
+                {
+                    auto vec1 = Load(tag, A.data + i + j);
+                    auto vec2 = Load(tag, B.data + i + j);
+                    auto vec3 = Load(tag, C.data + i + j);
+                    auto vec_result = Add(Div(vec1, vec2), vec3);
+                    Store(vec_result, tag, D.data + i + j);
+                }
+
+                // 3. 处理尾部剩余元素
+                for (;j<shape_last;j++)
+                {
+                    D.data[i+j] = A.data[i+j] / B.data[i+j] + C.data[i+j];
                 } });
         }
         else
