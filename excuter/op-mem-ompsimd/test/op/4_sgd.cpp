@@ -18,7 +18,7 @@ Mem setmem(std::vector<int> shape,int k)
     Shape shape_a(shape);
     shape_a[-1]=k;
     mem.add<float>("a",New<float>(shape_a.shape));
-    arange<float>(*mem.gettensor<float>("a").get(), 0, 1); 
+    arange<float>(*mem.gettensor<float>("a").get(), 1, 1);
 
     Shape shape_b(shape);
     shape_b[-2]=k;
@@ -39,9 +39,9 @@ void sgd(mem::Mem &mem,vector<string> &args,float learnrate)
 {
     for (auto &arg : args)
     {
-        Tensor<float> t = *mem.gettensor<float>(arg).get();
-        Tensor<float> t_grad = *mem.gettensor<float>(arg + ".grad").get();
-        muladd<float>(t_grad, learnrate *-1.0f ,t, 1.0f ,t);
+        Tensor<float>* t = mem.gettensor<float>(arg).get();
+        Tensor<float>* t_grad =mem.gettensor<float>(arg + ".grad").get();
+        muladd<float>(*t_grad, learnrate *-1.0f ,*t, 1.0f ,*t);
     }
 }
 
@@ -50,16 +50,18 @@ void test_sgd()
     Mem mem = setmem({2,3},4);
     std::vector<string>  args={"a","b"};
     cout<<"a"<<endl;
-     print(*mem.gettensor<float>("a").get());
+    Tensor<float> *a=mem.gettensor<float>("a").get();
+    print(*a);
     cout<<"b"<<endl;
-    print(*mem.gettensor<float>("b").get());
+    Tensor<float> *b=mem.gettensor<float>("b").get();
+    print(*b);
     
     cout<<"sgd:"<<endl;
-    sgd(mem,args,0.01f);
+    sgd(mem,args,0.1f);
     cout<<"a"<<endl;
-    print(*mem.gettensor<float>("a").get());
+    print(*mem.gettensor<float>("a").get(),"%.4f");
     cout<<"b"<<endl;
-    print(*mem.gettensor<float>("b").get());
+    print(*mem.gettensor<float>("b").get(),"%.4f");
 }
 
 int main(int argc, char **argv)
