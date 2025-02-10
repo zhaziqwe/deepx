@@ -10,3 +10,6 @@ target_link_libraries(2_add deepx)
 
 add_executable(3_matmul 3_matmul.cpp)
 target_link_libraries(3_matmul deepx)
+
+add_executable(4_sgd 4_sgd.cpp)
+target_link_libraries(4_sgd deepx)
