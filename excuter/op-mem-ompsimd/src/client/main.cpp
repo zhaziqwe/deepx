@@ -21,7 +21,7 @@ int main()
 {
     Mem  mem;   
     deepx::Tensor<float> tensor =  New<float>({1, 2, 3});
-     uniform(tensor,-1.0f,1.0f);
+    uniform(tensor,-1.0f,1.0f);
     mem.add("tensor", std::make_shared<deepx::Tensor<float>>(tensor));
 
     deepx::Tensor<float> result = New<float>({1, 2, 3});
