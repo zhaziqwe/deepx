@@ -1,0 +1,15 @@
+digraph computational_graph {
+  rankdir=LR;
+  node [shape=record];
+  
+  "0x1234" [label="Tensor|x|shape [3 4]", shape=ellipse];
+  "0x5678" [label="Tensor|W|shape [4 2]", shape=ellipse];
+  "0x9abc" [label="MatMul|matmul", shape=rectangle];
+  "0xdef0" [label="Tensor|bias|shape [2]", shape=ellipse];
+  "0x1357" [label="Add|add", shape=rectangle];
+  
+  "0x1234" -> "0x9abc" [label="MatMul"];
+  "0x5678" -> "0x9abc" [label="MatMul"];
+  "0x9abc" -> "0x1357";
+  "0xdef0" -> "0x1357" [label="+"];
+}
