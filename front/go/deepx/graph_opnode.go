@@ -7,10 +7,10 @@ type OpNode struct {
 	op     OpType
 }
 
-func NewOpNode(name string, ntype NodeType, op OpType) *OpNode {
+func NewOpNode(name string, op OpType) *OpNode {
 	return &OpNode{
 		name:   name,
-		ntype:  ntype,
+		ntype:  NodeOp,
 		inputs: make(map[string]Node),
 		op:     op,
 	}

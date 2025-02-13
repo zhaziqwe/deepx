@@ -23,8 +23,11 @@ const (
 )
 
 type Graph struct {
-	nodes         []Node
-	tensorCounter int // 新增计数器字段
+	nodes           []Node
+	tensorCounter   int // 新增计数器字段
+	opCounter       int // 新增计数器字段
+	constArgCounter int // 新增计数器字段
+
 }
 
 // 创建新图
@@ -40,7 +43,7 @@ func (g *Graph) AddTensor(name string, dtype Dtype, shape []int, inputs ...Node)
 		name = fmt.Sprintf("tensor_%d", g.tensorCounter)
 		g.tensorCounter++
 	}
-	node := NewTensorNode(name, NodeTensor)
+	node := NewTensorNode(name)
 	node.SetTensor(&Tensor{
 		Dtype: dtype,
 		graph: g,
@@ -56,10 +59,23 @@ func (g *Graph) AddTensor(name string, dtype Dtype, shape []int, inputs ...Node)
 
 // 添加操作节点
 func (g *Graph) AddOp(name string, opType OpType, inputs ...Node) *OpNode {
-	node := NewOpNode(name, NodeOp, opType)
+	if name == "" {
+		name = fmt.Sprintf("op_%d", g.opCounter)
+		g.opCounter++
+	}
+	node := NewOpNode(name, opType)
 	for _, input := range inputs {
 		node.AddInput(input.Name(), input)
 	}
+	g.nodes = append(g.nodes, node)
+	return node
+}
+func (g *Graph) AddConstArg(name string) *ConstArgNode {
+	if name == "" {
+		name = fmt.Sprintf("const_%d", g.constArgCounter)
+		g.constArgCounter++
+	}
+	node := NewConstArgNode(name)
 	g.nodes = append(g.nodes, node)
 	return node
 }

@@ -7,10 +7,10 @@ type TensorNode struct {
 	tensor *Tensor // 对于 NodeTensor 类型，存储实际的张量数据
 }
 
-func NewTensorNode(name string, ntype NodeType) *TensorNode {
+func NewTensorNode(name string) *TensorNode {
 	return &TensorNode{
 		name:   name,
-		ntype:  ntype,
+		ntype:  NodeTensor,
 		inputs: make(map[string]Node),
 	}
 }
