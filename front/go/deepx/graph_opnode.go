@@ -1,18 +1,18 @@
 package deepx
 
 type OpNode struct {
-	name   string
-	ntype  NodeType
-	inputs map[string]Node
-	op     OpType
+	name      string
+	shortchar string
+	ntype     NodeType
+	inputs    map[string]Node
 }
 
-func NewOpNode(name string, op OpType) *OpNode {
+func NewOpNode(name string, shortchar string) *OpNode {
 	return &OpNode{
-		name:   name,
-		ntype:  NodeOp,
-		inputs: make(map[string]Node),
-		op:     op,
+		name:      name,
+		shortchar: shortchar,
+		ntype:     NodeOp,
+		inputs:    make(map[string]Node),
 	}
 }
 func (n *OpNode) Ntype() NodeType {
@@ -33,6 +33,6 @@ func (n *OpNode) AddInput(name string, input Node) {
 func (n *OpNode) RemoveInput(name string) {
 	delete(n.inputs, name)
 }
-func (n *OpNode) Op() OpType {
-	return n.op
+func (n *OpNode) Shortchar() string {
+	return n.shortchar
 }

@@ -24,10 +24,10 @@ const (
 
 type Graph struct {
 	nodes           []Node
-	tensorCounter   int // 新增计数器字段
-	opCounter       int // 新增计数器字段
-	constArgCounter int // 新增计数器字段
-
+	tensorCounter   int
+	opCounter       int
+	constArgCounter int
+	enableGrad      bool
 }
 
 // 创建新图
@@ -38,17 +38,18 @@ func NewGraph() *Graph {
 }
 
 // 添加张量节点
-func (g *Graph) AddTensor(name string, dtype Dtype, shape []int, inputs ...Node) *TensorNode {
+func (g *Graph) AddTensor(name string, dtype Dtype, shape []int, requiresGrad bool, inputs ...Node) *TensorNode {
 	if name == "" {
 		name = fmt.Sprintf("tensor_%d", g.tensorCounter)
 		g.tensorCounter++
 	}
 	node := NewTensorNode(name)
 	node.SetTensor(&Tensor{
-		Dtype: dtype,
-		graph: g,
-		Shape: NewTensorShape(shape),
-		node:  node,
+		Dtype:        dtype,
+		graph:        g,
+		Shape:        NewTensorShape(shape),
+		node:         node,
+		requiresGrad: requiresGrad,
 	})
 	for _, input := range inputs {
 		node.AddInput(input.Name(), input)
@@ -58,12 +59,15 @@ func (g *Graph) AddTensor(name string, dtype Dtype, shape []int, inputs ...Node)
 }
 
 // 添加操作节点
-func (g *Graph) AddOp(name string, opType OpType, inputs ...Node) *OpNode {
+func (g *Graph) AddOp(name string, shortchar string, inputs ...Node) *OpNode {
 	if name == "" {
 		name = fmt.Sprintf("op_%d", g.opCounter)
 		g.opCounter++
 	}
-	node := NewOpNode(name, opType)
+	if shortchar == "" {
+		shortchar = name
+	}
+	node := NewOpNode(name, shortchar)
 	for _, input := range inputs {
 		node.AddInput(input.Name(), input)
 	}
@@ -95,24 +99,59 @@ func (g *Graph) ToDOT() string {
 
 	// 遍历所有节点
 	for _, node := range g.nodes {
-		// 根据节点类型设置不同样式
+		builder.WriteString(fmt.Sprintf(`"%p" `, node))
 		switch node.Ntype() {
 		case NodeTensor:
-			builder.WriteString(fmt.Sprintf("  \"%p\" [label=\"%s%v\", shape=ellipse];\n",
-				node, node.Name(), node.(*TensorNode).Tensor().Shape))
+			// 张量节点：显示形状和梯度信息
+			builder.WriteString(fmt.Sprintf(`[label= "%s \n %v`, node.Name(), node.(*TensorNode).Tensor().Shape))
+			if node.(*TensorNode).Tensor().requiresGrad {
+				builder.WriteString(`\n require_grad"`)
+			} else {
+				builder.WriteString(`"`)
+			}
+			builder.WriteString(",shape=box")
+			builder.WriteString(",color=skyblue")
+			builder.WriteString(",style=filled")
+			builder.WriteString(",fillcolor=aliceblue")
+			builder.WriteString(",fontname=\"Sans-Serif\"")
+
 		case NodeOp:
-			builder.WriteString(fmt.Sprintf("  \"%p\" [label=\"%s\", shape=rectangle];\n",
-				node, node.Name()))
+			// 操作节点：突出显示操作类型
+			opNode := node.(*OpNode)
+			builder.WriteString(fmt.Sprintf(`[label="%s\n(%s)"`, opNode.Name(), opNode.Shortchar()))
+			builder.WriteString(",shape=box")
+			builder.WriteString(",style=filled")
+			builder.WriteString(",fillcolor=lightgray")
+			builder.WriteString(",color=darkslategray")
+			builder.WriteString(",fontname=\"Courier Bold\"")
+
 		case NodeConstArg:
-			builder.WriteString(fmt.Sprintf("  \"%p\" [label=\"const%s\", shape=diamond];\n",
-				node, node.Name()))
+			// 常量参数节点：显示参数值
+			constNode := node.(*ConstArgNode)
+			var valueStr string
+			switch constNode.argType {
+			case ArgTypeInt:
+				valueStr = fmt.Sprintf("%d", constNode.Int())
+			case ArgTypeFloat:
+				valueStr = fmt.Sprintf("%.2f", constNode.Float())
+			case ArgTypeString:
+				valueStr = constNode.String()
+			}
+			builder.WriteString(fmt.Sprintf(`[label="%s\n%s"`, constNode.Name(), valueStr))
+			builder.WriteString(",shape=diamond")
+			builder.WriteString(",style=filled")
+			builder.WriteString(",fillcolor=lightyellow")
+			builder.WriteString(",color=goldenrod")
+			builder.WriteString(",fontname=\"Sans-Serif\"")
 		}
+		builder.WriteString("];\n")
 	}
 
-	// 添加边连接
+	// 添加边连接，为边也添加样式
 	for _, node := range g.nodes {
 		for _, input := range node.Inputs() {
-			builder.WriteString(fmt.Sprintf("  \"%p\" -> \"%p\"", input, node))
+			builder.WriteString(fmt.Sprintf(`  "%p" -> "%p"`, input, node))
+			builder.WriteString(`[color=gray40,penwidth=1.2,arrowsize=0.8]`)
 			builder.WriteString(";\n")
 		}
 	}

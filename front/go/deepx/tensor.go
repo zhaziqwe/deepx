@@ -39,46 +39,17 @@ const (
 )
 
 type Tensor struct {
-	Data  []byte
-	Dtype Dtype
-	Shape Shape
-	graph *Graph      // 所属计算图
-	node  *TensorNode // 对应的计算图节点
+	Data         []byte
+	Dtype        Dtype
+	Shape        Shape
+	graph        *Graph      // 所属计算图
+	node         *TensorNode // 对应的计算图节点
+	requiresGrad bool
 }
 
-func (t *Tensor) Add(other *Tensor) *Tensor {
-	// 创建新Tensor（继承graph）
-	result := t.graph.AddTensor("", t.Dtype, t.Shape.shape)
-	// 添加操作节点
-	op := t.graph.AddOp("add", OpAdd, t.node, other.node)
-	result.AddInput(op.name, op)
-	return result.tensor
-}
-
-func (t *Tensor) Sub(other *Tensor) *Tensor {
-	result := t.graph.AddTensor("", t.Dtype, t.Shape.shape)
-	// 添加操作节点
-	op := t.graph.AddOp("sub", OpSub, t.node, other.node)
-	result.AddInput(op.name, op)
-	return result.tensor
-}
-func (t *Tensor) Mul(other *Tensor) *Tensor {
-	result := t.graph.AddTensor("", t.Dtype, t.Shape.shape)
-	// 添加操作节点
-	op := t.graph.AddOp("mul", OpMul, t.node, other.node)
-	result.AddInput(op.name, op)
-	return result.tensor
-}
-func (t *Tensor) Div(other *Tensor) *Tensor {
-	result := t.graph.AddTensor("", t.Dtype, t.Shape.shape)
-	// 添加操作节点
-	op := t.graph.AddOp("div", OpDiv, t.node, other.node)
-	result.AddInput(op.name, op)
-	return result.tensor
-}
 func (t *Tensor) Matmul(other *Tensor) *Tensor {
-	result := t.graph.AddTensor("", t.Dtype, t.Shape.shape)
-	op := t.graph.AddOp("matmul", OpMatmul, t.node, other.node)
+	result := t.graph.AddTensor("", t.Dtype, t.Shape.shape, t.requiresGrad)
+	op := t.graph.AddOp("matmul", "matmul", t.node, other.node)
 	result.AddInput(op.name, op)
 	return result.tensor
 }

@@ -26,8 +26,8 @@ func NewLinear(name string, in_features, out_features int, dtype Dtype, g *Graph
 	out_features_node.SetInt(out_features)
 
 	//如果利用矩阵grad时的取巧运算，则需要将W的shape设置为[out_features,in_features]来实现提前转置
-	m.W = g.AddTensor(name+".W", dtype, []int{in_features, out_features}).Tensor()
-	m.b = g.AddTensor(name+".b", dtype, []int{out_features}).Tensor()
+	m.W = g.AddTensor(name+".W", dtype, []int{in_features, out_features}, true).Tensor()
+	m.b = g.AddTensor(name+".b", dtype, []int{out_features}, true).Tensor()
 	return m
 }
 func (m *Linear) Linear(input *Tensor) *Tensor {
