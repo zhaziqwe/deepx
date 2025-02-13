@@ -7,10 +7,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # 设置编译优化
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
 set(CMAKE_BUILD_TYPE Debug)
-# 设置 SIMD 编译选项
- 
+
+
+# include(FetchContent)
+# FetchContent_Declare(
+#     cutlass
+#     GIT_REPOSITORY https://github.com/NVIDIA/cutlass.git
+#     GIT_TAG v3.4.1
+# )
+# FetchContent_MakeAvailable(cutlass)
+
 # 包含头文件目录
 include_directories(src)
+# include_directories(${cutlass_SOURCE_DIR}/include)
+# include_directories(${cutlass_SOURCE_DIR}/tools/util/include)
+
+
 add_subdirectory(../common common)  # 包含公共模块
 
 # 源文件
@@ -36,7 +48,8 @@ target_link_libraries( deepx
     PUBLIC 
     deepx_common
     yaml-cpp
-    CUDA::cublas 
+    CUDA::cublas
+    # cutlass
 )
 add_executable(${PROJECT_NAME} ${CLIENT_SOURCES})
 target_link_libraries(${PROJECT_NAME}

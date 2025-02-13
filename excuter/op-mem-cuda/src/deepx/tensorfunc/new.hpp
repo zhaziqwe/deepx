@@ -7,13 +7,13 @@
 
 
 // 具体的张量类
-namespace deepx::op::cuda
+namespace deepx::tensorfunc
 {
     template <typename T>
     static T* dataNew(int size)
     {
         T* data;
-        cudaError_t err = cudaMallocManaged(&data, size * sizeof(T));
+        cudaError_t err = cudaMalloc(&data, size * sizeof(T));
         if (err != cudaSuccess) {
             throw std::runtime_error("Failed to allocate Unified Memory");
         }
