@@ -9,8 +9,12 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
+
+WORKDIR /home/
 # CUDA 已经预装，无需额外配置
-ADD . .
+ADD common common
+ADD op-mem-cuda op-mem-cuda
+WORKDIR /home/op-mem-cuda
 
 RUN rm -rf build && mkdir build && cd build && \
     cmake .. && \

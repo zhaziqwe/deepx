@@ -1,9 +1,5 @@
-#include "hwy/highway.h"
-
 #include "deepx/shapeslice.hpp"
-
-using namespace hwy;
-
+ 
 namespace deepx
 {
     ShapeSlice::ShapeSlice(const std::vector<int> &start, const std::vector<int> &shape, Shape *parent)

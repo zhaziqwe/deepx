@@ -1,5 +1,10 @@
 package deepx
 
 type Module interface {
-	Forward()
+	Graph() *Graph
+	Name() string
+}
+type ModuleBase struct {
+	name string
+	g    *Graph
 }
