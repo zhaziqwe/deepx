@@ -11,10 +11,13 @@ set(CMAKE_BUILD_TYPE Debug)
  
 # 包含头文件目录
 include_directories(src)
- 
+include_directories("../common/src")
+
+add_subdirectory(../common common)
+
 # 源文件
+
 file(GLOB_RECURSE DEEPX_SOURCES "src/deepx/*.cpp")
-file(GLOB_RECURSE STDUTIL_SOURCES "src/stdutil/*.cpp")
 file(GLOB_RECURSE CLIENT_SOURCES "src/client/*.cpp")
 
 # cpu 线性代数库
@@ -47,11 +50,11 @@ find_package(yaml-cpp REQUIRED)
  
 add_library(deepx SHARED 
     ${DEEPX_SOURCES}
-    ${STDUTIL_SOURCES}
 )
 
 target_link_libraries( deepx
     PUBLIC 
+    deepx_common
     yaml-cpp
     ${JEMALLOC_LIBRARIES}    
     openblas

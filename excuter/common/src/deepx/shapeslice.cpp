@@ -19,9 +19,7 @@ namespace deepx
     }
     const std::vector<int> ShapeSlice::toParentIndices(const std::vector<int> &indices) const
     {
-
         std::vector<int> parentindices = indices;
-        //const ScalableTag<int> d;
         for (int i = 0; i < parentindices.size(); i++)
         {
             parentindices[i] = parentindices[i] + start[i];

@@ -6,7 +6,6 @@
 namespace deepx
 {
     std::pair<int, int> calculateFanInAndFanOut(const Shape &shape);
- 
 }
 
 #endif // DEEPX_SHAPE_TENSORINIT_HPP
