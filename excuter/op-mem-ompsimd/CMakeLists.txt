@@ -11,8 +11,7 @@ set(CMAKE_BUILD_TYPE Debug)
  
 # 包含头文件目录
 include_directories(src)
-include_directories("../common/src")
-
+ 
 add_subdirectory(../common common)
 
 # 源文件
