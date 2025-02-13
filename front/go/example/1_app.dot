@@ -1,17 +1,17 @@
 digraph computational_graph {
   rankdir=LR;
   node [shape=record];
-  "0xc0000c6120" [label="tensor_0[]", shape=ellipse];
-  "0xc0000c6180" [label="tensor_1[]", shape=ellipse];
-  "0xc0000c61e0" [label="tensor_2[]", shape=ellipse];
-  "0xc0000c6240" [label="matmul", shape=rectangle];
-  "0xc0000c62a0" [label="tensor_3[]", shape=ellipse];
-  "0xc0000c6300" [label="tensor_4[]", shape=ellipse];
-  "0xc0000c6360" [label="add", shape=rectangle];
-  "0xc0000c6120" -> "0xc0000c6240";
-  "0xc0000c6180" -> "0xc0000c6240";
-  "0xc0000c61e0" -> "0xc0000c6360";
-  "0xc0000c6240" -> "0xc0000c61e0";
-  "0xc0000c62a0" -> "0xc0000c6360";
-  "0xc0000c6360" -> "0xc0000c6300";
+  "0xc000102120" [label="tensor_0[1 2 3]", shape=ellipse];
+  "0xc000102180" [label="tensor_1[3 4 5]", shape=ellipse];
+  "0xc0001021e0" [label="tensor_2[1 2 3]", shape=ellipse];
+  "0xc000102240" [label="matmul", shape=rectangle];
+  "0xc0001022a0" [label="tensor_3[1 4 5]", shape=ellipse];
+  "0xc000102300" [label="tensor_4[1 2 3]", shape=ellipse];
+  "0xc000102360" [label="add", shape=rectangle];
+  "0xc000102240" -> "0xc0001021e0";
+  "0xc000102120" -> "0xc000102240";
+  "0xc000102180" -> "0xc000102240";
+  "0xc000102360" -> "0xc000102300";
+  "0xc0001022a0" -> "0xc000102360";
+  "0xc0001021e0" -> "0xc000102360";
 }

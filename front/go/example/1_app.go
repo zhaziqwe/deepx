@@ -13,12 +13,14 @@ type Module1 struct {
 func (m *Module1) Forward() *deepx.Tensor {
 
 	// 创建输入节点
-	x := deepx.NewTensor(m.g, deepx.DtypeFloat32)
-	w := deepx.NewTensor(m.g, deepx.DtypeFloat32)
+	x_node := m.g.AddTensor("", deepx.DtypeFloat32, []int{1, 2, 3})
+	w_node := m.g.AddTensor("", deepx.DtypeFloat32, []int{3, 4, 5})
 
 	// 自动构建计算图
-	y := x.Matmul(w)
-	z := y.Add(deepx.NewTensor(m.g, deepx.DtypeFloat32))
+	y := x_node.Tensor().Matmul(w_node.Tensor())
+
+	b_node := m.g.AddTensor("", deepx.DtypeFloat32, []int{1, 4, 5})
+	z := y.Add(b_node.Tensor())
 
 	return z
 }

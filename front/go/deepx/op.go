@@ -19,7 +19,7 @@ func opTypeToString(op OpType) string {
 	case OpSub:
 		return "-"
 	case OpMul:
-		return "×"
+		return "✖"
 	case OpDiv:
 		return "÷"
 	case OpMatmul:
