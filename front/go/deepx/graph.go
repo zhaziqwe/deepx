@@ -25,7 +25,6 @@ const (
 type Graph struct {
 	nodes           []Node
 	tensorCounter   int
-	opCounter       int
 	constArgCounter int
 	enableGrad      bool
 }
@@ -60,10 +59,6 @@ func (g *Graph) AddTensor(name string, dtype Dtype, shape []int, requiresGrad bo
 
 // 添加操作节点
 func (g *Graph) AddOp(name string, inputs ...Node) *OpNode {
-	if name == "" {
-		name = fmt.Sprintf("op_%d", g.opCounter)
-		g.opCounter++
-	}
 	node := NewOpNode(name)
 	for _, input := range inputs {
 		node.AddInput(input.Name(), input)
