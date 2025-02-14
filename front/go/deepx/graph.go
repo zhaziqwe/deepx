@@ -104,12 +104,12 @@ func (g *Graph) ToDOT() string {
 		case NodeTensor:
 			// 张量节点：显示形状和梯度信息
 			builder.WriteString(fmt.Sprintf(`[label= "%s \n %v`, node.Name(), node.(*TensorNode).Tensor().Shape))
-			if node.(*TensorNode).Tensor().requiresGrad {
-				builder.WriteString(`\n require_grad"`)
-			} else {
-				builder.WriteString(`"`)
-			}
+			// if node.(*TensorNode).Tensor().requiresGrad {
+			// 	builder.WriteString(`\n require_grad`)
+			// }
+			builder.WriteString(`"`)
 			builder.WriteString(",shape=box")
+			builder.WriteString(",labeljust=l")
 			builder.WriteString(",color=skyblue")
 			builder.WriteString(",style=filled")
 			builder.WriteString(",fillcolor=aliceblue")
@@ -118,7 +118,7 @@ func (g *Graph) ToDOT() string {
 		case NodeOp:
 			// 操作节点：突出显示操作类型
 			opNode := node.(*OpNode)
-			builder.WriteString(fmt.Sprintf(`[label="%s\n(%s)"`, opNode.Name(), opNode.Shortchar()))
+			builder.WriteString(fmt.Sprintf(`[label="%s"`, opNode.Shortchar()))
 			builder.WriteString(",shape=box")
 			builder.WriteString(",style=filled")
 			builder.WriteString(",fillcolor=lightgray")
