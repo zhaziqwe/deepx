@@ -1,0 +1,29 @@
+digraph computational_graph {
+  rankdir=LR;
+  node [shape=record];
+"0xc000102150" [label= "Input \n [1 2 3]",shape=box,labeljust=l,color=skyblue,style=filled,fillcolor=aliceblue,fontname="Sans-Serif"];
+"0xc0001021b0" [label= "W \n [3 4 5]",shape=box,labeljust=l,color=skyblue,style=filled,fillcolor=aliceblue,fontname="Sans-Serif"];
+"0xc000102210" [label= "tensor_0 \n [1 2 3]",shape=box,labeljust=l,color=skyblue,style=filled,fillcolor=aliceblue,fontname="Sans-Serif"];
+"0xc000102270" [label="⊗",shape=box,style=filled,fillcolor=lightgray,color=darkslategray,fontname="Courier Bold"];
+"0xc0001022d0" [label= "b \n [1 4 5]",shape=box,labeljust=l,color=skyblue,style=filled,fillcolor=aliceblue,fontname="Sans-Serif"];
+"0xc000102330" [label= "tensor_1 \n [1 2 3]",shape=box,labeljust=l,color=skyblue,style=filled,fillcolor=aliceblue,fontname="Sans-Serif"];
+"0xc000102390" [label="+",shape=box,style=filled,fillcolor=lightgray,color=darkslategray,fontname="Courier Bold"];
+"0xc0001023f0" [label= "W \n [3 4 5]",shape=box,labeljust=l,color=skyblue,style=filled,fillcolor=aliceblue,fontname="Sans-Serif"];
+"0xc000102450" [label= "tensor_2 \n [1 2 3]",shape=box,labeljust=l,color=skyblue,style=filled,fillcolor=aliceblue,fontname="Sans-Serif"];
+"0xc0001024b0" [label="⊗",shape=box,style=filled,fillcolor=lightgray,color=darkslategray,fontname="Courier Bold"];
+"0xc000102510" [label= "b \n [1 4 5]",shape=box,labeljust=l,color=skyblue,style=filled,fillcolor=aliceblue,fontname="Sans-Serif"];
+"0xc000102570" [label= "tensor_3 \n [1 2 3]",shape=box,labeljust=l,color=skyblue,style=filled,fillcolor=aliceblue,fontname="Sans-Serif"];
+"0xc0001025d0" [label="+",shape=box,style=filled,fillcolor=lightgray,color=darkslategray,fontname="Courier Bold"];
+  "0xc000102270" -> "0xc000102210"[color=gray40,penwidth=1.2,arrowsize=0.8];
+  "0xc000102150" -> "0xc000102270"[color=gray40,penwidth=1.2,arrowsize=0.8];
+  "0xc0001021b0" -> "0xc000102270"[color=gray40,penwidth=1.2,arrowsize=0.8];
+  "0xc000102390" -> "0xc000102330"[color=gray40,penwidth=1.2,arrowsize=0.8];
+  "0xc000102210" -> "0xc000102390"[color=gray40,penwidth=1.2,arrowsize=0.8];
+  "0xc0001022d0" -> "0xc000102390"[color=gray40,penwidth=1.2,arrowsize=0.8];
+  "0xc0001024b0" -> "0xc000102450"[color=gray40,penwidth=1.2,arrowsize=0.8];
+  "0xc0001023f0" -> "0xc0001024b0"[color=gray40,penwidth=1.2,arrowsize=0.8];
+  "0xc000102330" -> "0xc0001024b0"[color=gray40,penwidth=1.2,arrowsize=0.8];
+  "0xc0001025d0" -> "0xc000102570"[color=gray40,penwidth=1.2,arrowsize=0.8];
+  "0xc000102450" -> "0xc0001025d0"[color=gray40,penwidth=1.2,arrowsize=0.8];
+  "0xc000102510" -> "0xc0001025d0"[color=gray40,penwidth=1.2,arrowsize=0.8];
+}

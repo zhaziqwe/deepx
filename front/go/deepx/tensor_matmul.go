@@ -1,12 +1,12 @@
 package deepx
 
 func init() {
-	RegistOpType("relu", "ReLU")
+	RegistOpType("matmul", "⊗")
 }
 
-func (t *Tensor) Relu() *Tensor {
+func (t *Tensor) Matmul(other *Tensor) *Tensor {
 	result := t.graph.AddTensor("", t.Dtype, t.Shape.shape, t.requiresGrad)
-	op := t.graph.AddOp("relu", t.node)
+	op := t.graph.AddOp("matmul", t.node, other.node)
 	result.AddInput(op.name, op)
 	return result.tensor
 }

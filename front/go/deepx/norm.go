@@ -1,0 +1,115 @@
+package deepx
+
+// LayerNorm 层归一化
+type LayerNorm struct {
+	ModuleBase
+	weight *Tensor
+	bias   *Tensor
+}
+
+func NewLayerNorm(name string, normalized_shape int, dtype Dtype, g *Graph) *LayerNorm {
+	m := &LayerNorm{
+		ModuleBase: ModuleBase{
+			g:    g,
+			name: name,
+		},
+	}
+
+	m.weight = g.AddTensor(name+".weight", dtype, []int{normalized_shape}, true).Tensor()
+	m.bias = g.AddTensor(name+".bias", dtype, []int{normalized_shape}, true).Tensor()
+
+	return m
+}
+
+func (m *LayerNorm) LayerNorm(x *Tensor) *Tensor {
+	op := x.LayerNorm(m.weight, m.bias)
+	return op
+}
+
+// BatchNorm 批归一化
+type BatchNorm struct {
+	ModuleBase
+	weight       *Tensor
+	bias         *Tensor
+	running_mean *Tensor
+	running_var  *Tensor
+}
+
+func NewBatchNorm(name string, num_features int, dtype Dtype, g *Graph) *BatchNorm {
+	m := &BatchNorm{
+		ModuleBase: ModuleBase{
+			g:    g,
+			name: name,
+		},
+	}
+
+	m.weight = g.AddTensor(name+".weight", dtype, []int{num_features}, true).Tensor()
+	m.bias = g.AddTensor(name+".bias", dtype, []int{num_features}, true).Tensor()
+	m.running_mean = g.AddTensor(name+".running_mean", dtype, []int{num_features}, false).Tensor()
+	m.running_var = g.AddTensor(name+".running_var", dtype, []int{num_features}, false).Tensor()
+
+	return m
+}
+
+func (m *BatchNorm) BatchNorm(x *Tensor) *Tensor {
+	op := x.BatchNorm(m.weight, m.bias, m.running_mean, m.running_var)
+	return op
+}
+
+// InstanceNorm 实例归一化
+type InstanceNorm struct {
+	ModuleBase
+	weight *Tensor
+	bias   *Tensor
+}
+
+func NewInstanceNorm(name string, num_features int, dtype Dtype, g *Graph) *InstanceNorm {
+	m := &InstanceNorm{
+		ModuleBase: ModuleBase{
+			g:    g,
+			name: name,
+		},
+	}
+
+	m.weight = g.AddTensor(name+".weight", dtype, []int{num_features}, true).Tensor()
+	m.bias = g.AddTensor(name+".bias", dtype, []int{num_features}, true).Tensor()
+
+	return m
+}
+
+func (m *InstanceNorm) InstanceNorm(x *Tensor) *Tensor {
+	op := x.InstanceNorm(m.weight, m.bias)
+	return op
+}
+
+// GroupNorm 组归一化
+type GroupNorm struct {
+	ModuleBase
+	weight     *Tensor
+	bias       *Tensor
+	num_groups int
+}
+
+func NewGroupNorm(name string, num_groups, num_channels int, dtype Dtype, g *Graph) *GroupNorm {
+	m := &GroupNorm{
+		ModuleBase: ModuleBase{
+			g:    g,
+			name: name,
+		},
+		num_groups: num_groups,
+	}
+
+	m.weight = g.AddTensor(name+".weight", dtype, []int{num_channels}, true).Tensor()
+	m.bias = g.AddTensor(name+".bias", dtype, []int{num_channels}, true).Tensor()
+
+	// 添加num_groups作为常量参数
+	num_groups_node := g.AddConstArg(name + ".num_groups")
+	num_groups_node.SetInt(num_groups)
+
+	return m
+}
+
+func (m *GroupNorm) GroupNorm(x *Tensor) *Tensor {
+	op := x.GroupNorm(m.weight, m.bias, m.num_groups)
+	return op
+}

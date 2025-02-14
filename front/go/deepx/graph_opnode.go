@@ -1,18 +1,30 @@
 package deepx
 
-type OpNode struct {
+type OpType struct {
 	name      string
 	shortchar string
-	ntype     NodeType
-	inputs    map[string]Node
 }
 
-func NewOpNode(name string, shortchar string) *OpNode {
+var (
+	opmaps = make(map[string]OpType)
+)
+
+func RegistOpType(name string, shortchar string) {
+	opmaps[name] = OpType{name, shortchar}
+}
+
+type OpNode struct {
+	OpType
+	ntype NodeType
+
+	inputs map[string]Node
+}
+
+func NewOpNode(name string) *OpNode {
 	return &OpNode{
-		name:      name,
-		shortchar: shortchar,
-		ntype:     NodeOp,
-		inputs:    make(map[string]Node),
+		OpType: opmaps[name],
+		ntype:  NodeOp,
+		inputs: make(map[string]Node),
 	}
 }
 func (n *OpNode) Ntype() NodeType {

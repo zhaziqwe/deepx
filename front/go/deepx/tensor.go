@@ -46,10 +46,3 @@ type Tensor struct {
 	node         *TensorNode // 对应的计算图节点
 	requiresGrad bool
 }
-
-func (t *Tensor) Matmul(other *Tensor) *Tensor {
-	result := t.graph.AddTensor("", t.Dtype, t.Shape.shape, t.requiresGrad)
-	op := t.graph.AddOp("matmul", "matmul", t.node, other.node)
-	result.AddInput(op.name, op)
-	return result.tensor
-}

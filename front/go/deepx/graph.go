@@ -59,15 +59,12 @@ func (g *Graph) AddTensor(name string, dtype Dtype, shape []int, requiresGrad bo
 }
 
 // 添加操作节点
-func (g *Graph) AddOp(name string, shortchar string, inputs ...Node) *OpNode {
+func (g *Graph) AddOp(name string, inputs ...Node) *OpNode {
 	if name == "" {
 		name = fmt.Sprintf("op_%d", g.opCounter)
 		g.opCounter++
 	}
-	if shortchar == "" {
-		shortchar = name
-	}
-	node := NewOpNode(name, shortchar)
+	node := NewOpNode(name)
 	for _, input := range inputs {
 		node.AddInput(input.Name(), input)
 	}
@@ -94,7 +91,7 @@ func (g *Graph) Forward(node Node) *Tensor {
 func (g *Graph) ToDOT() string {
 	var builder strings.Builder
 	builder.WriteString("digraph computational_graph {\n")
-	builder.WriteString("  rankdir=LR;\n")
+	builder.WriteString("  rankdir=TB;\n")
 	builder.WriteString("  node [shape=record];\n")
 
 	// 遍历所有节点
@@ -133,11 +130,11 @@ func (g *Graph) ToDOT() string {
 			case ArgTypeInt:
 				valueStr = fmt.Sprintf("%d", constNode.Int())
 			case ArgTypeFloat:
-				valueStr = fmt.Sprintf("%.2f", constNode.Float())
+				valueStr = fmt.Sprintf("%.2f", constNode.Float()) + "f"
 			case ArgTypeString:
 				valueStr = constNode.String()
 			}
-			builder.WriteString(fmt.Sprintf(`[label="%s\n%s"`, constNode.Name(), valueStr))
+			builder.WriteString(fmt.Sprintf(`[label="%s"`, valueStr))
 			builder.WriteString(",shape=diamond")
 			builder.WriteString(",style=filled")
 			builder.WriteString(",fillcolor=lightyellow")
