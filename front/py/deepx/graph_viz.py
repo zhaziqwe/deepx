@@ -5,7 +5,7 @@ from .opnode import OpNode
 from .constargnode import ConstArgNode
 
 def graph_method(f):
-    """装饰器：将函数注册为Graph类的方法"""
+    """装饰器:将函数注册为Graph类的方法"""
     # 延迟到模块加载完成后再绑定方法
     from .graph import Graph
     setattr(Graph, f.__name__, f)
@@ -13,7 +13,7 @@ def graph_method(f):
 
 @graph_method
 def to_dot(self):
-        """生成DOT格式的计算图可视化"""
+        """生成DOT格式的计算图可视化""" 
         dot = graphviz.Digraph(comment='Computational Graph')
         dot.attr(rankdir='TB')  # 从上到下的布局
         

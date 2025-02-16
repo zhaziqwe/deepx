@@ -4,6 +4,7 @@
 #include "deepx/shape.hpp"
 namespace deepx
 {
+    //主要支持CNN的slice操作
     template <typename T>
     struct TensorSlice
     {

@@ -5,6 +5,7 @@ func init() {
 	RegistOpType("batchnorm", "BN")
 	RegistOpType("instancenorm", "IN")
 	RegistOpType("groupnorm", "GN")
+	RegistOpType("rmsnorm", "RMS")
 }
 
 func (t *Tensor) LayerNorm(weight, bias *Tensor) *Tensor {
@@ -42,6 +43,21 @@ func (t *Tensor) GroupNorm(weight, bias *Tensor, num_groups int) *Tensor {
 	num_groups_node.SetInt(num_groups)
 
 	op := t.graph.AddOp("groupnorm", t.node, weight.node, bias.node, num_groups_node)
+	result.AddInput(op.name, op)
+
+	return result.tensor
+}
+
+// RMSNorm 实现 Root Mean Square Layer Normalization
+// 数学表达式: y = x / sqrt(mean(x^2) + eps) * weight
+func (t *Tensor) RMSNorm(weight *Tensor, eps float32) *Tensor {
+	result := t.graph.AddTensor("", t.Dtype, t.Shape.shape, t.requiresGrad)
+
+	// 添加eps作为常量参数
+	eps_node := t.graph.AddConstArg(t.node.Name() + ".eps")
+	eps_node.SetFloat(float64(eps))
+
+	op := t.graph.AddOp("rmsnorm", t.node, weight.node, eps_node)
 	result.AddInput(op.name, op)
 
 	return result.tensor

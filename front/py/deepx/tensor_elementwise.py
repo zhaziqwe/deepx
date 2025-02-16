@@ -1,4 +1,3 @@
-from .tensor import Tensor
 from .opnode import regist_op_type, OpNode
 
 # 注册基本操作类型

@@ -113,3 +113,30 @@ func (m *GroupNorm) GroupNorm(x *Tensor) *Tensor {
 	op := x.GroupNorm(m.weight, m.bias, m.num_groups)
 	return op
 }
+
+// RMSNorm Root Mean Square Layer Normalization
+type RMSNorm struct {
+	ModuleBase
+	weight *Tensor // 缩放参数
+	eps    float32 // 数值稳定性参数
+}
+
+func NewRMSNorm(name string, normalized_shape int, dtype Dtype, g *Graph) *RMSNorm {
+	m := &RMSNorm{
+		ModuleBase: ModuleBase{
+			g:    g,
+			name: name,
+		},
+		eps: 1e-6, // 默认值
+	}
+
+	// 只需要缩放参数，不需要偏置项
+	m.weight = g.AddTensor(name+".weight", dtype, []int{normalized_shape}, true).Tensor()
+
+	return m
+}
+
+func (m *RMSNorm) RMSNorm(x *Tensor) *Tensor {
+	op := x.RMSNorm(m.weight, m.eps)
+	return op
+}

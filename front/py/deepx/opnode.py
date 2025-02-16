@@ -23,8 +23,6 @@ class OpNode(Node):
     def shortchar(self):
         return self.op_type.shortchar
 
-# 注册基本操作类型
-regist_op_type("MatMul", "@")
 
 regist_op_type("ReLU", "relu")
 regist_op_type("Placeholder", "ph")

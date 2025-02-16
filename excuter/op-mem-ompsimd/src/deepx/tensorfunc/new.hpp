@@ -31,8 +31,7 @@ namespace deepx::tensorfunc
         Shape shape(shapedata);
  
         // 分配内存
-        
-
+    
         // 创建tensor并返回
         Tensor<T> tensor(shape);
         tensor.device = CPU;
