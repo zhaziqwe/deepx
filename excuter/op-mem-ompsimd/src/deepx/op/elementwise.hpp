@@ -165,6 +165,7 @@ namespace deepx::op
             auto c = mem.gettensor<T>(this->returns[0]).get();
             deepx::tensorfunc::sub(*a, *b, *c);
         }
+        //已验证，2025-02-19，lipeng
         void backward(mem::Mem &mem) override
         {
             auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
@@ -223,7 +224,7 @@ namespace deepx::op
             auto c = mem.gettensor<T>(this->returns[0]).get();
             deepx::tensorfunc::mul(*a, *b, *c);
         }
-        // 需要累计梯度
+        //已验证，2025-02-19，lipeng
         void backward(mem::Mem &mem) override
         {
             auto a = mem.gettensor<T>(this->args[0]).get();  // 需要用到前向传播的输入
@@ -234,13 +235,11 @@ namespace deepx::op
             
             // 乘法的反向传播：
             // 对于 c = a * b
-
-
             // ∂L/∂a = ∂L/∂c * ∂c/∂a = ∂L/∂c * b
-            deepx::tensorfunc::muladd(*b, *c_grad,*a_grad, *a_grad);  // a_grad = b * c_grad
+            deepx::tensorfunc::muladd(*b, *c_grad, *a_grad, *a_grad);  // a_grad += b * c_grad
             
             // ∂L/∂b = ∂L/∂c * ∂c/∂b = ∂L/∂c * a
-            deepx::tensorfunc::muladd(*a, *c_grad, *b_grad, *b_grad);  // b_grad = a * c_grad
+            deepx::tensorfunc::muladd(*a, *c_grad, *b_grad, *b_grad);  // b_grad += a * c_grad
         }
     };
 
@@ -274,13 +273,15 @@ namespace deepx::op
                 }
             }
         }
+        //已验证，2025-02-19，lipeng
         void forward(mem::Mem &mem) override    
         {
             auto a = mem.gettensor<T>(this->args[0]).get();
             auto b = mem.get<T>(this->args[1]);
-            auto c = mem.gettensor<T>(this->returns[0]);
+            auto c = mem.gettensor<T>(this->returns[0]).get();
             deepx::tensorfunc::mul(*a, b, *c);
         }
+        //已验证，2025-02-19，lipeng
         void backward(mem::Mem &mem) override
         {
             // 需要用到前向传播的标量输入b
@@ -291,7 +292,7 @@ namespace deepx::op
             // 标量乘法的反向传播：
             // 对于 c = a * b，其中b是标量
             // ∂L/∂a = ∂L/∂c * ∂c/∂a = ∂L/∂c * b
-            deepx::tensorfunc::muladd(*c_grad, b, *a_grad, *a_grad);  // a_grad = c_grad * b
+            deepx::tensorfunc::muladd(*c_grad, b, *a_grad, *a_grad);  // a_grad += c_grad * b
             // 标量b不需要计算梯度
         }
     };
@@ -341,6 +342,7 @@ namespace deepx::op
             auto c = mem.gettensor<T>(this->returns[0]).get();
             deepx::tensorfunc::div(*a, *b, *c);
         }
+        //已验证，2025-02-19，lipeng
         void backward(mem::Mem &mem) override
         {   
             // 需要用到前向传播的输入和输出
@@ -353,15 +355,69 @@ namespace deepx::op
             // 除法的反向传播：
             // 对于 c = a/b
             // ∂L/∂a = ∂L/∂c * ∂c/∂a = ∂L/∂c * (1/b)
-             // a_grad = c_grad / b
-            deepx::tensorfunc::divadd(*c_grad, *b, *a_grad, *a_grad); 
+            deepx::tensorfunc::divadd(*c_grad, *b, *a_grad, *a_grad); // a_grad += c_grad / b
             
             // ∂L/∂b = ∂L/∂c * ∂c/∂b 
             // ∂L/∂b = ∂L/∂c * (-a/b²) 
-            //或 ∂L/∂b= -c_grad * (c/b)
-            auto temp_tensor=mem.temptensor<T>(b->shape.shape).get();
+            // 或 ∂L/∂b = -c_grad * (c/b)
+            auto temp_tensor = mem.temptensor<T>(b->shape.shape).get();
             deepx::tensorfunc::div(*c, *b, *temp_tensor);      // temp = c/b
-            deepx::tensorfunc::muladd(*c_grad, *temp_tensor, T(-1), *b_grad,T(1), *b_grad);     // b_grad = -c_grad * temp
+            deepx::tensorfunc::muladd(*c_grad, *temp_tensor, T(-1), *b_grad, T(1), *b_grad);  // b_grad -= c_grad * temp
+        }
+    };
+
+    //Div_scalar之所以不复用Mul_scalar，是防止b接近0时，Mul_scalar(1/b)不稳定
+    template <typename T>
+    class Div_scalar : public Op<T>
+    {
+    public:
+        Div_scalar(string a, string b, string c, bool require_grad = false, string a_grad = "", string c_grad = "")
+        {
+            this->name = std::string("div_scalar") + "_" + dtype<T>::name();
+            this->args = {a, b};
+            this->returns.push_back(c);
+            if (require_grad)
+            {
+                if (a_grad != "")
+                {
+                    this->args_grad.push_back(a_grad);
+                }
+                else
+                {
+                    this->args_grad.push_back(a + ".grad");
+                }
+                if (c_grad != "")
+                {
+                    this->returns_grad.push_back(c_grad);
+                }
+                else
+                {
+                    this->returns_grad.push_back(c + ".grad");
+                }
+            }
+        }
+
+        //已验证，2025-02-19，lipeng
+        void forward(mem::Mem &mem) override
+        {
+            auto a = mem.gettensor<T>(this->args[0]).get();
+            auto b = mem.get<T>(this->args[1]);
+            auto c = mem.gettensor<T>(this->returns[0]).get();
+            deepx::tensorfunc::div(*a, b, *c);  // 直接使用除法
+        }
+
+        //已验证，2025-02-19，lipeng
+        void backward(mem::Mem &mem) override
+        {
+            auto b = mem.get<T>(this->args[1]);  // 获取标量b
+            auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
+            auto c_grad = mem.gettensor<T>(this->returns_grad[0]).get();
+            
+            // 标量除法的反向传播：
+            // 对于 c = a/b，其中b是标量
+            // ∂L/∂a = ∂L/∂c * ∂c/∂a = ∂L/∂c * (1/b)
+            deepx::tensorfunc::divadd(*c_grad, b, *a_grad, T(1), *a_grad);  // a_grad += c_grad / b
+            // 标量b不需要计算梯度
         }
     };
 
