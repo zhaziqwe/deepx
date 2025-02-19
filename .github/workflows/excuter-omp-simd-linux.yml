@@ -45,24 +45,18 @@ jobs:
     # Highway 库安装
     - name: Install Highway (Ubuntu)
       run: |
-        for i in 1 2 3; do
-          echo "Attempt $i to build Highway"
-          git clone --depth 1 --branch ${{ env.HIGHWAY_VERSION }} https://github.com/google/highway.git && \
-          cd highway && \
-          cmake -B build \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DBUILD_TESTING=OFF \
-            -DHWY_ENABLE_EXAMPLES=OFF \
-            -DHWY_ENABLE_CONTRIB=OFF \
-            -DCMAKE_INSTALL_PREFIX=/usr/local && \
-          cmake --build build -j$(nproc) --target hwy && \
-          sudo cmake --install build && \
-          break || \
-          cd .. && rm -rf highway && \
-          if [ $i -eq 3 ]; then exit 1; fi && \
-          sleep 5
-        done
-
+        echo "Attempt to build Highway"
+        git clone --depth 1 --branch ${{ env.HIGHWAY_VERSION }} https://github.com/google/highway.git && \
+        cd highway && \
+        cmake -B build \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_TESTING=OFF \
+          -DHWY_ENABLE_EXAMPLES=OFF \
+          -DHWY_ENABLE_CONTRIB=OFF \
+          -DCMAKE_INSTALL_PREFIX=/usr/local && \
+        cmake --build build -j$(nproc) --target hwy && \
+        sudo cmake --install build && \
+        
     # 构建 common 库
     - name: Build Common Library
       run: |
