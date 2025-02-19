@@ -1,6 +1,9 @@
 name: Excuter/omp-simd Build
 on: [push, pull_request]
 
+env:
+  HIGHWAY_VERSION: v1.2.0  # 统一的 Highway 版本号
+
 jobs:
   build:
     strategy:
@@ -53,7 +56,7 @@ jobs:
       run: |
         git clone https://github.com/google/highway.git
         cd highway
-        git checkout v1.0.7
+        git checkout ${{ env.HIGHWAY_VERSION }}
         cmake -B build -DCMAKE_BUILD_TYPE=Release -DHWY_SYSTEM_GTEST=OFF -DBUILD_TESTING=OFF
         cmake --build build -j$(nproc)
         sudo cmake --install build
@@ -61,14 +64,19 @@ jobs:
     - name: Install Highway (macOS)
       if: matrix.os == 'macos-latest'
       run: |
-        brew install google/google/highway
+        git clone https://github.com/google/highway.git
+        cd highway
+        git checkout ${{ env.HIGHWAY_VERSION }}
+        cmake -B build -DCMAKE_BUILD_TYPE=Release -DHWY_SYSTEM_GTEST=OFF -DBUILD_TESTING=OFF
+        cmake --build build -j$(nproc)
+        sudo cmake --install build
 
     - name: Install Highway (Windows)
       if: matrix.os == 'windows-latest'
       run: |
         git clone https://github.com/google/highway.git
         cd highway
-        git checkout v1.0.7
+        git checkout ${{ env.HIGHWAY_VERSION }}
         cmake -B build -DCMAKE_BUILD_TYPE=Release -DHWY_SYSTEM_GTEST=OFF -DBUILD_TESTING=OFF
         cmake --build build --config Release
         cmake --install build
