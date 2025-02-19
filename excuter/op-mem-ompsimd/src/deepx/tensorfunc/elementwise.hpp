@@ -642,7 +642,7 @@ namespace deepx::tensorfunc
     {
         if (  A.shape == B.shape && A.shape ==C.shape && A.shape == D.shape)
         {
-            D.shape.rangeParallel(D.shape.dim - 1, [&A,   &alpha, &B, &beta, &C](int i)
+            D.shape.rangeParallel(D.shape.dim - 1, [&A,&alpha, &B, &beta, &C,&D](int i)
                                   {
                 int shape_last=D.shape[-1];
                 const ScalableTag<T> tag;
