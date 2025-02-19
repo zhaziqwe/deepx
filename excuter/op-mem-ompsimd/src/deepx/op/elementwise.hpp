@@ -12,6 +12,7 @@ namespace deepx::op
     using namespace std;
     using namespace deepx::mem;
 
+    
     template <typename T>
     class Add : public Op<T>
     {
@@ -57,6 +58,7 @@ namespace deepx::op
             auto c = mem.gettensor<T>(this->returns[0]).get();
             deepx::tensorfunc::add(*a, *b, *c);
         }
+        //已验证，2025-02-19，lipeng
         void backward(mem::Mem &mem) override
         {
             auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
@@ -98,6 +100,7 @@ namespace deepx::op
                 }
             }
         }
+        //已验证，2025-02-19，lipeng
         void forward(mem::Mem &mem) override
         {
             auto a = mem.gettensor<T>(this->args[0]);
@@ -105,6 +108,7 @@ namespace deepx::op
             auto c = mem.gettensor<T>(this->returns[0]);
             deepx::tensorfunc::add(*a, b, *c);
         }
+        //已验证，2025-02-19，lipeng  
         void backward(mem::Mem &mem) override
         {
             auto a_grad = mem.gettensor<T>(this->args_grad[0]);
@@ -360,6 +364,55 @@ namespace deepx::op
             deepx::tensorfunc::muladd(*c_grad, *temp_tensor, T(-1), *b_grad,T(1), *b_grad);     // b_grad = -c_grad * temp
         }
     };
+
+    template <typename T>
+    class Sqrt : public Op<T>{
+        public:
+            Sqrt(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
+            {
+                this->name = std::string("sqrt") + "_" + dtype<T>::name();
+                this->args.push_back(a);
+                this->returns.push_back(b);
+                if (require_grad)
+                {
+                    if (a_grad != "")
+                    {
+                        this->args_grad.push_back(a_grad);
+                    }
+                    else
+                    {
+                        this->args_grad.push_back(a + ".grad");
+                    }
+                    if (b_grad != "")
+                    {
+                        this->returns_grad.push_back(b_grad);
+                    }
+                    else
+                    {
+                        this->returns_grad.push_back(b + ".grad");
+                    }
+                }
+            }
+            void forward(mem::Mem &mem) override
+            {
+                auto a = mem.gettensor<T>(this->args[0]).get();
+                auto b = mem.gettensor<T>(this->returns[0]).get();
+                deepx::tensorfunc::sqrt(*a, *b);
+            }
+            //todo: 需要验证
+            void backward(mem::Mem &mem) override
+            {
+                auto a = mem.gettensor<T>(this->args[0]).get();
+                auto b = mem.gettensor<T>(this->returns[0]).get();
+                auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
+                auto b_grad = mem.gettensor<T>(this->returns_grad[0]).get();
+                // 对于 c = sqrt(a)
+                // ∂L/∂a = ∂L/∂c * ∂c/∂a = ∂L/∂c * (1/(2*sqrt(a)))
+                deepx::tensorfunc::div(*b_grad, *b, *a_grad);
+                deepx::tensorfunc::mul(*a_grad, T(0.5), *a_grad);   
+            }   
+    };
+
     template <typename T>
     class Pow : public Op<T>
     {

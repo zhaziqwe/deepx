@@ -9,11 +9,10 @@ namespace deepx::op
     template<typename T>
     class Sum : public Op<T>{
         public:
-            Sum(string A, string dims, string output, bool require_grad = false, string A_grad = "", string output_grad = "")
+            Sum(string A, string output, bool require_grad = false, string A_grad = "", string output_grad = "")
             {
                 this->name = std::string("sum") + "_" + dtype<T>::name();
                 this->args.push_back(A);
-                this->args.push_back(dims);
                 this->returns.push_back(output);
                 if(require_grad){
                     if (A_grad != ""){
@@ -39,9 +38,10 @@ namespace deepx::op
             {
                 auto output_grad = mem.gettensor<T>(this->returns_grad[0]);
                 auto A_grad = mem.gettensor<T>(this->args_grad[0]);
-                tensorfunc::sum(*output_grad, dims, *A_grad);
+                tensorfunc::broadcast(*output_grad, *A_grad);
             }
     };
+ 
 }
 
 #endif

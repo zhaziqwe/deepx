@@ -6,6 +6,7 @@ const (
 	ArgTypeInt ArgType = iota
 	ArgTypeFloat
 	ArgTypeString
+	ArgTypeIntVector
 )
 
 type ConstArgNode struct {
@@ -62,6 +63,10 @@ func (n *ConstArgNode) String() string {
 func (n *ConstArgNode) SetInt(value int) {
 	n.value = value
 	n.argType = ArgTypeInt
+}
+func (n *ConstArgNode) SetInts(value []int) {
+	n.value = value
+	n.argType = ArgTypeIntVector
 }
 func (n *ConstArgNode) SetFloat(value float64) {
 	n.value = value
