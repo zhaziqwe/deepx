@@ -72,6 +72,9 @@ jobs:
         make -j$(nproc)
         sudo make install
         sudo ldconfig  # 更新动态链接库缓存
+        
+        # 确保头文件正确安装
+        sudo cp -r ../hwy /usr/local/include/
 
     # 构建 common 库
     - name: Build Common Library
