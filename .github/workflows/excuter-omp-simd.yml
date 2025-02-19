@@ -2,7 +2,7 @@ name: Excuter/omp-simd Build
 on: [push, pull_request]
 
 env:
-  HIGHWAY_VERSION: 1.2.0  # 统一的 Highway 版本号
+  HIGHWAY_VERSION: 1.2.0  # 添加 'v' 前缀
 
 jobs:
   build:
@@ -31,10 +31,22 @@ jobs:
       run: |
         brew install openblas yaml-cpp jemalloc
         
+    # Windows 依赖安装
     - name: Install Dependencies (Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        choco install openblas yaml-cpp
+        # 安装 vcpkg
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        .\bootstrap-vcpkg.bat
+        .\vcpkg integrate install
+        
+        # 安装依赖
+        .\vcpkg install openblas:x64-windows
+        .\vcpkg install yaml-cpp:x64-windows
+        
+        # 设置 vcpkg 根目录环境变量，供 CMake 使用
+        echo "VCPKG_ROOT=$env:GITHUB_WORKSPACE/vcpkg" | Out-File -FilePath $env:GITHUB_ENV -Append
 
     # 设置 ccache
     - name: Setup ccache
@@ -56,12 +68,22 @@ jobs:
     - name: Install Highway (Ubuntu)
       if: matrix.os == 'ubuntu-22.04'
       run: |
-        git clone https://github.com/google/highway.git
-        cd highway
-        git checkout ${{ env.HIGHWAY_VERSION }}
-        cmake -B build -DCMAKE_BUILD_TYPE=Release -DHWY_SYSTEM_GTEST=OFF -DBUILD_TESTING=OFF
-        cmake --build build -j$(nproc)
-        sudo cmake --install build
+        echo "Attempt $i to build Highway"
+        git clone --depth 1 --branch ${{ env.HIGHWAY_VERSION }} https://github.com/google/highway.git && \
+        cd highway && \
+        cmake -B build \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_TESTING=OFF \
+          -DHWY_ENABLE_EXAMPLES=OFF \
+          -DHWY_ENABLE_CONTRIB=OFF \
+          -DCMAKE_INSTALL_PREFIX=/usr/local && \
+        cmake --build build -j$(nproc) --target hwy && \
+        sudo cmake --install build && \
+        break || \
+        cd .. && rm -rf highway && \
+        if [ $i -eq 3 ]; then exit 1; fi && \
+        sleep 5
+        
 
     - name: Install Highway (macOS)
       if: matrix.os == 'macos-latest'
@@ -88,16 +110,18 @@ jobs:
       run: |
         cd excuter/common
         mkdir -p build && cd build
-        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER_LAUNCHER=ccache ..
-        cmake --build . --config Release -j$(nproc)
+        $vcpkg_toolchain = if ($env:VCPKG_ROOT) { "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" } else { "" }
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER_LAUNCHER=ccache $vcpkg_toolchain ..
+        cmake --build . --config Release -j$env:NUMBER_OF_PROCESSORS
         
     # 构建执行器
     - name: CMake Build
       run: |
         cd excuter/op-mem-ompsimd
         mkdir -p build && cd build
-        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER_LAUNCHER=ccache ..
-        cmake --build . --config Release -j$(nproc)
+        $vcpkg_toolchain = if ($env:VCPKG_ROOT) { "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" } else { "" }
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER_LAUNCHER=ccache $vcpkg_toolchain ..
+        cmake --build . --config Release -j$env:NUMBER_OF_PROCESSORS
 
     # # 运行测试（可选）
     # - name: Run Tests
