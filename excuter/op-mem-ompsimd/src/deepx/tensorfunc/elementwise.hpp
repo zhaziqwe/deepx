@@ -725,7 +725,45 @@ namespace deepx::tensorfunc
         }
     }
 
-   
+   template <typename T>
+    void sqrt(const Tensor<T> &input, Tensor<T> &output)
+    {
+        if (input.shape == output.shape)
+        {
+            output.shape.rangeParallel(output.shape.dim - 1, [&input, &output](int i)
+                                       {
+                int shape_last=output.shape[-1];
+                const ScalableTag<T> tag;
+                const size_t lanes = Lanes(tag);
+                size_t j=0;
+
+                // 1. 处理前置未对齐部分
+                while (j < shape_last && !IsAligned(tag,input.data + i + j)) {
+                    output.data[i+j] = std::sqrt(input.data[i+j]);
+                    ++j;
+                }
+
+                // 2. 处理中间对齐部分
+                size_t aligned_end=shape_last-(shape_last%lanes);
+                for (; j+lanes<=aligned_end; j +=  lanes  )
+                {
+                    auto vec = Load(tag, input.data + i + j);
+                    auto vec_result = Sqrt(vec);
+                    Store(vec_result, tag, output.data + i + j);
+                }
+
+                // 3. 处理尾部剩余元素
+                for (;j<shape_last;j++)
+                {
+                    output.data[i+j] = std::sqrt(input.data[i+j]);
+                } });
+        }
+        else
+        {
+            throw std::invalid_argument("shape mismatch");
+        }
+    }
+
     template <typename T>
     void pow(const Tensor<T> &input, const T value, Tensor<T> &output)
     {

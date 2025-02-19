@@ -38,7 +38,7 @@ namespace deepx::tensorfunc
     }
 
     template <typename T>
-    void kaimingUniform(Tensor<T> &tensor, float a = sqrt(5))
+    void kaimingUniform(Tensor<T> &tensor, float a = std::sqrt(5))
     {
         std::pair<int, int> fanInAndFanOut = calculateFanInAndFanOut(tensor.shape);
         float std = a / std::sqrt(static_cast<float>(fanInAndFanOut.first));
