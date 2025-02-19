@@ -59,6 +59,5 @@ func (t *Tensor) RMSNorm(weight *Tensor, eps float32) *Tensor {
 
 	op := t.graph.AddOp("rmsnorm", t.node, weight.node, eps_node)
 	result.AddInput(op.name, op)
-
 	return result.tensor
 }

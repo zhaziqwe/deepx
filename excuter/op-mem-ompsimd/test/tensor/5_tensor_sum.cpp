@@ -23,8 +23,9 @@ void test_sum()
     {
         Shape sShape = reduceShape(shape, comb);
         std::cout << comb <<  std::endl;
-        
-        Tensor<float> r = sum(tensor, comb);
+        Shape sumshape=reduceShape(shape,comb);
+        Tensor<float> r = New<float>(sumshape.shape);
+        sum(tensor, comb, r);
         print(r);
     }
 /*
@@ -49,19 +50,28 @@ void benchmark_sum(int i){
     for (const auto &comb : result)
     {
         Shape sShape = reduceShape(shape, comb);
-        Tensor<float> r = sum(tensor, comb);
+        Tensor<float> r=New<float>(sShape.shape);
+         sum(tensor, comb,r);
         save(r,"5_tensor_sum"+std::to_string(i)+"result");
     }
     auto end=std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
     std::cout << "time:" << duration.count() << " seconds" << std::endl;
 }
-int main()
-{
-    test_sum();
-    for (int i = 64; i < 1024*32; i*=2)
+
+int main(int arvc,char **argv)
+{   
+    int i=0;
+    if (arvc>1){
+        i=std::atoi(argv[1]);
+    }
+    switch (i)
     {
-        benchmark_sum(i);
+    case 0:
+        test_sum();
+        break;
+    default:
+         benchmark_sum(i);
     }
     return 0;
 }
