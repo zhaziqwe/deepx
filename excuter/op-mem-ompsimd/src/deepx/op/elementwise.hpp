@@ -455,18 +455,68 @@ namespace deepx::op
                 auto b = mem.gettensor<T>(this->returns[0]).get();
                 deepx::tensorfunc::sqrt(*a, *b);
             }
-            //todo: 需要验证
+            //已验证，2025-02-19，lipeng
             void backward(mem::Mem &mem) override
             {
-                auto a = mem.gettensor<T>(this->args[0]).get();
-                auto b = mem.gettensor<T>(this->returns[0]).get();
+                auto b = mem.gettensor<T>(this->returns[0]).get();  // b = sqrt(a)
                 auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
                 auto b_grad = mem.gettensor<T>(this->returns_grad[0]).get();
-                // 对于 c = sqrt(a)
-                // ∂L/∂a = ∂L/∂c * ∂c/∂a = ∂L/∂c * (1/(2*sqrt(a)))
-                deepx::tensorfunc::div(*b_grad, *b, *a_grad);
-                deepx::tensorfunc::mul(*a_grad, T(0.5), *a_grad);   
-            }   
+                
+                // 平方根的反向传播：
+                // 对于 b = sqrt(a)
+                // ∂L/∂a = ∂L/∂b * ∂b/∂a = ∂L/∂b * (1/(2*sqrt(a))) = b_grad/(2*b)
+                deepx::tensorfunc::divadd(*b_grad, *b,T(0.5), *a_grad, T(1), *a_grad);  // a_grad += 0.5 * b_grad/b
+            }
+    };
+
+    template <typename T>
+    class Exp : public Op<T>
+    {
+    public:
+        Exp(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
+        {
+            this->name = std::string("exp") + "_" + dtype<T>::name();
+            this->args.push_back(a);
+            this->returns.push_back(b);
+            if (require_grad)
+            {
+                if (a_grad != "")
+                {
+                    this->args_grad.push_back(a_grad);
+                }
+                else
+                {
+                    this->args_grad.push_back(a + ".grad");
+                }
+                if (b_grad != "")
+                {
+                    this->returns_grad.push_back(b_grad);
+                }
+                else
+                {
+                    this->returns_grad.push_back(b + ".grad");
+                }
+            }
+        }
+        void forward(mem::Mem &mem) override
+        {
+            auto a = mem.gettensor<T>(this->args[0]).get();
+            auto b = mem.gettensor<T>(this->returns[0]).get();
+            deepx::tensorfunc::exp(*a, *b);
+        }
+        //已验证，2025-02-19，lipeng
+        void backward(mem::Mem &mem) override
+        {
+            auto b = mem.gettensor<T>(this->returns[0]).get();  // b = exp(a)
+            auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
+            auto b_grad = mem.gettensor<T>(this->returns_grad[0]).get();
+            
+            // 指数函数的反向传播：
+            // 对于 b = exp(a)
+            // exp的导数是exp(x)本身，所以
+            // ∂L/∂a = ∂L/∂b * ∂b/∂a = ∂L/∂b * exp(a) = b_grad * b
+            deepx::tensorfunc::muladd(*b_grad, *b, *a_grad, *a_grad);  // a_grad += b_grad * b
+        }
     };
 
     template <typename T>
@@ -645,50 +695,7 @@ namespace deepx::op
             deepx::tensorfunc::div(*b_grad, *b, *b_grad);
         }
     };
-    template <typename T>
-    class Exp : public Op<T>
-    {
-    public:
-        Exp(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
-        {
-            this->name = std::string("exp") + "_" + dtype<T>::name();
-            this->args.push_back(a);
-            this->returns.push_back(b);
-            if (require_grad)
-            {
-                if (a_grad != "")
-                {
-                    this->args_grad.push_back(a_grad);
-                }
-                else
-                {
-                    this->args_grad.push_back(a + ".grad");
-                }
-                if (b_grad != "")
-                {
-                    this->returns_grad.push_back(b_grad);
-                }
-                else
-                {
-                    this->returns_grad.push_back(b + ".grad");
-                }
-            }
-        }
-        void forward(mem::Mem &mem) override
-        {
-            auto a = mem.gettensor<T>(this->args[0]).get();
-            auto b = mem.gettensor<T>(this->returns[0]).get();
-            deepx::tensorfunc::exp(*a, *b);
-        }
-        void backward(mem::Mem &mem) override
-        {
-            auto b=mem.gettensor<T>(this->returns[1]).get();
-            auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
-            auto b_grad = mem.gettensor<T>(this->returns_grad[0]).get();
-            deepx::tensorfunc::mul(*a_grad, *b, *a_grad);
-            deepx::tensorfunc::mul(*b_grad, *b, *b_grad);
-        }
-    };
+   
     template <typename T>
     class Sin : public Op<T>
     {

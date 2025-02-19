@@ -544,7 +544,9 @@ namespace deepx::tensorfunc
             throw std::invalid_argument("shape mismatch");
         }
     }
- 
+    
+    //divadd
+    // D= A/B+ C
     template <typename T>
     void divadd(const Tensor<T> &A, const Tensor<T> &B, const Tensor<T> &C,const Tensor<T> &D)
     {
@@ -632,6 +634,56 @@ namespace deepx::tensorfunc
             throw std::invalid_argument("shape mismatch");
         }
     }
+
+     //divadd
+    // D= A/B*alpha+ C*beta
+   template <typename T>
+    void divadd(const Tensor<T> &A, const Tensor<T> &B, const T alpha, const Tensor<T> &C,const T beta,const Tensor<T> &D)
+    {
+        if (  A.shape == B.shape && A.shape ==C.shape && A.shape == D.shape)
+        {
+            D.shape.rangeParallel(D.shape.dim - 1, [&A,   &alpha, &B, &beta, &C](int i)
+                                  {
+                int shape_last=D.shape[-1];
+                const ScalableTag<T> tag;
+                const size_t lanes = Lanes(tag);
+                size_t j=0;
+
+                // 1. 处理前置未对齐部分
+                while (j < shape_last && !IsAligned(tag,A.data + i + j)) {
+                    D.data[i+j] = A.data[i+j] / B.data[i+j] * alpha + C.data[i+j] * beta;
+                    ++j;
+                }
+
+                // 2. 处理中间对齐部分
+                size_t aligned_end=shape_last-(shape_last%lanes);
+                for (; j+lanes<=aligned_end; j +=  lanes  )
+                {
+                    auto vec_a = Load(tag, A.data + i + j);
+                    auto vec_b = Load(tag, B.data + i + j);
+                    auto vec_c = Load(tag, C.data + i + j);
+                    auto vec_d = Load(tag, D.data + i + j);
+                    auto alpha_vec = Set(tag, alpha);
+                    vec_a=Div(vec_a,vec_b);
+                    vec_a=Mul(vec_a,alpha_vec);
+                    auto beta_vec = Set(tag, beta);
+                    vec_c=Mul(vec_c,beta_vec);
+                    auto vec_result = Add(vec_a, vec_c);
+                    Store(vec_result, tag, D.data + i + j); 
+                }
+
+                // 3. 处理尾部剩余元素
+                for (;j<shape_last;j++)
+                {
+                    D.data[i+j] = A.data[i+j] / B.data[i+j] * alpha + C.data[i+j] * beta;
+                } });
+        }
+        else
+        {
+            throw std::invalid_argument("shape mismatch");
+        }
+    }
+
 
     template <typename T>
     void div(const Tensor<T> &input, const T value, Tensor<T> &output)
