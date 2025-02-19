@@ -50,9 +50,6 @@ jobs:
         cd highway && \
         cmake -B build \
           -DCMAKE_BUILD_TYPE=Release \
-          -DBUILD_TESTING=OFF \
-          -DHWY_ENABLE_EXAMPLES=OFF \
-          -DHWY_ENABLE_CONTRIB=OFF \
           -DCMAKE_INSTALL_PREFIX=/usr/local && \
         cmake --build build -j$(nproc) --target hwy && \
         sudo cmake --install build
