@@ -55,7 +55,7 @@ jobs:
           -DHWY_ENABLE_CONTRIB=OFF \
           -DCMAKE_INSTALL_PREFIX=/usr/local && \
         cmake --build build -j$(nproc) --target hwy && \
-        sudo cmake --install build && \
+        sudo cmake --install build
         
     # 构建 common 库
     - name: Build Common Library
