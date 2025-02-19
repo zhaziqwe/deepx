@@ -1,0 +1,72 @@
+name: Excuter/omp-simd Build
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, macos-latest, windows-latest]
+        backend: [ompsimd]
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    # 系统依赖安装
+    - name: Install Dependencies (Ubuntu)
+      if: matrix.os == 'ubuntu-22.04'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake libopenblas-dev libyaml-cpp-dev libjemalloc-dev clang git
+        
+    - name: Install Dependencies (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        brew install openblas yaml-cpp jemalloc
+        
+    - name: Install Dependencies (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        choco install openblas yaml-cpp
+
+    # Highway缓存
+    - name: Cache Highway
+      id: cache-highway
+      uses: actions/cache@v3
+      with:
+        path: |
+          build/_deps/highway-src
+          build/_deps/highway-build
+        key: ${{ runner.os }}-highway-${{ hashFiles('**/CMakeLists.txt') }}
+        
+    # 预下载Highway（缓存未命中时）
+    - name: Fetch Highway (Cache Miss)
+      if: steps.cache-highway.outputs.cache-hit != 'true'
+      run: |
+        git clone https://github.com/google/highway.git build/_deps/highway-src
+        cd build/_deps/highway-src
+        git checkout v1.0.7
+
+    # 构建common库
+    - name: Build Common Library
+      run: |
+        cd excuter/common
+        mkdir build && cd build
+        cmake ..
+        cmake --build . --config Release
+        
+    # 构建执行器
+    - name: CMake Build
+      run: |
+        cd excuter/op-mem-ompsimd
+        mkdir build && cd build
+        cmake -DCOMMON_DIR=../../../common/build ..
+        cmake --build . --config Release -j4
+
+    # # 运行测试（可选）
+    # - name: Run Tests
+    #   run: |
+    #     cd excuter/op-mem-ompsimd/build
+    #     ctest --output-on-failure
