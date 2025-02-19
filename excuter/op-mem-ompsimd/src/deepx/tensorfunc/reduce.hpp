@@ -33,8 +33,7 @@ namespace deepx::tensorfunc
         std::sort(sorted_dims.begin(), sorted_dims.end(), std::greater<int>());
         std::vector<int> sumMap = reduceDimMap(tensor.shape, sorted_dims);
         // 如果dims的最后一个元素是tensor.shape.dim-1，则说明求和的数据不连续（不对齐），无法simd（需要不停跳跃）
-        // if (sorted_dims.at(sorted_dims.size() - 1) == tensor.shape.dim - 1)
-        if (1)
+         if (sorted_dims.at(sorted_dims.size() - 1) == tensor.shape.dim - 1&&tensor.shape.dim>sorted_dims.size())
         {
             tensor.shape.rangeParallel(tensor.shape.dim, [&tensor, &result, &sumMap](const int idx_linear, const std::vector<int> &indices, std::vector<int> &newIndices)
                                        {
