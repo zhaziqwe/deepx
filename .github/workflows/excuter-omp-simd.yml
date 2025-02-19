@@ -2,7 +2,7 @@ name: Excuter/omp-simd Build
 on: [push, pull_request]
 
 env:
-  HIGHWAY_VERSION: v1.2.0  # 统一的 Highway 版本号
+  HIGHWAY_VERSION: 1.2.0  # 统一的 Highway 版本号
 
 jobs:
   build:
