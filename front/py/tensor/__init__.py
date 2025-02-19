@@ -6,6 +6,7 @@ from .reduction import sum, mean, max, min
 from .shape import reshape, transpose
 from .comparison import lt, gt, eq
 from .trigonometric import sin, cos, tan
+from .dtype import DType, _dtype_to_typestr
 
 __all__ = [
     'Tensor',
@@ -15,5 +16,7 @@ __all__ = [
     'sum', 'mean', 'max', 'min',
     'reshape', 'transpose',
     'lt', 'gt', 'eq',
-    'sin', 'cos', 'tan'
+    'sin', 'cos', 'tan',
+    'DType',
+    '_dtype_to_typestr'
 ] 

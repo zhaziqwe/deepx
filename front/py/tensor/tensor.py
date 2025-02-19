@@ -1,11 +1,12 @@
 from enum import Enum
 from typing import Optional, Union, Tuple
+from tensor.shape import Shape
 
 class Tensor:
     def __init__(self, data=None, name=None, shape=None, device=None):
         self.data = data
         self.name = name
-        self.shape = shape
+        self._shape = Shape(shape) if shape is not None else None
         self.device = device
         self.node = None
         
@@ -19,4 +20,6 @@ class Tensor:
         return self._requires_grad
         
     def detach(self):
-        return Tensor(self.data.copy()) 
+        return Tensor(self.data.copy())
+
+  
