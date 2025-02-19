@@ -31,39 +31,63 @@ jobs:
       run: |
         choco install openblas yaml-cpp
 
-    # Highway缓存
-    - name: Cache Highway
-      id: cache-highway
+    # 设置 ccache
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+
+    # 构建缓存
+    - name: Cache Build
       uses: actions/cache@v3
       with:
         path: |
-          build/_deps/highway-src
-          build/_deps/highway-build
-        key: ${{ runner.os }}-highway-${{ hashFiles('**/CMakeLists.txt') }}
-        
-    # 预下载Highway（缓存未命中时）
-    - name: Fetch Highway (Cache Miss)
-      if: steps.cache-highway.outputs.cache-hit != 'true'
-      run: |
-        git clone https://github.com/google/highway.git build/_deps/highway-src
-        cd build/_deps/highway-src
-        git checkout v1.0.7
+          excuter/op-mem-ompsimd/build
+          excuter/common/build
+          ~/.ccache
+        key: ${{ runner.os }}-build-${{ hashFiles('**/CMakeLists.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-build-
 
-    # 构建common库
+    # Highway 库安装
+    - name: Install Highway (Ubuntu)
+      if: matrix.os == 'ubuntu-22.04'
+      run: |
+        git clone https://github.com/google/highway.git
+        cd highway
+        git checkout v1.0.7
+        cmake -B build -DCMAKE_BUILD_TYPE=Release -DHWY_SYSTEM_GTEST=OFF -DBUILD_TESTING=OFF
+        cmake --build build -j$(nproc)
+        sudo cmake --install build
+
+    - name: Install Highway (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        brew install google/google/highway
+
+    - name: Install Highway (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        git clone https://github.com/google/highway.git
+        cd highway
+        git checkout v1.0.7
+        cmake -B build -DCMAKE_BUILD_TYPE=Release -DHWY_SYSTEM_GTEST=OFF -DBUILD_TESTING=OFF
+        cmake --build build --config Release
+        cmake --install build
+
+    # 构建 common 库
     - name: Build Common Library
       run: |
         cd excuter/common
-        mkdir build && cd build
-        cmake ..
-        cmake --build . --config Release
+        mkdir -p build && cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER_LAUNCHER=ccache ..
+        cmake --build . --config Release -j$(nproc)
         
     # 构建执行器
     - name: CMake Build
       run: |
         cd excuter/op-mem-ompsimd
-        mkdir build && cd build
-        cmake -DCOMMON_DIR=../../../common/build ..
-        cmake --build . --config Release -j4
+        mkdir -p build && cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER_LAUNCHER=ccache ..
+        cmake --build . --config Release -j$(nproc)
 
     # # 运行测试（可选）
     # - name: Run Tests
