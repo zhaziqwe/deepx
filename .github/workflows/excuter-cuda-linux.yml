@@ -1,0 +1,102 @@
+name: Excuter/cuda-linux Build
+on: [push, pull_request]
+
+env:
+  CUDA_VERSION: "12.1.0"
+  CUDNN_VERSION: "8.9.2.*"
+  CUTLASS_VERSION: "3.4.1"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+        backend: [cuda]
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    # 安装 CUDA
+    - name: Setup CUDA
+      uses: Jimver/cuda-toolkit@v0.2.14
+      with:
+        cuda: ${{ env.CUDA_VERSION }}
+        method: 'network'
+        sub-packages: '["nvcc", "cudart", "cublas", "cublas-dev", "cusolver", "cusolver-dev", "thrust", "nvrtc", "nvrtc-dev"]'
+
+    # 安装 cuDNN
+    - name: Install cuDNN
+      run: |
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
+        sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
+        sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub
+        sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /"
+        sudo apt-get update
+        sudo apt-get install -y libcudnn8=$CUDNN_VERSION libcudnn8-dev=$CUDNN_VERSION
+
+    # 安装 CUTLASS
+    - name: Install CUTLASS
+      run: |
+        git clone --depth 1 --branch v$CUTLASS_VERSION https://github.com/NVIDIA/cutlass.git
+        cd cutlass
+        mkdir build && cd build
+        cmake .. -DCUTLASS_ENABLE_TESTS=OFF -DCUTLASS_UNITY_BUILD_ENABLED=ON
+        sudo cmake --install . --prefix /usr/local
+        
+    # 系统依赖安装
+    - name: Install Dependencies (Ubuntu)
+      if: matrix.os == 'ubuntu-22.04'
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          cmake \
+          libyaml-cpp-dev \
+          libgtest-dev \
+          clang \
+          git \
+          ninja-build
+
+    # 设置 ccache
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+
+    # 构建缓存
+    - name: Cache Build
+      uses: actions/cache@v3
+      with:
+        path: |
+          excuter/op-mem-cuda/build
+          excuter/common/build
+          ~/.ccache
+        key: ${{ runner.os }}-cuda-build-${{ hashFiles('**/CMakeLists.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-cuda-build-
+
+    # 构建 common 库
+    - name: Build Common Library
+      run: |
+        cd excuter/common
+        mkdir -p build && cd build
+        cmake -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+          -GNinja ..
+        ninja
+        
+    # 构建 CUDA 执行器
+    - name: CMake Build
+      run: |
+        cd excuter/op-mem-cuda
+        mkdir -p build && cd build
+        cmake -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+          -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-${{ env.CUDA_VERSION }} \
+          -DCMAKE_CUDA_ARCHITECTURES="60;70;75;80;86" \
+          -DCUTLASS_DIR=/usr/local \
+          -GNinja ..
+        ninja
