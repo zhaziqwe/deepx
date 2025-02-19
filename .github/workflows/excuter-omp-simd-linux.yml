@@ -24,7 +24,15 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential cmake libopenblas-dev libyaml-cpp-dev libjemalloc-dev clang git
+        sudo apt-get install -y \
+          build-essential \
+          cmake \
+          libopenblas-dev \
+          libyaml-cpp-dev \
+          libjemalloc-dev \
+          libgtest-dev \
+          clang \
+          git
 
     # 设置 ccache
     - name: Setup ccache
@@ -45,15 +53,26 @@ jobs:
     # Highway 库安装
     - name: Install Highway (Ubuntu)
       run: |
-        echo "Attempt to build Highway"
-        git clone --depth 1 --branch ${{ env.HIGHWAY_VERSION }} https://github.com/google/highway.git && \
-        cd highway && \
-        cmake -B build \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_INSTALL_PREFIX=/usr/local && \
-        cmake --build build -j$(nproc) --target hwy && \
-        sudo cmake --install build
+        # 安装依赖
+        sudo apt-get install -y libgtest-dev
         
+        # 克隆 Highway
+        git clone --depth 1 --branch ${HIGHWAY_VERSION} https://github.com/google/highway.git
+        cd highway
+        mkdir -p build && cd build
+        
+        # 使用标准的 CMake 构建流程
+        cmake .. \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_SHARED_LIBS=ON \
+          -DHWY_SYSTEM_GTEST=ON \
+          -DHWY_ENABLE_TESTS=OFF
+        
+        # 构建和安装
+        make -j$(nproc)
+        sudo make install
+        sudo ldconfig  # 更新动态链接库缓存
+
     # 构建 common 库
     - name: Build Common Library
       run: |
