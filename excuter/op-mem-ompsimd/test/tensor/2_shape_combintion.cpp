@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "deepx/shape_combination.hpp"
+#include "deepx/vector_combination.hpp"
 #include "stdutil/vector.hpp"
 using namespace deepx;
 

@@ -3,10 +3,11 @@
 #include <numeric>
 #include <chrono>
 
+#include <omp.h>
 #include "deepx/tensor.hpp"
 #include "deepx/tensorfunc/reduce.hpp"
 #include "stdutil/vector.hpp"
-#include "deepx/shape_combination.hpp"
+#include "deepx/vector_combination.hpp"
 #include "deepx/shape_reduce.hpp"
 #include "deepx/tensorfunc/new.hpp"
 #include "deepx/tensorfunc/print.hpp"
@@ -51,7 +52,7 @@ void benchmark_sum(int i){
     {
         Shape sShape = reduceShape(shape, comb);
         Tensor<float> r=New<float>(sShape.shape);
-         sum(tensor, comb,r);
+        sum(tensor, comb,r);
         save(r,"5_tensor_sum"+std::to_string(i)+"result");
     }
     auto end=std::chrono::high_resolution_clock::now();
@@ -61,6 +62,7 @@ void benchmark_sum(int i){
 
 int main(int arvc,char **argv)
 {   
+     omp_set_num_threads(1); 
     int i=0;
     if (arvc>1){
         i=std::atoi(argv[1]);

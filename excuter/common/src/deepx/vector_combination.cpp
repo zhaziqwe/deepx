@@ -1,10 +1,11 @@
 #include <functional>
 
-#include "deepx/shape_combination.hpp"
+#include "deepx/vector_combination.hpp"
 
 namespace deepx
 {
-    std::vector<std::vector<int>> combination(int n, int k)
+    using namespace std;
+    vector<vector<int>> combination(int n, int k)
     {
         if (k > n || k < 0)
         {
@@ -15,11 +16,11 @@ namespace deepx
             return {{}};
         }
 
-        std::vector<std::vector<int>> result;
-        std::vector<int> path;
+        vector<vector<int>> result;
+        vector<int> path;
 
         // 递归函数
-        std::function<void(int)> backtrack = [&](int start)
+        function<void(int)> backtrack = [&](int start)
         {
             if (path.size() == k)
             {
@@ -37,13 +38,22 @@ namespace deepx
         backtrack(0);
         return result;
     }
-    std::vector<std::vector<int>> combination(int n )
+    vector<vector<int>> combination(int n )
     {
-        std::vector<std::vector<int>> result;
+        vector<vector<int>> result;
         for (int k = 0; k <= n; k++)
         {
-            std::vector<std::vector<int>> temp = combination(n, k);
+            vector<vector<int>> temp = combination(n, k);
             result.insert(result.end(), temp.begin(), temp.end());
+        }
+        return result;
+    }
+    vector<int> arrange(int n)
+    {
+        vector<int> result;
+        for (int i = 0; i < n; i++)
+        {
+            result.push_back(i);
         }
         return result;
     }
