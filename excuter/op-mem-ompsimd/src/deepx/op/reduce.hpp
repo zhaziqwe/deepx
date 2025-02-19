@@ -9,15 +9,11 @@ namespace deepx::op
     template<typename T>
     class Sum : public Op<T>{
         public:
-            Sum(string A, std::vector<int> dims, string output, bool require_grad = false, string A_grad = "", string output_grad = "")
+            Sum(string A, string dims, string output, bool require_grad = false, string A_grad = "", string output_grad = "")
             {
                 this->name = std::string("sum") + "_" + dtype<T>::name();
                 this->args.push_back(A);
-                std::string dimsstr = "";
-                for (int i = 0; i < dims.size(); i++) {
-                    dimsstr += std::to_string(dims[i]) + ",";
-                }
-                this->args.push_back(dimsstr);
+                this->args.push_back(dims);
                 this->returns.push_back(output);
                 if(require_grad){
                     if (A_grad != ""){
@@ -35,10 +31,7 @@ namespace deepx::op
            void forward(mem::Mem &mem) override
             {
                 auto A = mem.gettensor<T>(this->args[0]);
-                std::vector<int> dims;
-                for (int i = 0; i < this->args[1].size(); i++) {
-                    dims.push_back(std::stoi(this->args[1][i]));
-                }
+                std::vector<int> dims=mem.getvector<int>(this->args[1]);
                 auto output = mem.gettensor<T>(this->returns[0]);
                 tensorfunc::sum(*A, dims, *output);
             }

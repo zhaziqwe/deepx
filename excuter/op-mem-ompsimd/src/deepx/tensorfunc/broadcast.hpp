@@ -7,17 +7,15 @@
 namespace deepx::tensorfunc
 {
     template <typename T>
-    Tensor<T> broadcast(const Tensor<T> &tensor, const std::vector<int> &broadcastShape)
+    void broadcast(const Tensor<T> &tensor, Tensor<T> &result)
     {
-        std::vector<BroadcastMap> bm = broadcastMap(tensor.shape.shape, broadcastShape);
-        Tensor<T> result = New<T>(broadcastShape);
-        result.shape.rangeParallel(broadcastShape.size(), [&](int idx_linear,const std::vector<int> &indices, std::vector<int> &oldIndices)
+        std::vector<BroadcastMap> bm = broadcastMap(tensor.shape.shape, result.shape.shape);
+        result.shape.rangeParallel(result.shape.dim, [&bm,&result,&tensor](int idx_linear,const std::vector<int> &indices, std::vector<int> &oldIndices)
                            {
             fromBroadcastIndices(bm,indices,oldIndices);
             int idx_old = tensor.shape.linearat(oldIndices);
-            result.data[idx_linear]= tensor.data[idx_old]; }, tensor.shape.dim );
-        return result;
+            result.data[idx_linear]= tensor.data[idx_old];
+             }, tensor.shape.dim );
     }
 }
-
 #endif
