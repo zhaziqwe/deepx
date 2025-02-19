@@ -1,5 +1,5 @@
 from .node import Node, NodeType
-from .tensor import Tensor
+from ..tensor import Tensor
 
 class TensorNode(Node):
     def __init__(self, name=None):
