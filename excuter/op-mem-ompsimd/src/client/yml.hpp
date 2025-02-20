@@ -10,6 +10,6 @@ namespace client
 {
     using namespace deepx::op;
     using namespace std;
-    shared_ptr<OpBase> parse(const char *yml);
+    Op parse(const char *yml);
 }
 #endif

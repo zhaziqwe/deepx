@@ -7,17 +7,15 @@
 namespace deepx::op
 {
     template <typename T>
-    class Concat : public Op<T>
+    class Concat : public OpT<T>
     {
     public:
-        Concat(std::vector<string> input,string output,int axis)
-        {
-            this->name = std::string("concat") + "_" + dtype<T>::name();
-            this->args = input;
-            this->returns.push_back(output);
-            std::string axisstr=std::to_string(axis);
-            this->args.push_back(axisstr);
-        };
+        Concat(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
+            this->init("concat", args, returns, require_grad, args_grad, returns_grad);
+        }
+        Concat(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
+            this->init("concat", args, returns, require_grad, args_grad, returns_grad);
+        }
         void forward(mem::Mem<T> &mem) override
         {
             std::vector<Tensor<T>*> input;
@@ -25,7 +23,8 @@ namespace deepx::op
                 input.push_back(mem.get(this->args[i]).get());
             }
             auto output = mem.get(this->returns[0]).get();
-            int axis = std::stoi(this->args.back());
+ 
+            int axis = mem.get<int>(this->args.back());
             cpu::concat(input,axis,*output);
         };
         void backward(mem::Mem<T> &mem) override
@@ -34,7 +33,7 @@ namespace deepx::op
             for (int i=0;i<this->args.size()-1;i++){
                 input.push_back(mem.get(this->args[i]).get());
             }
-            int axis = std::stoi(this->args.back());
+            int axis = mem.get<int>(this->args.back());
             auto output = mem.get(this->returns[0]).get();
             cpu::split(output,axis,input);
         };

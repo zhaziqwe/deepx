@@ -16,7 +16,7 @@ namespace deepx::op
     using deepx::mem::Mem;
     using namespace std;
 
-    class OpBase
+    class Op
     {
     protected:
         string name;
@@ -26,10 +26,21 @@ namespace deepx::op
         vector<string> returns_grad;
 
     public:
-        virtual ~OpBase() = default;
-        virtual void forward(mem::Mem &mem) = 0;
-        virtual void backward(mem::Mem &mem) = 0;
-        virtual std::shared_ptr<OpBase> clone() const = 0;
+        Op() = default;
+        Op(const Op &) = default;
+        Op &operator=(const Op &) = default;
+
+        // 改为普通虚函数，提供默认实现
+        virtual void forward(mem::Mem &mem)
+        {
+            throw std::runtime_error("forward not implemented");
+        }
+
+        virtual void backward(mem::Mem &mem)
+        {
+            throw std::runtime_error("backward not implemented");
+        }
+
         void load(const YAML::Node &node)
         {
             name = node["name"].as<std::string>();
@@ -38,14 +49,14 @@ namespace deepx::op
             args_grad = node["args_grad"].as<std::vector<std::string>>();
             returns_grad = node["returns_grad"].as<std::vector<std::string>>();
         }
-        void init(const string &opname, const string dtype,
+        void init(const string &dtypeopname,  
                   const vector<string> &args,
                   const vector<string> &returns,
                   bool require_grad,
                   const vector<string> &args_grad,
                   const vector<string> &returns_grad)
         {
-            this->name = opname + "_" + dtype;
+            this->name =dtypeopname;
             this->args = args;
             this->returns = returns;
 
@@ -73,47 +84,49 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Op : public OpBase
+    class OpT : public Op
     {
     public:
-        Op() = default;
-
-        // 前向传播
-        virtual void forward(mem::Mem &mem)
+        string getdtype()
         {
-            std::cout << "forward op: " << name << std::endl;
-        }
-
-        // 反向传播
-        virtual void backward(mem::Mem &mem)
-        {
-            std::cout << "backward op: " << name << std::endl;
+            return dtype<T>::name();
         }
     };
+
+    using Op_dtype = std::unordered_map<std::string, std::shared_ptr<Op>>;
+    static std::unordered_map<std::string, Op_dtype> ops;
 
     class OpFactory
     {
-    private:
-        using PrototypeMap = std::unordered_map<std::string, std::shared_ptr<OpBase>>;
-        static std::unordered_map<std::string, PrototypeMap> prototypes_;
-
     public:
-        template <typename T>
-        static void Register(const std::string &opname)
+        template <typename T> // T 表示具体算子类型（如Add<float>）
+        static void add_op(const std::string &opname)
         {
+            // 存储原型对象的智能指针
             auto proto = std::make_shared<T>();
-            prototypes_[opname][dtype<T>::name()] = proto;
+            ops[opname][proto->getdtype()] = proto;
         }
 
-
-        static std::shared_ptr<OpBase> Create(const std::string &opname,
-                                              const std::string &dtype,
-                                              const std::vector<std::string> &args,
-                                              const std::vector<std::string> &returns,
-                                              const bool require_grad,
-                                              const std::vector<std::string> &args_grad,
-                                              const std::vector<std::string> &returns_grad);
+        template <typename T> // T 表示具体算子类型（如Add<float>）
+        static std::shared_ptr<Op> get_op(const std::string &opname,
+                                          const std::string &dtype,
+                                          const std::vector<std::string> &args,
+                                          const std::vector<std::string> &returns,
+                                          const bool require_grad,
+                                          const std::vector<std::string> &args_grad,
+                                          const std::vector<std::string> &returns_grad)
+        {
+            auto &type_map = ops[opname];
+            auto it = type_map.find(dtype);
+            if (it != type_map.end())
+            {
+                auto cloned = std::make_shared<T>(*static_cast<T *>(it->second.get()));
+                cloned->init(opname, dtype, args, returns, require_grad, args_grad, returns_grad);
+                return cloned;
+            }
+            return nullptr;
+        }
     };
- 
+
 }
 #endif

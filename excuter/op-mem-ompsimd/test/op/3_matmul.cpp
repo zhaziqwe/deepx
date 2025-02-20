@@ -43,7 +43,7 @@ void test_matmul()
 {
     vector<int> shape={2,3,4};
     Mem mem=setmem(shape,7);
-    op::MatMul<float> matmul("a","b","c",true,"a.grad","b.grad","c.grad");
+    op::MatMul<float> matmul({"a", "b"}, {"c"}, true, {"a.grad", "b.grad"}, {"c.grad"});
     matmul.forward(mem);
 
     cout<<"a"<<endl;

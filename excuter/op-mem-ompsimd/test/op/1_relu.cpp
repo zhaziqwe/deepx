@@ -42,7 +42,7 @@ void test_max()
     mem.add("b.grad", b_grad);
 
 
-    op::Max<float> max("a", "b", "c",true,"a.grad","b.grad","c.grad");
+    op::Max<float> max({"a", "b"}, {"c"}, true, {"a.grad", "b.grad"}, {"c.grad"});
     max.forward(mem);
     cout << "c: " << endl;
     print(*mem.gettensor<float>("c").get());
@@ -72,7 +72,7 @@ void test_max_scalar()
     Tensor<float> a_grad = New<float>({1, 2, 3});
     mem.add("a.grad", a_grad);
 
-    op::Max_scalar<float> max_scalar("a", "b", "c",true);
+    op::Max_scalar<float> max_scalar({"a", "b"}, {"c"}, true);
     max_scalar.forward(mem);
     cout << "a: " << endl;
     print(*mem.gettensor<float>("a").get());

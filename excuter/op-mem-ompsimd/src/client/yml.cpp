@@ -5,7 +5,7 @@ namespace  client
 {
     using namespace deepx::op;
     using namespace deepx::mem;
-    shared_ptr<OpBase> parse(const char *yml)
+    Op parse(const char *yml)
     {
         YAML::Node config = YAML::Load(yml);
 
@@ -27,10 +27,8 @@ namespace  client
             returns_grad = config["returns_grad"].as<std::vector<std::string>>();
         }
  
-        // 通过工厂创建OP
-        auto op = OpFactory::Create(opname, dtype, args, returns,
-                                    require_grad, args_grad, returns_grad);
-
+        Op op;
+        op.init(opname+dtype, args, returns, require_grad, args_grad, returns_grad);
         return op;
     }
 }

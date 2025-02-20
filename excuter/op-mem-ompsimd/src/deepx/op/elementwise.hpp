@@ -14,11 +14,14 @@ namespace deepx::op
 
     
     template <typename T>
-    class Add : public Op<T>
+    class Add : public OpT<T>
     {
     public:
         Add(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-            this->init("add", args, returns, require_grad, args_grad, returns_grad);
+            this->init("add"+dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+        }
+        Add(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
+            this->init("add"+dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         void forward(mem::Mem &mem) override
         {
@@ -41,33 +44,14 @@ namespace deepx::op
         }
     };
     template <typename T>
-    class Add_scalar : public Op<T>
+    class Add_scalar : public OpT<T>
     {
     public:
-        Add_scalar(string a, string b, string c, bool require_grad = false, string a_grad = "", string c_grad = "")
-        {
-            this->name = std::string("add_scalar") + "_" + dtype<T>::name();
-            this->args = {a, b};
-            this->returns.push_back(c);
-            if (require_grad)
-            {
-                if (a_grad != "")
-                {
-                    this->args_grad.push_back(a_grad);
-                }
-                else
-                {
-                    this->args_grad.push_back(a + ".grad");
-                }
-                if (c_grad != "")
-                {
-                    this->returns_grad.push_back(c_grad);
-                }
-                else
-                {
-                    this->returns_grad.push_back(c + ".grad");
-                }
-            }
+        Add_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
+            this->init("add_scalar"+dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+        }
+        Add_scalar(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
+            this->init("add_scalar"+dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         //已验证，2025-02-19，lipeng
         void forward(mem::Mem &mem) override
@@ -90,42 +74,14 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Sub : public Op<T>
+    class Sub : public OpT<T>
     {
     public:
-        Sub(string a, string b, string c, bool require_grad = false, string a_grad = "", string b_grad = "", string c_grad = "")
-        {
-            this->name = std::string("sub") + "_" + dtype<T>::name();
-            this->args.push_back(a);
-            this->args.push_back(b);
-            this->returns.push_back(c);
-            if (require_grad)
-            {
-                if (a_grad != "")
-                {
-                    this->args_grad.push_back(a_grad);
-                }
-                else
-                {
-                    this->args_grad.push_back(a + ".grad");
-                }
-                if (b_grad != "")
-                {
-                    this->args_grad.push_back(b_grad);
-                }
-                else
-                {
-                    this->args_grad.push_back(b + ".grad");
-                }
-                if (c_grad != "")
-                {
-                    this->returns_grad.push_back(c_grad);
-                }
-                else
-                {
-                    this->returns_grad.push_back(c + ".grad");
-                }
-            }
+        Sub(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
+            this->init("sub"+dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+        }
+        Sub(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
+            this->init("sub"+dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         void forward(mem::Mem &mem) override
         {
@@ -149,42 +105,14 @@ namespace deepx::op
         }
     };
     template <typename T>
-    class Mul : public Op<T>
+    class Mul : public OpT<T>
     {
     public:
-        Mul(string a, string b, string c, bool require_grad = false, string a_grad = "", string b_grad = "", string c_grad = "")
-        {
-            this->name = std::string("mul") + "_" + dtype<T>::name();
-            this->args.push_back(a);
-            this->args.push_back(b);
-            this->returns.push_back(c);
-            if (require_grad)
-            {
-                if (a_grad != "")
-                {
-                    this->args_grad.push_back(a_grad);
-                }
-                else
-                {
-                    this->args_grad.push_back(a + ".grad");
-                }
-                if (b_grad != "")
-                {
-                    this->args_grad.push_back(b_grad);
-                }
-                else
-                {
-                    this->args_grad.push_back(b + ".grad");
-                }
-                if (c_grad != "")
-                {
-                    this->returns_grad.push_back(c_grad);
-                }
-                else
-                {
-                    this->returns_grad.push_back(c + ".grad");
-                }
-            }
+        Mul(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
+            this->init("mul"+dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+        }
+        Mul(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
+            this->init("mul"+dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         void forward(mem::Mem &mem) override
         {
@@ -213,34 +141,14 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Mul_scalar : public Op<T>
+    class Mul_scalar : public OpT<T>
     {
     public:
-        Mul_scalar(string a, string b, string c, bool require_grad = false, string a_grad = "", string c_grad = "")
-        {
-            this->name = std::string("mul_scalar") + "_" + dtype<T>::name();
-            this->args.push_back(a);
-            this->args.push_back(b);
-            this->returns.push_back(c);
-            if (require_grad)
-            {
-                if (a_grad != "")
-                {
-                    this->args_grad.push_back(a_grad);
-                }
-                else
-                {
-                    this->args_grad.push_back(a + ".grad");
-                }
-                if (c_grad != "")
-                {
-                    this->returns_grad.push_back(c_grad);
-                }
-                else
-                {
-                    this->returns_grad.push_back(c + ".grad");
-                }
-            }
+        Mul_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
+            this->init("mul_scalar"+dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+        }
+        Mul_scalar(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
+            this->init("mul_scalar"+dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         //已验证，2025-02-19，lipeng
         void forward(mem::Mem &mem) override    
@@ -267,42 +175,14 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Div : public Op<T>
+    class Div : public OpT<T>
     {
     public:
-        Div(string a, string b, string c, bool require_grad = false, string a_grad = "", string b_grad = "", string c_grad = "")
-        {
-            this->name = std::string("div") + "_" + dtype<T>::name();
-            this->args.push_back(a);
-            this->args.push_back(b);
-            this->returns.push_back(c);
-            if (require_grad)
-            {
-                if (a_grad != "")
-                {
-                    this->args_grad.push_back(a_grad);
-                }
-                else
-                {
-                    this->args_grad.push_back(a + ".grad");
-                }
-                if (b_grad != "")
-                {
-                    this->args_grad.push_back(b_grad);
-                }
-                else
-                {
-                    this->args_grad.push_back(b + ".grad");
-                }
-                if (c_grad != "")
-                {
-                    this->returns_grad.push_back(c_grad);
-                }
-                else
-                {
-                    this->returns_grad.push_back(c + ".grad");
-                }
-            }
+        Div(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
+            this->init("div", args, returns, require_grad, args_grad, returns_grad);
+        }
+        Div(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
+            this->init("div", args, returns, require_grad, args_grad, returns_grad);
         }
         void forward(mem::Mem &mem) override
         {
@@ -337,35 +217,15 @@ namespace deepx::op
 
     //Div_scalar之所以不复用Mul_scalar，是防止b接近0时，Mul_scalar(1/b)不稳定
     template <typename T>
-    class Div_scalar : public Op<T>
+    class Div_scalar : public OpT<T>
     {
     public:
-        Div_scalar(string a, string b, string c, bool require_grad = false, string a_grad = "", string c_grad = "")
-        {
-            this->name = std::string("div_scalar") + "_" + dtype<T>::name();
-            this->args = {a, b};
-            this->returns.push_back(c);
-            if (require_grad)
-            {
-                if (a_grad != "")
-                {
-                    this->args_grad.push_back(a_grad);
-                }
-                else
-                {
-                    this->args_grad.push_back(a + ".grad");
-                }
-                if (c_grad != "")
-                {
-                    this->returns_grad.push_back(c_grad);
-                }
-                else
-                {
-                    this->returns_grad.push_back(c + ".grad");
-                }
-            }
+        Div_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
+            this->init("div_scalar", args, returns, require_grad, args_grad, returns_grad);
         }
-
+        Div_scalar(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
+            this->init("div_scalar", args, returns, require_grad, args_grad, returns_grad);
+        }   
         //已验证，2025-02-19，lipeng
         void forward(mem::Mem &mem) override
         {
@@ -391,32 +251,13 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Sqrt : public Op<T>{
+    class Sqrt : public OpT<T>{
         public:
-            Sqrt(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
-            {
-                this->name = std::string("sqrt") + "_" + dtype<T>::name();
-                this->args.push_back(a);
-                this->returns.push_back(b);
-                if (require_grad)
-                {
-                    if (a_grad != "")
-                    {
-                        this->args_grad.push_back(a_grad);
-                    }
-                    else
-                    {
-                        this->args_grad.push_back(a + ".grad");
-                    }
-                    if (b_grad != "")
-                    {
-                        this->returns_grad.push_back(b_grad);
-                    }
-                    else
-                    {
-                        this->returns_grad.push_back(b + ".grad");
-                    }
-                }
+            Sqrt(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
+                this->init("sqrt", args, returns, require_grad, args_grad, returns_grad);
+            }
+            Sqrt(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
+                this->init("sqrt", args, returns, require_grad, args_grad, returns_grad);
             }
             void forward(mem::Mem &mem) override
             {
@@ -439,33 +280,14 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Exp : public Op<T>
+    class Exp : public OpT<T>
     {
     public:
-        Exp(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
-        {
-            this->name = std::string("exp") + "_" + dtype<T>::name();
-            this->args.push_back(a);
-            this->returns.push_back(b);
-            if (require_grad)
-            {
-                if (a_grad != "")
-                {
-                    this->args_grad.push_back(a_grad);
-                }
-                else
-                {
-                    this->args_grad.push_back(a + ".grad");
-                }
-                if (b_grad != "")
-                {
-                    this->returns_grad.push_back(b_grad);
-                }
-                else
-                {
-                    this->returns_grad.push_back(b + ".grad");
-                }
-            }
+        Exp(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
+            this->init("exp", args, returns, require_grad, args_grad, returns_grad);
+        }
+        Exp(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
+            this->init("exp", args, returns, require_grad, args_grad, returns_grad);
         }
         void forward(mem::Mem &mem) override
         {
@@ -489,42 +311,14 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Pow : public Op<T>
+    class Pow : public OpT<T>
     {
     public:
-        Pow(string a, string b, string c, bool require_grad = false, string a_grad = "", string b_grad = "", string c_grad = "")
-        {
-            this->name = std::string("pow") + "_" + dtype<T>::name();
-            this->args.push_back(a);
-            this->args.push_back(b);
-            this->returns.push_back(c);
-            if (require_grad)
-            {
-                if (a_grad != "")
-                {
-                    this->args_grad.push_back(a_grad);
-                }
-                else
-                {
-                    this->args_grad.push_back(a + ".grad");
-                }
-                if (b_grad != "")
-                {
-                    this->args_grad.push_back(b_grad);
-                }
-                else
-                {
-                    this->args_grad.push_back(b + ".grad");
-                }
-                if (c_grad != "")
-                {
-                    this->returns_grad.push_back(c_grad);
-                }
-                else
-                {
-                    this->returns_grad.push_back(c + ".grad");
-                }
-            }
+        Pow(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
+            this->init("pow", args, returns, require_grad, args_grad, returns_grad);
+        }
+        Pow(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
+            this->init("pow", args, returns, require_grad, args_grad, returns_grad);
         }
         void forward(mem::Mem &mem) override
         {
@@ -563,34 +357,14 @@ namespace deepx::op
 
 
     template <typename T>
-    class Pow_scalar : public Op<T>
+    class Pow_scalar : public OpT<T>
     {
     public:
-        Pow_scalar(string a, string b, string c, bool require_grad = false, string a_grad = "", string c_grad = "")
-        {
-            this->name = std::string("pow_scalar") + "_" + dtype<T>::name();
-            this->args.push_back(a);
-            this->args.push_back(b);
-            this->returns.push_back(c);
-            if (require_grad)
-            {   
-                if (a_grad != "")
-                {
-                    this->args_grad.push_back(a_grad);
-                }
-                else
-                {   
-                    this->args_grad.push_back(a + ".grad");
-                }
-                if (c_grad != "")
-                {
-                    this->returns_grad.push_back(c_grad);
-                }   
-                else
-                {
-                    this->returns_grad.push_back(c + ".grad");
-                }
-            }
+        Pow_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
+            this->init("pow_scalar", args, returns, require_grad, args_grad, returns_grad);
+        }
+        Pow_scalar(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
+            this->init("pow_scalar", args, returns, require_grad, args_grad, returns_grad);
         }
         void forward(mem::Mem &mem) override
         {
@@ -621,33 +395,14 @@ namespace deepx::op
 
 
     template <typename T>
-    class Log : public Op<T>
+    class Log : public OpT<T>
     {
     public:
-        Log(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
-        {
-            this->name = std::string("log") + "_" + dtype<T>::name();
-            this->args.push_back(a);
-            this->returns.push_back(b);
-            if (require_grad)
-            {
-                if (a_grad != "")
-                {
-                    this->args_grad.push_back(a_grad);
-                }
-                else
-                {
-                    this->args_grad.push_back(a + ".grad");
-                }
-                if (b_grad != "")
-                {
-                    this->returns_grad.push_back(b_grad);
-                }
-                else
-                {
-                    this->returns_grad.push_back(b + ".grad");
-                }
-            }
+        Log(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
+            this->init("log", args, returns, require_grad, args_grad, returns_grad);
+        }
+        Log(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
+            this->init("log", args, returns, require_grad, args_grad, returns_grad);
         }
         void forward(mem::Mem &mem) override
         {
@@ -665,124 +420,124 @@ namespace deepx::op
         }
     };
    
-    template <typename T>
-    class Sin : public Op<T>
-    {
-    public:
-        Sin(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
-        {
-            this->name = std::string("sin") + "_" + dtype<T>::name();
-            this->args.push_back(a);
-            this->returns.push_back(b);
-            if (require_grad)
-            {
-                if (a_grad != "")
-                {
-                    this->args_grad.push_back(a_grad);
-                }
-                else
-                {
-                    this->args_grad.push_back(a + ".grad");
-                }
-                if (b_grad != "")
-                {
-                    this->returns_grad.push_back(b_grad);
-                }
-                else
-                {
-                    this->returns_grad.push_back(b + ".grad");
-                }
-            }
-        }
-        void forward(mem::Mem &mem) override
-        {
-            auto a = mem.gettensor<T>(this->args[0]).get();
-            auto b = mem.gettensor<T>(this->returns[0]).get();
-            deepx::tensorfunc::sin(*a, *b);
-        }
-        void backward(mem::Mem &mem) override
-        {
-            auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
-            auto b_grad = mem.gettensor<T>(this->returns_grad[0]).get();
-            deepx::tensorfunc::cos(*a_grad, *a_grad);
-            deepx::tensorfunc::mul(*b_grad, *a_grad, *b_grad);
-        }
-    };
-    template <typename T>
-    class Cos : public Op<T>
-    {
-    public:
-        Cos(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
-        {
-            this->name = std::string("cos") + "_" + dtype<T>::name();
-            this->args.push_back(a);
-            this->returns.push_back(b);
-            if (require_grad)
-            {
-                if (a_grad != "")
-                {
-                    this->args_grad.push_back(a_grad);
-                }
-                else
-                {
-                    this->args_grad.push_back(a + ".grad");
-                }
-                if (b_grad != "")
-                {
-                    this->returns_grad.push_back(b_grad);
-                }
-                else
-                {
-                    this->returns_grad.push_back(b + ".grad");
-                }
-            }
-        }
-        void forward(mem::Mem &mem) override
-        {
-            auto a = mem.gettensor<T>(this->args[0]).get();
-            auto b = mem.gettensor<T>(this->returns[0]).get();
-            deepx::tensorfunc::cos(*a, *b);
-        }
-        void backward(mem::Mem &mem) override
-        {
-            auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
-            auto b_grad = mem.gettensor<T>(this->returns_grad[0]).get();
-            deepx::tensorfunc::sin(*a_grad, *a_grad);
-            deepx::tensorfunc::mul(*b_grad, *a_grad, *b_grad);
-        }
-    };
-    template <typename T>
-    class Tan : public Op<T>
-    {
-    public:
-        Tan(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
-        {
-            this->name = std::string("tan") + "_" + dtype<T>::name();
-            this->args.push_back(a);
-            this->returns.push_back(b);
-            if (require_grad)
-            {
-                if (a_grad != "")
-                {
-                }
-            }
-        }
-        void forward(mem::Mem &mem) override
-        {
-            auto a = mem.gettensor<T>(this->args[0]).get();
-            auto b = mem.gettensor<T>(this->returns[0]).get();
-            deepx::tensorfunc::tan(*a, *b);
-        }
-        void backward(mem::Mem &mem) override
-        {
-            auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
-            auto b_grad = mem.gettensor<T>(this->returns_grad[0]).get();
-            auto b=mem.gettensor<T>(this->returns[0]).get();
-            deepx::tensorfunc::div(*a_grad, *b, *a_grad);
-            deepx::tensorfunc::mul(*b_grad, *a_grad, *b_grad);
-            deepx::tensorfunc::div(*b_grad, *b, *b_grad);
-        }
-    };
+    // template <typename T>
+    // class Sin : public Op<T>
+    // {
+    // public:
+    //     Sin(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
+    //     {
+    //         this->name = std::string("sin") + "_" + dtype<T>::name();
+    //         this->args.push_back(a);
+    //         this->returns.push_back(b);
+    //         if (require_grad)
+    //         {
+    //             if (a_grad != "")
+    //             {
+    //                 this->args_grad.push_back(a_grad);
+    //             }
+    //             else
+    //             {
+    //                 this->args_grad.push_back(a + ".grad");
+    //             }
+    //             if (b_grad != "")
+    //             {
+    //                 this->returns_grad.push_back(b_grad);
+    //             }
+    //             else
+    //             {
+    //                 this->returns_grad.push_back(b + ".grad");
+    //             }
+    //         }
+    //     }
+    //     void forward(mem::Mem &mem) override
+    //     {
+    //         auto a = mem.gettensor<T>(this->args[0]).get();
+    //         auto b = mem.gettensor<T>(this->returns[0]).get();
+    //         deepx::tensorfunc::sin(*a, *b);
+    //     }
+    //     void backward(mem::Mem &mem) override
+    //     {
+    //         auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
+    //         auto b_grad = mem.gettensor<T>(this->returns_grad[0]).get();
+    //         deepx::tensorfunc::cos(*a_grad, *a_grad);
+    //         deepx::tensorfunc::mul(*b_grad, *a_grad, *b_grad);
+    //     }
+    // };
+    // template <typename T>
+    // class Cos : public Op<T>
+    // {
+    // public:
+    //     Cos(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
+    //     {
+    //         this->name = std::string("cos") + "_" + dtype<T>::name();
+    //         this->args.push_back(a);
+    //         this->returns.push_back(b);
+    //         if (require_grad)
+    //         {
+    //             if (a_grad != "")
+    //             {
+    //                 this->args_grad.push_back(a_grad);
+    //             }
+    //             else
+    //             {
+    //                 this->args_grad.push_back(a + ".grad");
+    //             }
+    //             if (b_grad != "")
+    //             {
+    //                 this->returns_grad.push_back(b_grad);
+    //             }
+    //             else
+    //             {
+    //                 this->returns_grad.push_back(b + ".grad");
+    //             }
+    //         }
+    //     }
+    //     void forward(mem::Mem &mem) override
+    //     {
+    //         auto a = mem.gettensor<T>(this->args[0]).get();
+    //         auto b = mem.gettensor<T>(this->returns[0]).get();
+    //         deepx::tensorfunc::cos(*a, *b);
+    //     }
+    //     void backward(mem::Mem &mem) override
+    //     {
+    //         auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
+    //         auto b_grad = mem.gettensor<T>(this->returns_grad[0]).get();
+    //         deepx::tensorfunc::sin(*a_grad, *a_grad);
+    //         deepx::tensorfunc::mul(*b_grad, *a_grad, *b_grad);
+    //     }
+    // };
+    // template <typename T>
+    // class Tan : public Op<T>
+    // {
+    // public:
+    //     Tan(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
+    //     {
+    //         this->name = std::string("tan") + "_" + dtype<T>::name();
+    //         this->args.push_back(a);
+    //         this->returns.push_back(b);
+    //         if (require_grad)
+    //         {
+    //             if (a_grad != "")
+    //             {
+    //             }
+    //         }
+    //     }
+    //     void forward(mem::Mem &mem) override
+    //     {
+    //         auto a = mem.gettensor<T>(this->args[0]).get();
+    //         auto b = mem.gettensor<T>(this->returns[0]).get();
+    //         deepx::tensorfunc::tan(*a, *b);
+    //     }
+    //     void backward(mem::Mem &mem) override
+    //     {
+    //         auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
+    //         auto b_grad = mem.gettensor<T>(this->returns_grad[0]).get();
+    //         auto b=mem.gettensor<T>(this->returns[0]).get();
+    //         deepx::tensorfunc::div(*a_grad, *b, *a_grad);
+    //         deepx::tensorfunc::mul(*b_grad, *a_grad, *b_grad);
+    //         deepx::tensorfunc::div(*b_grad, *b, *b_grad);
+    //     }
+    // };
     // template <typename T>
     // class Asin : public Op<T>
     // {
