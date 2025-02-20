@@ -17,39 +17,8 @@ namespace deepx::op
     class Add : public Op<T>
     {
     public:
-        Add(string a, string b, string c, bool require_grad = false, string a_grad = "", string b_grad = "", string c_grad = "")
-        {
-            this->name = std::string("add") + "_" + dtype<T>::name();
-            this->args.push_back(a);
-            this->args.push_back(b);
-            this->returns.push_back(c);
-            if (require_grad)
-            {
-                if (a_grad != "")
-                {
-                    this->args_grad.push_back(a_grad);
-                }
-                else
-                {
-                    this->args_grad.push_back(a + ".grad");
-                }
-                if (b_grad != "")
-                {
-                    this->args_grad.push_back(b_grad);
-                }
-                else
-                {
-                    this->args_grad.push_back(b + ".grad");
-                }
-                if (c_grad != "")
-                {
-                    this->returns_grad.push_back(c_grad);
-                }
-                else
-                {
-                    this->returns_grad.push_back(c + ".grad");
-                }
-            }
+        Add(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
+            this->init("add", args, returns, require_grad, args_grad, returns_grad);
         }
         void forward(mem::Mem &mem) override
         {

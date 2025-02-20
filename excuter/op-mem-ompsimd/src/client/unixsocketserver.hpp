@@ -15,12 +15,13 @@ namespace client
         std::string socket_path;
         int sockfd;
         struct sockaddr_un servaddr, cliaddr; // 修改为使用完整类型
-        char buffer[1024];
+        char* buffer;        // 改为指针类型
+        const int buffer_size; // 新增缓冲区大小成员
         socklen_t len;
         ssize_t n;
 
     public:
-        unixsocketserver(const std::string &path);
+        unixsocketserver(const std::string &path, const int buffersize);
         ~unixsocketserver();
         void start();
         using handlefunc = std::function<void(char *buffer)>;

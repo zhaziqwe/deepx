@@ -10,10 +10,12 @@
 #include <deepx/tensorfunc/print.hpp>
 
 #include "deepx/op/op.hpp"
-#include "deepx/op/activite.hpp"
+#include "deepx/op/elementwise.hpp"
+#include "deepx/op/reduce.hpp"
 
 #include "deepx/mem/mem.hpp"
 #include "client/udpserver.hpp"
+#include "client/yml.hpp"
 using namespace deepx::tensorfunc;
 using namespace deepx::mem;
 
@@ -31,18 +33,12 @@ int main()
     client::udpserver server(8080);
     server.func = [&mem](char *buffer)
     {
-        YAML::Node config = YAML::Load(buffer);
+        // auto op = client::parse(buffer);
 
-        if (config["op"].as<std::string>() == "relu")
-        {
-            std::string input = config["args"][0].as<std::string>();
-            std::string output = config["returns"][0].as<std::string>();
+        // op->forward(mem);
 
-            deepx::op::Relu<float> relu(input, output);
-            relu.forward(mem);
-
-            print(*mem.gettensor<float>("result"));
-        }
+        // print(*mem.gettensor<float>("result"));
+         
     };
     server.start();
     return 0;

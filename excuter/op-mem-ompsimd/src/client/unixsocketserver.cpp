@@ -2,12 +2,17 @@
 
 namespace client
 {
-    unixsocketserver::unixsocketserver(const std::string& path)
+    unixsocketserver::unixsocketserver(const std::string& path, const int buffersize)
+        : socket_path(path), buffer_size(buffersize)
     {
-        this->socket_path = path;
+        buffer = new char[buffer_size];
+        if (!buffer) {
+            throw std::bad_alloc();
+        }
     }
     unixsocketserver::~unixsocketserver()
     {
+        delete[] buffer;
         if (sockfd > 0)
         {
             close(sockfd);
@@ -49,7 +54,7 @@ namespace client
                 continue;
             }
 
-            n = read(client_fd, buffer, sizeof(buffer)-1);
+            n = read(client_fd, buffer, buffer_size - 1);
             if (n > 0) {
                 buffer[n] = '\0';
                 std::cout << "Received message: " << buffer << std::endl;

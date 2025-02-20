@@ -8,9 +8,8 @@
 #include "deepx/tensorfunc/activite.hpp"
 
 #include "deepx/op/op.hpp"
-#include "deepx/op/minmax.hpp"
-#include "deepx/op/activite.hpp"
-
+#include "deepx/op/reduce.hpp"
+ 
 using namespace deepx::op;
 using namespace deepx;
 using namespace deepx::tensorfunc;
@@ -85,17 +84,7 @@ void test_max_scalar()
     cout << "a.grad: " << endl;
     print(*mem.gettensor<float>("a.grad").get());
 }
-void test_relu()
-{
-    Mem mem;
-    Tensor<float> tensor = New<float>({1, 2, 3});
-    uniform(tensor, -1.0f, 1.0f);
-    mem.add("tensor", std::make_shared<Tensor<float>>(tensor));
-    op::Relu<float> relu("tensor","tensor");
-    relu.forward(mem);
-    print(*mem.gettensor<float>("tensor").get());
-}
-
+ 
 int main(int argc, char **argv)
 {   
     int casei=atoi(argv[1]);
@@ -107,9 +96,7 @@ int main(int argc, char **argv)
     case 2:
         test_max_scalar();
         break;
-    case 3:
-        test_relu();
-        break;
+    
     }
      
     return 0;
