@@ -12,10 +12,10 @@ namespace deepx::op
     class Sum : public OpT<T>{
         public:
             Sum(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-                this->init("sum", args, returns, require_grad, args_grad, returns_grad);
+                this->init("sum",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
             }
             Sum(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-                this->init("sum", args, returns, require_grad, args_grad, returns_grad);
+                this->init("sum",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
             }   
            void forward(mem::Mem &mem) override
             {
@@ -36,10 +36,10 @@ namespace deepx::op
     class Max : public OpT<T>{
         public:
             Max(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-                this->init("max"+dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+                this->init("max",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
             }
             Max(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-                this->init("max"+dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+                this->init("max",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
             }   
             void forward(mem::Mem  &mem) override
             {
@@ -64,10 +64,10 @@ namespace deepx::op
     class Max_scalar : public OpT<T>{
         public:
             Max_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-                this->init("max_scalar"+dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+                this->init("max_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
             }
             Max_scalar(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-                this->init("max_scalar"+dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+                this->init("max_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
             }   
  
 
@@ -91,10 +91,10 @@ namespace deepx::op
     class Min : public OpT<T>{
         public:
             Min(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-                this->init("min", args, returns, require_grad, args_grad, returns_grad);
+                this->init("min",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
             }
             Min(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-                this->init("min", args, returns, require_grad, args_grad, returns_grad);
+                this->init("min",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
             }      
             void forward(mem::Mem &mem) override{
                 auto A=mem.gettensor<T>(this->args[0]);
@@ -117,10 +117,10 @@ namespace deepx::op
     class Min_scalar : public OpT<T>{
         public:
             Min_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-                this->init("min_scalar", args, returns, require_grad, args_grad, returns_grad);
+                this->init("min_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
             }
             Min_scalar(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-                this->init("min_scalar", args, returns, require_grad, args_grad, returns_grad);
+                this->init("min_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
             }      
             void forward(mem::Mem &mem) override{
                 auto A=mem.gettensor<T>(this->args[0]);

@@ -11,10 +11,10 @@ namespace deepx::op
     {
     public:
         Concat(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-            this->init("concat", args, returns, require_grad, args_grad, returns_grad);
+            this->init("concat",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         Concat(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-            this->init("concat", args, returns, require_grad, args_grad, returns_grad);
+            this->init("concat",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         void forward(mem::Mem<T> &mem) override
         {
@@ -38,5 +38,8 @@ namespace deepx::op
             cpu::split(output,axis,input);
         };
     };
+    // 注册concat算子
+    auto concat_float = OpFactory::add_op<Concat<float>>("concat");
+    auto concat_double = OpFactory::add_op<Concat<double>>("concat");
 }
 #endif  // DEEPX_OP_CONCAT_HPP

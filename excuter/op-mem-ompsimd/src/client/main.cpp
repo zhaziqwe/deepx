@@ -12,10 +12,9 @@
 #include "deepx/op/op.hpp"
 #include "deepx/op/elementwise.hpp"
 #include "deepx/op/reduce.hpp"
-
 #include "deepx/mem/mem.hpp"
 #include "client/udpserver.hpp"
-#include "client/yml.hpp"
+ 
 using namespace deepx::tensorfunc;
 using namespace deepx::mem;
 
@@ -31,14 +30,18 @@ int main()
     mem.add("result", std::make_shared<deepx::Tensor<float>>(result));
 
     client::udpserver server(8080);
-    server.func = [&mem](char *buffer)
+    deepx::op::OpFactory opfactory;
+    server.func = [&mem, &opfactory](char *buffer)
     {
-        // auto op = client::parse(buffer);
-
-        // op->forward(mem);
-
-        // print(*mem.gettensor<float>("result"));
-         
+        deepx::op::Op op;
+        op.load(buffer);
+        op.forward(mem);
+ 
+        shared_ptr<deepx::op::Op> opsrc = opfactory.get_op(op);
+ 
+        (*opsrc).init(op.name, op.dtype, op.args, op.returns, op.require_grad, op.args_grad, op.returns_grad);
+        (*opsrc).forward(mem);
+        print(*mem.gettensor<float>("result"));
     };
     server.start();
     return 0;
