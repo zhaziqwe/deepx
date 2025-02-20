@@ -11,6 +11,7 @@ namespace deepx::op
     template<typename T>
     class Sum : public OpT<T>{
         public:
+            Sum()=default;
             Sum(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
                 this->init("sum",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
             }
@@ -35,6 +36,7 @@ namespace deepx::op
  template<typename T>
     class Max : public OpT<T>{
         public:
+            Max()=default;
             Max(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
                 this->init("max",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
             }
@@ -90,6 +92,7 @@ namespace deepx::op
     template<typename T>
     class Min : public OpT<T>{
         public:
+            Min()=default;
             Min(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
                 this->init("min",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
             }

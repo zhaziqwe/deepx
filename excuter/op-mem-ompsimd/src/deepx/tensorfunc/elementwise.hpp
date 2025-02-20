@@ -320,6 +320,7 @@ namespace deepx::tensorfunc
         }
     }
 
+    //A*B+C=D
     template <typename T>
     void muladd(const Tensor<T> &A, const Tensor<T> &B, const Tensor<T> &C,const Tensor<T> &D)
     {
@@ -844,38 +845,17 @@ namespace deepx::tensorfunc
         }
     }
 
+    //发现hwy库没有exp函数，所以只能用std::exp
     template <typename T>
     void exp(const Tensor<T> &input, Tensor<T> &output)
     {
         if (input.shape == output.shape)
         {
-            output.shape.rangeParallel(output.shape.dim - 1, [&input, &output](int i)   
+            output.shape.rangeParallel(output.shape.dim  , [&input, &output](int i)   
                                        {
-                int shape_last=output.shape[-1];
-                const ScalableTag<T> tag;
-                const size_t lanes = Lanes(tag);
-                size_t j=0; 
-
-                // 1. 处理前置未对齐部分
-                while (j < shape_last && !IsAligned(tag,input.data + i + j)) {
-                    output.data[i+j] = std::exp(input.data[i+j]);
-                    ++j;
-                }
-
-                // 2. 处理中间对齐部分
-                size_t aligned_end=shape_last-(shape_last%lanes);
-                for (; j+lanes<=aligned_end; j +=  lanes  )
-                {
-                    auto vec = Load(tag, input.data + i + j);
-                    auto vec_result = Exp(vec); 
-                    Store(vec_result, tag, output.data + i + j);
-                }
-
-                // 3. 处理尾部剩余元素
-                for (;j<shape_last;j++)
-                {
-                    output.data[i+j] = std::exp(input.data[i+j]);
-                } 
+                 
+                    output.data[i] = std::exp(input.data[i]);
+                
             });
         }
         else

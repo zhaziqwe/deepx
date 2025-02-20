@@ -44,12 +44,12 @@ namespace deepx::op
             deepx::tensorfunc::add(*b_grad, *c_grad, *b_grad);  // b_grad += c_grad
         }
     };
-    // 注册add算子
  
     template <typename T>
     class Add_scalar : public OpT<T>
     {
     public:
+        Add_scalar()=default;
         Add_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("add_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
@@ -80,6 +80,7 @@ namespace deepx::op
     class Sub : public OpT<T>
     {
     public:
+        Sub()=default;
         Sub(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("sub",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
@@ -111,6 +112,7 @@ namespace deepx::op
     class Mul : public OpT<T>
     {
     public:
+        Mul()=default;
         Mul(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("mul",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
@@ -147,6 +149,7 @@ namespace deepx::op
     class Mul_scalar : public OpT<T>
     {
     public:
+        Mul_scalar()=default;
         Mul_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("mul_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
@@ -172,7 +175,7 @@ namespace deepx::op
             // 标量乘法的反向传播：
             // 对于 c = a * b，其中b是标量
             // ∂L/∂a = ∂L/∂c * ∂c/∂a = ∂L/∂c * b
-            deepx::tensorfunc::muladd(*c_grad, b, *a_grad, *a_grad);  // a_grad += c_grad * b
+            deepx::tensorfunc::muladd(*c_grad, b, *a_grad,T(1), *a_grad);  // a_grad += c_grad * b
             // 标量b不需要计算梯度
         }
     };
@@ -181,6 +184,7 @@ namespace deepx::op
     class Div : public OpT<T>
     {
     public:
+        Div()=default;
         Div(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("div",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
@@ -223,6 +227,7 @@ namespace deepx::op
     class Div_scalar : public OpT<T>
     {
     public:
+        Div_scalar()=default;
         Div_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("div_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
@@ -254,38 +259,41 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Sqrt : public OpT<T>{
-        public:
-            Sqrt(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-                this->init("sqrt",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
-            }
-            Sqrt(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-                this->init("sqrt",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
-            }
-            void forward(mem::Mem &mem) override
-            {
-                auto a = mem.gettensor<T>(this->args[0]).get();
-                auto b = mem.gettensor<T>(this->returns[0]).get();
-                deepx::tensorfunc::sqrt(*a, *b);
-            }
-            //已验证，2025-02-19，lipeng
-            void backward(mem::Mem &mem) override
-            {
-                auto b = mem.gettensor<T>(this->returns[0]).get();  // b = sqrt(a)
-                auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
-                auto b_grad = mem.gettensor<T>(this->returns_grad[0]).get();
-                
-                // 平方根的反向传播：
-                // 对于 b = sqrt(a)
-                // ∂L/∂a = ∂L/∂b * ∂b/∂a = ∂L/∂b * (1/(2*sqrt(a))) = b_grad/(2*b)
-                deepx::tensorfunc::divadd(*b_grad, *b,T(0.5), *a_grad, T(1), *a_grad);  // a_grad += 0.5 * b_grad/b
-            }
+    class Sqrt : public OpT<T>
+    {
+    public:
+        Sqrt()=default;
+        Sqrt(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
+            this->init("sqrt",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+        }
+        Sqrt(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
+            this->init("sqrt",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+        }
+        void forward(mem::Mem &mem) override
+        {
+            auto a = mem.gettensor<T>(this->args[0]).get();
+            auto b = mem.gettensor<T>(this->returns[0]).get();
+            deepx::tensorfunc::sqrt(*a, *b);
+        }
+        //已验证，2025-02-19，lipeng
+        void backward(mem::Mem &mem) override
+        {
+            auto b = mem.gettensor<T>(this->returns[0]).get();  // b = sqrt(a)
+            auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
+            auto b_grad = mem.gettensor<T>(this->returns_grad[0]).get();
+            
+            // 平方根的反向传播：
+            // 对于 b = sqrt(a)
+            // ∂L/∂a = ∂L/∂b * ∂b/∂a = ∂L/∂b * (1/(2*sqrt(a))) = b_grad/(2*b)
+            deepx::tensorfunc::divadd(*b_grad, *b,T(0.5), *a_grad, T(1), *a_grad);  // a_grad += 0.5 * b_grad/b
+        }
     };
 
     template <typename T>
     class Exp : public OpT<T>
     {
     public:
+        Exp()=default;
         Exp(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("exp",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }

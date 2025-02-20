@@ -12,6 +12,7 @@
 #include "deepx/op/op.hpp"
 #include "deepx/op/elementwise.hpp"
 #include "deepx/op/reduce.hpp"
+#include "deepx/op/opfactory.hpp"
 #include "deepx/mem/mem.hpp"
 #include "client/udpserver.hpp"
  
@@ -31,6 +32,7 @@ int main()
 
     client::udpserver server(8080);
     deepx::op::OpFactory opfactory;
+    deepx::op::register_all(opfactory);
     server.func = [&mem, &opfactory](char *buffer)
     {
         deepx::op::Op op;

@@ -106,35 +106,5 @@ namespace deepx::op
             return deepx::dtype<T>::name();
         }
     };
-
-    using Op_dtype = std::unordered_map<std::string, std::shared_ptr<Op>>;
-
-    class OpFactory
-    {
-    private:
-        std::unordered_map<std::string, Op_dtype> ops;
-
-    public:
-    
-        template <typename T>
-        int add_op(const T &op)
-        {
-            ops[op.name][op.dtype] = std::make_shared<T>(op);
-            return 0;
-        }
-
-        std::shared_ptr<Op> get_op(const Op &op)
-        {
-            auto &type_map = ops[op.name];
-            auto it = type_map.find(op.dtype);
-            if (it != type_map.end())
-            {
-                auto src = it->second;
-                return src;
-            }
-            return nullptr;
-        }
-    };
-
 }
 #endif

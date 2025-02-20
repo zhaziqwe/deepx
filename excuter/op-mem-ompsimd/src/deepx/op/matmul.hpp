@@ -18,6 +18,7 @@ namespace deepx::op
     class MatMul : public OpT<T>
     {
     public:
+        MatMul()=default;
         MatMul(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("matmul",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
