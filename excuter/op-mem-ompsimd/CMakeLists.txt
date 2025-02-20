@@ -47,11 +47,11 @@ pkg_check_modules(JEMALLOC REQUIRED jemalloc)
 
 find_package(yaml-cpp REQUIRED)
  
-add_library(deepx SHARED 
+add_library(deepx_ompsimd SHARED 
     ${DEEPX_SOURCES}
 )
 
-target_link_libraries( deepx
+target_link_libraries( deepx_ompsimd
     PUBLIC 
     deepx_common
     yaml-cpp
@@ -64,7 +64,7 @@ target_link_libraries( deepx
 add_executable(${PROJECT_NAME} ${CLIENT_SOURCES})
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-    deepx
+    deepx_ompsimd
 )
 # 测试
 add_subdirectory(test/tensor)
