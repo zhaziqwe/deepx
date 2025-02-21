@@ -10,8 +10,13 @@ namespace deepx::op
 {   
     //new
     void register_new(OpFactory &opfactory){
+        opfactory.add_op(NewTensor<int8_t>());
+        opfactory.add_op(NewTensor<int16_t>());
+        opfactory.add_op(NewTensor<int32_t>());
+        opfactory.add_op(NewTensor<int64_t>());
         opfactory.add_op(NewTensor<float>());
         opfactory.add_op(NewTensor<double>());
+
         opfactory.add_op(ArgSet<int32_t>());
         opfactory.add_op(ArgSet<float>());
         opfactory.add_op(ArgSet<double>());
@@ -19,7 +24,6 @@ namespace deepx::op
     //del
     void register_del(OpFactory &opfactory){
         opfactory.add_op(DelTensor<float>());
-        opfactory.add_op(DelTensor<double>());
     }
     //init
     void register_uniform(OpFactory &opfactory){

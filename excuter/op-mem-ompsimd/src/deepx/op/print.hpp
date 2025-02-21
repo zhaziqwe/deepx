@@ -12,7 +12,7 @@ namespace deepx::op{
             this->init("print","any", {}, {}, false, {}, {});
         }
         void forward(mem::Mem &mem) override{
-            string name=this->returns[0];
+            string name=this->args[0];
             if (mem.existstensor(name)){
                 auto t=mem.gettensor<T>(name);
                 tensorfunc::print<T>(*t);

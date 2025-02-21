@@ -41,7 +41,7 @@ namespace deepx::op{
         }
         void forward(mem::Mem &mem) override{
             auto output = mem.gettensor<T>(this->returns[0]).get();
-            T value = mem.getarg<T>(this->args[1]);
+            T value = mem.getarg<T>(this->args[0]);
             tensorfunc::constant(*output,value);
         }
         void backward(mem::Mem &mem) override{
@@ -63,8 +63,8 @@ namespace deepx::op{
         }
         void forward(mem::Mem &mem) override{
             auto output = mem.gettensor<T>(this->returns[0]).get();
-            T start = mem.getarg<T>(this->args[1]);
-            T step = mem.getarg<T>(this->args[2]);
+            T start = mem.getarg<T>(this->args[0]);
+            T step = mem.getarg<T>(this->args[1]);
             tensorfunc::arange(*output,start,step);
         }
         void backward(mem::Mem &mem) override{

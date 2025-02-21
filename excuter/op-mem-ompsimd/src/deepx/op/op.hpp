@@ -52,60 +52,49 @@ namespace deepx::op
         }
 
         void load(const char* str) {
-            // 格式: opname dtype args returns require_grad args_grad returns_grad
-            // 例子: "add float32 a,b c 1 a.grad,b.grad c.grad"
-            // 或者: "add float32 a,b c 0"
-            // 或者: "print a"
-            
-            stringstream ss(str);
+            // 新格式示例：mul@float32 a(a_grad) b(b_grad) -> a(a_grad) requires_grad=true
+            string input(str);
+            size_t arrow_pos = input.find("->");
+            string head = input.substr(0, arrow_pos);
+            string tail = arrow_pos != string::npos ? input.substr(arrow_pos+2) : "";
+
+            // 解析操作名和类型
+            size_t at_pos = head.find('@');
+            if (at_pos != string::npos) {
+                name = head.substr(0, at_pos);
+                dtype = head.substr(at_pos+1, head.find(' ')-at_pos-1);
+                head = head.substr(head.find(' ')+1);
+            } else {
+                name = head.substr(0, head.find(' '));
+                dtype = "any";
+                head = head.substr(name.size()+1);
+            }
+
+            // 解析输入参数（支持带括号的梯度名）
+            stringstream head_ss(head);
             string token;
-            
-            // 读取操作名
-            ss >> name;
-            
-            // 读取数据类型
-            ss >> dtype;
-            
-            // 读取参数列表 (逗号分隔)
-            ss >> token;
-            args.clear();
-            stringstream args_ss(token);
-            string arg;
-            while (getline(args_ss, arg, ',')) {
-                args.push_back(arg);
-            }
-            
-            // 读取返回值列表
-            ss >> token;
-            returns.clear();
-            stringstream returns_ss(token);
-            string ret;
-            while (getline(returns_ss, ret, ',')) {
-                returns.push_back(ret);
-            }
-            
-            // 读取是否需要梯度
-            ss >> token;
-            require_grad = (token == "1");
-            
-            // 如果需要梯度，继续读取梯度变量名
-            if (require_grad && ss >> token) {
-                // 读取参数梯度列表
-                args_grad.clear();
-                stringstream args_grad_ss(token);
-                string arg_grad;
-                while (getline(args_grad_ss, arg_grad, ',')) {
-                    args_grad.push_back(arg_grad);
+            while (head_ss >> token) {
+                size_t bracket = token.find('(');
+                if (bracket != string::npos) {
+                    args.push_back(token.substr(0, bracket));
+                    args_grad.push_back(token.substr(bracket+1, token.find(')')-bracket-1));
+                    require_grad = true;
+                } else {
+                    args.push_back(token);
                 }
-                
-                // 读取返回值梯度列表
-                if (ss >> token) {
-                    returns_grad.clear();
-                    stringstream returns_grad_ss(token);
-                    string ret_grad;
-                    while (getline(returns_grad_ss, ret_grad, ',')) {
-                        returns_grad.push_back(ret_grad);
-                    }
+            }
+
+            // 解析输出参数和标志
+            stringstream tail_ss(tail);
+            while (tail_ss >> token) {
+                if (token.find('(') != string::npos) {
+                    size_t bracket = token.find('(');
+                    returns.push_back(token.substr(0, bracket));
+                    returns_grad.push_back(token.substr(bracket+1, token.find(')')-bracket-1));
+                } else if (token == "requires_grad=true") {
+                    require_grad = true;
+                } else {
+                    returns.push_back(token);
                 }
             }
         }

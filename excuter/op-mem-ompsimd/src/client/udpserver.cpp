@@ -44,7 +44,7 @@ namespace client
                          0, (struct sockaddr *)&cliaddr,
                          &len);
             buffer[n] = '\0';
-            std::cout << ">>"<< buffer << std::endl;
+            std::cout << "~"<< buffer;
             func(buffer);
         }
 

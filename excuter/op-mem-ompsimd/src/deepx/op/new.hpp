@@ -34,13 +34,13 @@ namespace deepx::op{
     class DelTensor : public OpT<T>{
         public:
         DelTensor(){
-            this->init("deltensor",dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("deltensor","any", {}, {}, false, {}, {});
         }
         DelTensor(string args){
-            this->init("deltensor",dtype<T>::name(), args, {}, false, {}, {});
+            this->init("deltensor","any", args, {}, false, {}, {});
         }
         DelTensor(initializer_list<string> args){
-            this->init("deltensor",dtype<T>::name(), args, {}, false, {}, {});
+            this->init("deltensor","any", args, {}, false, {}, {});
         }
         void forward(mem::Mem &mem) override{
             string name= this->args[0];
