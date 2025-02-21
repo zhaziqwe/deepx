@@ -68,6 +68,6 @@ target_link_libraries(${PROJECT_NAME}
 )
 # 测试
 add_subdirectory(test/tensor)
-add_subdirectory(test/op)
+add_subdirectory(test/tensorfunc)
 # # 数据集测试
 # add_subdirectory(test/dataset)
