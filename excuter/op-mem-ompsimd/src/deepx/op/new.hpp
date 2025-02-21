@@ -18,8 +18,8 @@ namespace deepx::op{
             this->init("newtensor",dtype<T>::name(), args, {}, false, {}, {});
         }
         void forward(mem::Mem &mem) override{
-            string name= this->args[0];
-            vector<int> shape=mem.getvector<int>(this->args[1]);
+            string name= this->returns[0];
+            vector<int> shape=mem.getvector<int32_t>(this->args[0]);
             Tensor<T> t=tensorfunc::New<T>(shape);
             mem.addtensor(name,t);
         }   

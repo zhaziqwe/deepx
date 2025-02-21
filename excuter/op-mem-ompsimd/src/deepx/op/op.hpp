@@ -6,7 +6,8 @@
 #include <memory>
 #include <string>
 #include <iostream>
-#include <yaml-cpp/yaml.h>
+#include <sstream>
+
 #include "deepx/tensor.hpp"
 #include "deepx/mem/mem.hpp"
 #include "deepx/dtype.hpp"
@@ -50,26 +51,62 @@ namespace deepx::op
             throw std::runtime_error("backward not implemented");
         }
 
-        void load(const char *yml)
-        {
-            YAML::Node config = YAML::Load(yml);
-            name = config["name"].as<std::string>();
-            dtype = config["dtype"].as<std::string>();
-            if (config["args"])
-            {
-                args = config["args"].as<std::vector<std::string>>();
+        void load(const char* str) {
+            // 格式: opname dtype args returns require_grad args_grad returns_grad
+            // 例子: "add float32 a,b c 1 a.grad,b.grad c.grad"
+            // 或者: "add float32 a,b c 0"
+            // 或者: "print a"
+            
+            stringstream ss(str);
+            string token;
+            
+            // 读取操作名
+            ss >> name;
+            
+            // 读取数据类型
+            ss >> dtype;
+            
+            // 读取参数列表 (逗号分隔)
+            ss >> token;
+            args.clear();
+            stringstream args_ss(token);
+            string arg;
+            while (getline(args_ss, arg, ',')) {
+                args.push_back(arg);
             }
-            if (config["returns"])
-            {
-                returns = config["returns"].as<std::vector<std::string>>();
+            
+            // 读取返回值列表
+            ss >> token;
+            returns.clear();
+            stringstream returns_ss(token);
+            string ret;
+            while (getline(returns_ss, ret, ',')) {
+                returns.push_back(ret);
             }
-            if (config["args_grad"])
-            {
-                args_grad = config["args_grad"].as<std::vector<std::string>>();
-            }
-            if (config["returns_grad"])
-            {
-                returns_grad = config["returns_grad"].as<std::vector<std::string>>();
+            
+            // 读取是否需要梯度
+            ss >> token;
+            require_grad = (token == "1");
+            
+            // 如果需要梯度，继续读取梯度变量名
+            if (require_grad && ss >> token) {
+                // 读取参数梯度列表
+                args_grad.clear();
+                stringstream args_grad_ss(token);
+                string arg_grad;
+                while (getline(args_grad_ss, arg_grad, ',')) {
+                    args_grad.push_back(arg_grad);
+                }
+                
+                // 读取返回值梯度列表
+                if (ss >> token) {
+                    returns_grad.clear();
+                    stringstream returns_grad_ss(token);
+                    string ret_grad;
+                    while (getline(returns_grad_ss, ret_grad, ',')) {
+                        returns_grad.push_back(ret_grad);
+                    }
+                }
             }
         }
         void init(const string &opname,

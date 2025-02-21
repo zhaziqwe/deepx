@@ -5,6 +5,7 @@
 #include "deepx/op/init.hpp"
 #include "deepx/op/new.hpp"
 #include "deepx/op/arg.hpp"
+#include "deepx/op/print.hpp"
 namespace deepx::op
 {   
     //new
@@ -37,6 +38,10 @@ namespace deepx::op
         register_uniform(opfactory);
         register_constant(opfactory);
         register_arange(opfactory);
+    }
+    //print
+    void register_print(OpFactory &opfactory){
+        opfactory.add_op(Print<float>());
     }
     //elementwise
      void register_add(OpFactory &opfactory){
@@ -110,6 +115,7 @@ namespace deepx::op
     int register_all(OpFactory &opfactory){
         register_new(opfactory);
         register_init(opfactory);
+        register_print(opfactory);
         register_elementwise_op(opfactory);
         register_concat(opfactory);
         register_matmul(opfactory);

@@ -30,10 +30,20 @@ int main()
         deepx::op::Op op;
         op.load(buffer);
 
-        shared_ptr<deepx::op::Op> opsrc = opfactory.get_op(op);
+
+        if (opfactory.ops.find(op.name)==opfactory.ops.end()){
+            cout<<"<op> "<<op.name<<" not found"<<endl;
+            return;
+        }
+        auto &type_map = opfactory.ops.find(op.name)->second;
+        if (type_map.find(op.dtype)==type_map.end()){
+            cout<<"<op>"<<op.name<<" "<<op.dtype<<" not found"<<endl;
+            return;
+        }
+        auto src = type_map.find(op.dtype)->second;
  
-        (*opsrc).init(op.name, op.dtype, op.args, op.returns, op.require_grad, op.args_grad, op.returns_grad);
-        (*opsrc).forward(mem);
+        (*src).init(op.name, op.dtype, op.args, op.returns, op.require_grad, op.args_grad, op.returns_grad);
+        (*src).forward(mem);
     };
     server.start();
     return 0;

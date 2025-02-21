@@ -18,8 +18,8 @@ namespace deepx::op{
         }
         void forward(mem::Mem &mem) override{
             auto output = mem.gettensor<T>(this->returns[0]).get();
-            T low = mem.getarg<T>(this->args[1]);
-            T high = mem.getarg<T>(this->args[2]);
+            T low = mem.getarg<T>(this->args[0]);
+            T high = mem.getarg<T>(this->args[1]);
             tensorfunc::uniform(*output,low,high);
         } 
         void backward(mem::Mem &mem) override{

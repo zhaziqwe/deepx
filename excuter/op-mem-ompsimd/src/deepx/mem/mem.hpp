@@ -117,19 +117,20 @@ namespace deepx::mem
             tempidx++;
             return cloned;
         }
-        template <typename T>
+ 
         bool existstensor(const string &name) const
         {
             return mem.find(name) != mem.end();
         }   
 
-        template <typename T>
+        template <typename T> 
         shared_ptr<Tensor<T>> gettensor(const string &name) const
         {
             auto  ptr = mem.at(name);
             return std::static_pointer_cast<Tensor<T>>(ptr);
         }
- 
+
+
         // 获取多个张量
         template <typename T>
         vector<Tensor<T> *> gettensors(const vector<string> &names) const

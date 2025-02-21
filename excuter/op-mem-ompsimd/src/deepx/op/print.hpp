@@ -2,21 +2,22 @@
 #define DEEPX_OP_PRINT_HPP
 
 #include "deepx/op/op.hpp"
+#include "deepx/tensorfunc/print.hpp"
 
 namespace deepx::op{
- 
+    template <typename T>
     class Print : public Op{
         public:
         Print(){
-            this->init("print","", {}, {}, false, {}, {});
+            this->init("print","any", {}, {}, false, {}, {});
         }
         void forward(mem::Mem &mem) override{
             string name=this->returns[0];
-            if (mem.existtensor(name)){
+            if (mem.existstensor(name)){
                 auto t=mem.gettensor<T>(name);
-                cout<<t<<endl;
+                tensorfunc::print<T>(*t);
             }else{
-                throw std::runtime_error("Print op does not support backward");
+                cout<<"<print> "<<name<<" not found"<<endl;
             }
         }   
         void backward(mem::Mem &mem) override{

@@ -14,28 +14,14 @@ namespace deepx::op
 
     class OpFactory
     {
-    private:
-        std::unordered_map<std::string, Op_dtype> ops;
-
     public:
-    
+        std::unordered_map<std::string, Op_dtype> ops;
         template <typename T>
         void add_op(const T &op)
         {
             ops[op.name][op.dtype] = std::make_shared<T>(op);
         }
-
-        std::shared_ptr<Op> get_op(const Op &op)
-        {
-            auto &type_map = ops[op.name];
-            auto it = type_map.find(op.dtype);
-            if (it != type_map.end())
-            {
-                auto src = it->second;
-                return src;
-            }
-            return nullptr;
-        }
+ 
 
         void print(){
             cout<<"support op:"<<endl;
