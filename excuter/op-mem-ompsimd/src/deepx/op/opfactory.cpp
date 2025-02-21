@@ -86,7 +86,7 @@ namespace deepx::op
         opfactory.add_op(Exp<double>());
     }
     void register_elementwise_op(OpFactory &opfactory){
-         register_add(opfactory);
+        register_add(opfactory);
         register_add_scalar(opfactory);
         register_sub(opfactory);
         register_mul(opfactory);
