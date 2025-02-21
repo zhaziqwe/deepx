@@ -21,8 +21,8 @@ Mem  makeMem(int cnt,std::vector<int> shape){
     Mem  mem; // 使用模板参数
 
     for (int j=0; j<cnt; j++){
-        auto ptr = std::make_shared<Tensor<float>>(New<float>(shape));
-        mem.add("tensor"+std::to_string(j), ptr);
+        auto ptr = New<float>(shape);
+        mem.addtensor("tensor"+std::to_string(j), ptr);
     }
     return mem;
 }

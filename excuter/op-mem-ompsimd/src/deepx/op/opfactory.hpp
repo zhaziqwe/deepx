@@ -36,6 +36,17 @@ namespace deepx::op
             }
             return nullptr;
         }
+
+        void print(){
+            cout<<"support op:"<<endl;
+            for(auto &op:ops){
+                cout<<op.first<<":";
+                for(auto &op2:op.second){
+                    cout<<"\t"<<op2.first;
+                }
+                cout<<endl;
+            }
+        }
     };
     
     int register_all(OpFactory &opfactory);  

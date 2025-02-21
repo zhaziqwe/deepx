@@ -19,21 +19,21 @@ Mem setmem(std::vector<int> shape,int k)
     Mem mem;
     Shape shape_a(shape);
     shape_a[-1]=k;
-    mem.add<float>("a",New<float>(shape_a.shape));
+    mem.addtensor("a",New<float>(shape_a.shape));
     // uniform(*mem.gettensor<float>("a").get(), -1.0f, 1.0f);
     arange<float>(*mem.gettensor<float>("a").get(), 0, 1); 
 
     Shape shape_b(shape);
     shape_b[-2]=k;
-    mem.add<float>("b",New<float>(shape_b.shape));
+    mem.addtensor("b",New<float>(shape_b.shape));
     constant(*mem.gettensor<float>("b").get(), 0.5f);
 
-    mem.add<float>("c",New<float>(shape));
+    mem.addtensor("c",New<float>(shape));
 
 
-    mem.add<float>("a.grad",New<float>(shape_a.shape));
-    mem.add<float>("b.grad",New<float>(shape_b.shape));
-    mem.add<float>("c.grad",New<float>(shape));
+    mem.addtensor("a.grad",New<float>(shape_a.shape));
+    mem.addtensor("b.grad",New<float>(shape_b.shape));
+    mem.addtensor("c.grad",New<float>(shape));
     constant(*mem.gettensor<float>("c.grad").get(), 3.33f);
 
     return mem;
@@ -63,7 +63,10 @@ void test_matmul()
 
 int main(int argc, char **argv)
 {
-    int casei=atoi(argv[1]);    
+    int casei=0;
+    if (argc>1){
+        casei=atoi(argv[1]);    
+    }
     switch (casei)
     {
     case 1:

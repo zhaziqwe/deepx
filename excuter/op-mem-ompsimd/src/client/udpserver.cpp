@@ -41,10 +41,10 @@ namespace client
             len = sizeof(cliaddr); // len is value/result
             // 接收消息
             n = recvfrom(sockfd, (char *)buffer, 1024,
-                         MSG_WAITALL, (struct sockaddr *)&cliaddr,
+                         0, (struct sockaddr *)&cliaddr,
                          &len);
             buffer[n] = '\0';
-            std::cout << "Received message: " << buffer << std::endl;
+            std::cout << "Recv "<<n<<"bytes:" << buffer << std::endl;
             func(buffer);
         }
 

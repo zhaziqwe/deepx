@@ -10,7 +10,9 @@ namespace deepx::op
     class Concat : public OpT<T>
     {
     public:
-        Concat()=default;
+        Concat(){
+            this->init("concat",dtype<T>::name(), {}, {}, false, {}, {});
+        }
         Concat(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("concat",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
@@ -25,7 +27,7 @@ namespace deepx::op
             }
             auto output = mem.gettensor<T>(this->returns[0]).get();
  
-            int axis = mem.get<int>(this->args.back());
+            int axis = mem.getarg<int>(this->args.back());
             tensorfunc::concat(input,axis,*output);
         };
         void backward(mem::Mem  &mem) override
@@ -34,7 +36,7 @@ namespace deepx::op
             for (int i=0;i<this->args.size()-1;i++){
                 input.push_back(mem.gettensor<T>(this->args[i]).get());
             }
-            int axis = mem.get<int>(this->args.back());
+            int axis = mem.getarg<int>(this->args.back());
             auto output = mem.gettensor<T>(this->returns[0]).get();
             tensorfunc::split(*output,axis,input);
         };

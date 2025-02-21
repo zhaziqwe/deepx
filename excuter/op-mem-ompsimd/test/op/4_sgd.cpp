@@ -17,18 +17,18 @@ Mem setmem(std::vector<int> shape,int k)
     Mem mem;
     Shape shape_a(shape);
     shape_a[-1]=k;
-    mem.add<float>("a",New<float>(shape_a.shape));
+    mem.addtensor("a",New<float>(shape_a.shape));
     arange<float>(*mem.gettensor<float>("a").get(), 1, 1);
 
     Shape shape_b(shape);
     shape_b[-2]=k;
-    mem.add<float>("b",New<float>(shape_b.shape));
+    mem.addtensor("b",New<float>(shape_b.shape));
     constant(*mem.gettensor<float>("b").get(), 0.5f);
 
-    mem.add<float>("a.grad",New<float>(shape_a.shape));
+    mem.addtensor("a.grad",New<float>(shape_a.shape));
     constant(*mem.gettensor<float>("a.grad").get(), 1.33f);
 
-    mem.add<float>("b.grad",New<float>(shape_b.shape));
+    mem.addtensor("b.grad",New<float>(shape_b.shape));
     constant(*mem.gettensor<float>("b.grad").get(), 2.33f);
 
     return mem;
@@ -66,7 +66,10 @@ void test_sgd()
 
 int main(int argc, char **argv)
 {
-    int casei = std::stoi(argv[1]);
+    int casei = 0;
+    if (argc>1){
+        casei=atoi(argv[1]);
+    }
     switch (casei)
     {
     case 1:

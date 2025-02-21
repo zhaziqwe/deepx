@@ -55,10 +55,22 @@ namespace deepx::op
             YAML::Node config = YAML::Load(yml);
             name = config["name"].as<std::string>();
             dtype = config["dtype"].as<std::string>();
-            args = config["args"].as<std::vector<std::string>>();
-            returns = config["returns"].as<std::vector<std::string>>();
-            args_grad = config["args_grad"].as<std::vector<std::string>>();
-            returns_grad = config["returns_grad"].as<std::vector<std::string>>();
+            if (config["args"])
+            {
+                args = config["args"].as<std::vector<std::string>>();
+            }
+            if (config["returns"])
+            {
+                returns = config["returns"].as<std::vector<std::string>>();
+            }
+            if (config["args_grad"])
+            {
+                args_grad = config["args_grad"].as<std::vector<std::string>>();
+            }
+            if (config["returns_grad"])
+            {
+                returns_grad = config["returns_grad"].as<std::vector<std::string>>();
+            }
         }
         void init(const string &opname,
                   const string &dtype,
@@ -73,26 +85,30 @@ namespace deepx::op
             this->args = args;
             this->returns = returns;
             this->require_grad = require_grad;
-
-            auto handle_grad = [](const vector<string> &src, auto &dest, const string &suffix)
-            {
-                if (!src.empty())
-                {
-                    dest = src;
+            
+            if (require_grad) {
+                // 如果提供了梯度变量名,就使用提供的名字
+                if (!args_grad.empty()) {
+                    this->args_grad = args_grad;
                 }
-                else
-                {
-                    for (const auto &s : dest)
-                    {
-                        dest.push_back(s + suffix);
+                // 否则为每个参数添加.grad后缀
+                else {
+                    this->args_grad.clear();
+                    for (const auto &arg : args) {
+                        this->args_grad.push_back(arg + ".grad");
                     }
                 }
-            };
 
-            if (require_grad)
-            {
-                handle_grad(args_grad, this->args_grad, ".grad");
-                handle_grad(returns_grad, this->returns_grad, ".grad");
+                // 同样处理返回值的梯度
+                if (!returns_grad.empty()) {
+                    this->returns_grad = returns_grad;
+                }
+                else {
+                    this->returns_grad.clear();
+                    for (const auto &ret : returns) {
+                        this->returns_grad.push_back(ret + ".grad");
+                    }
+                }
             }
         }
     };

@@ -21,25 +21,25 @@ void test_max()
     std::vector<int> shape = { 2, 3};
     Tensor<float> a = New<float>(shape);
     uniform(a, -1.0f, 1.0f);
-    mem.add("a", a);   
+    mem.addtensor("a", a);   
 
     Tensor<float> b = New<float>(shape);
     constant(b, 0.5f);
 
-    mem.add ("b", b);
+    mem.addtensor("b", b);
 
     Tensor<float> c = New<float>(shape);
-    mem.add("c", c);
+    mem.addtensor("c", c);
 
 
     Tensor<float> c_grad = New<float>(shape);
     constant(c_grad, 2.5f);
-    mem.add("c.grad", c_grad);
+    mem.addtensor("c.grad", c_grad);
 
     Tensor<float> a_grad = New<float>(shape);
     Tensor<float> b_grad = New<float>(shape);
-    mem.add("a.grad", a_grad);
-    mem.add("b.grad", b_grad);
+    mem.addtensor("a.grad", a_grad);
+    mem.addtensor("b.grad", b_grad);
 
 
     op::Max<float> max({"a", "b"}, {"c"}, true, {"a.grad", "b.grad"}, {"c.grad"});
@@ -58,19 +58,19 @@ void test_max_scalar()
     Mem mem;
     Tensor<float> A = New<float>({1, 2, 3});
     uniform(A, -1.0f, 1.0f);
-    mem.add("a", A);
+    mem.addtensor("a", A);
  
-    mem.add("b", 0.5f);
+    mem.addarg("b", 0.5f);
 
     Tensor<float> C = New<float>({1, 2, 3});
-    mem.add("c", C);
+    mem.addtensor("c", C);
 
     Tensor<float> c_grad = New<float>({1, 2, 3});
     constant(c_grad, 2.5f);
-    mem.add("c.grad", c_grad);
+    mem.addtensor("c.grad", c_grad);
 
     Tensor<float> a_grad = New<float>({1, 2, 3});
-    mem.add("a.grad", a_grad);
+    mem.addtensor("a.grad", a_grad);
 
     op::Max_scalar<float> max_scalar({"a", "b"}, {"c"}, true);
     max_scalar.forward(mem);
@@ -87,7 +87,10 @@ void test_max_scalar()
  
 int main(int argc, char **argv)
 {   
-    int casei=atoi(argv[1]);
+    int casei=0;
+    if (argc>1){
+        casei=atoi(argv[1]);
+    }
     switch (casei)
     {
     case 1:

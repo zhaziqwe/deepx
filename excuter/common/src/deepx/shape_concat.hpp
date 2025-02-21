@@ -6,7 +6,9 @@
 
 namespace deepx
 {
+
     Shape concatShape(const std::vector<Shape> &shapes,const int axis);
+
     template<typename T>
     Shape concatShape(const std::vector<Tensor<T>*> &tensors,const int axis){
         std::vector<Shape> shapes;

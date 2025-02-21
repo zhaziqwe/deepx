@@ -17,18 +17,18 @@ Mem setmem(std::vector<int> shape)
 {
     Mem mem;
  
-    mem.add<float>("a",New<float>(shape));
+    mem.addtensor("a",New<float>(shape));
     uniform(*mem.gettensor<float>("a").get(), -1.0f, 1.0f);
 
-    mem.add<float>("b",New<float>(shape));
+    mem.addtensor("b",New<float>(shape));
     constant(*mem.gettensor<float>("b").get(), 0.5f);
 
-    mem.add<float>("c",New<float>(shape));
+    mem.addtensor("c",New<float>(shape));
 
 
-    mem.add<float>("a.grad",New<float>(shape));
-    mem.add<float>("b.grad",New<float>(shape));
-    mem.add<float>("c.grad",New<float>(shape));
+    mem.addtensor("a.grad",New<float>(shape));
+    mem.addtensor("b.grad",New<float>(shape));
+    mem.addtensor("c.grad",New<float>(shape));
     constant(*mem.gettensor<float>("c.grad").get(), 3.33f);
 
     return mem;
@@ -61,15 +61,15 @@ void test_add_scalar()
 {
     Mem mem;
     std::vector<int> shape = { 2, 3};
-    mem.add<float>("a",New<float>(shape));
+    mem.addtensor("a",New<float>(shape));
     uniform(*mem.gettensor<float>("a").get(), -1.0f, 1.0f);
 
-    mem.add<float>("b",0.5f);
+    mem.addarg("b",0.5f);
 
-    mem.add<float>("c",New<float>(shape));
+    mem.addtensor("c",New<float>(shape));
     
-    mem.add<float>("a.grad",New<float>(shape));
-    mem.add<float>("c.grad",New<float>(shape));
+    mem.addtensor("a.grad",New<float>(shape));
+    mem.addtensor("c.grad",New<float>(shape));
     constant(*mem.gettensor<float>("c.grad").get(), 3.33f);
 
     op::Add_scalar<float> add_scalar({"a", "b"}, {"c"}, true, {"a.grad"}, {"c.grad"});
@@ -105,7 +105,10 @@ void test_div()
 }
 int main(int argc, char **argv)
 {
-    int casei=atoi(argv[1]);    
+    int casei=0;
+    if (argc>1){
+        casei=atoi(argv[1]);
+    }
     switch (casei)
     {
     case 1:

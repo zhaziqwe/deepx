@@ -10,7 +10,7 @@
 namespace deepx::tensorfunc
 {
     template <typename T>
-    void uniform(Tensor<T> &tensor, T low = 0, T high = 1)
+    void uniform(Tensor<T> &tensor,const T low = 0,const T high = 1)
     {
         std::uniform_real_distribution<double> distribution(low, high);
         std::random_device rd;
@@ -32,7 +32,7 @@ namespace deepx::tensorfunc
     }
 
     template <typename T>
-    void constant(Tensor<T> &tensor, T value)
+    void constant(Tensor<T> &tensor,const T value)
     {
         std::fill(tensor.data, tensor.data + tensor.shape.size, value);
     }
@@ -47,7 +47,7 @@ namespace deepx::tensorfunc
     };
 
     template <typename T>
-    void arange(Tensor<T> &tensor, T start, T step = 1)
+    void arange(Tensor<T> &tensor, const T start,const T step = 1)
     {
         tensor.shape.rangeParallel(tensor.shape.dim, [&](int idx_linear)
                                    {

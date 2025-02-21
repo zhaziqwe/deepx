@@ -17,20 +17,20 @@ namespace deepx::mem
     private:
         unordered_map<string, std::any> args;
 
-        std::unordered_map<int, std::unordered_map<std::string, std::shared_ptr<void>>> mem;
+        std::unordered_map<std::string, std::shared_ptr<TensorBase>> mem;
         int tempidx=0;
 
-        template <typename T>
-        static std::shared_ptr<void> type_erase(const std::shared_ptr<Tensor<T>> &ptr)
-        {
-            return std::static_pointer_cast<void>(ptr);
-        }
+        // template <typename T>
+        // static std::shared_ptr<void> type_erase(const std::shared_ptr<Tensor<T>> &ptr)
+        // {
+        //     return std::static_pointer_cast<void>(ptr);
+        // }
 
-        template <typename T>
-        static std::shared_ptr<Tensor<T>> type_restore(const std::shared_ptr<void> &ptr)
-        {
-            return std::static_pointer_cast<Tensor<T>>(ptr);
-        }
+        // template <typename T>
+        // static std::shared_ptr<Tensor<T>> type_restore(const std::shared_ptr<void> &ptr)
+        // {
+        //     return std::static_pointer_cast<Tensor<T>>(ptr);
+        // }
 
     public:
         Mem() = default;
@@ -58,19 +58,19 @@ namespace deepx::mem
             return *this;
         }
         template <typename T>
-        void add(const string &name, const T value)
+        void addarg(const string &name, const T value)
         {
             args[name] = value;
         }
 
         template <typename T>
-        T get(const string &name) const
+        T getarg(const string &name) const
         {
             return any_cast<T>(args.at(name));
         }
 
         template <typename T>
-        void add(const string &name, const vector<T> &value)
+        void addvector(const string &name, const vector<T> &value)
         {
             args[name] = value;
         }
@@ -82,24 +82,29 @@ namespace deepx::mem
             return v;
         }
 
-        template <typename T>
-        void add(const string &name, Tensor<T> &&tensor)
-        {
-            constexpr int type_code = dtype<T>::value;
-            auto ptr = std::make_shared<Tensor<T>>(std::move(tensor));
-            mem[type_code][name] = type_erase(ptr);
-        }
 
+        //tensor
+        
         template <typename T>
-        void add(const string &name, const Tensor<T> &tensor)
+        void addtensor(const string &name, Tensor<T> &&tensor)
         {
-            if (exists<T>(name))
+            if (mem.find(name) != mem.end())
             {
                 throw std::runtime_error("Tensor already exists: " + name);
             }
-            constexpr int type_code = dtype<T>::value;
+            auto ptr = std::make_shared<Tensor<T>>(std::move(tensor));
+            mem[name] = ptr;
+        }
+
+        template <typename T>
+        void addtensor(const string &name, const Tensor<T> &tensor)
+        {
+            if (mem.find(name) != mem.end())
+            {
+                throw std::runtime_error("Tensor already exists: " + name);
+            }
             auto ptr = std::make_shared<Tensor<T>>(tensor);
-            mem[type_code][name] = type_erase(ptr);
+            mem[name] = ptr;
         }
 
         template <typename T>
@@ -108,55 +113,34 @@ namespace deepx::mem
             // 直接构造到shared_ptr避免移动
             auto temp = tensorfunc::New<T>(shape);  // 临时对象
             auto cloned = make_shared<Tensor<T>>(std::move(temp));  
-             constexpr int type_code = dtype<T>::value;
-            mem[type_code]["temp"+to_string(tempidx)]=type_erase(cloned);
+            mem["temp"+to_string(tempidx)]=cloned;
             tempidx++;
             return cloned;
         }
         template <typename T>
-        bool exists(const string &name) const
+        bool existstensor(const string &name) const
         {
-            constexpr int type_code = dtype<T>::value;
-            try
-            {
-                auto &type_map = mem.at(type_code);
-                auto erased_ptr = type_map.at(name);
-                return true;
-            }
-            catch (const std::out_of_range &)
-            {
-                return false;
-            }
-        }
+            return mem.find(name) != mem.end();
+        }   
+
         template <typename T>
         shared_ptr<Tensor<T>> gettensor(const string &name) const
         {
-            constexpr int type_code = dtype<T>::value;
-            try
-            {
-                auto &type_map = mem.at(type_code);
-                auto erased_ptr = type_map.at(name);
-                return type_restore<T>(erased_ptr);
-            }
-            catch (const std::out_of_range &)
-            {
-                throw std::runtime_error("Tensor not found: " + name);
-            }
+            auto  ptr = mem.at(name);
+            return std::static_pointer_cast<Tensor<T>>(ptr);
         }
-
+ 
         // 获取多个张量
         template <typename T>
         vector<Tensor<T> *> gettensors(const vector<string> &names) const
         {
-            constexpr int type_code = dtype<T>::value;
             std::vector<Tensor<T> *> tensors;
             try
             {
-                auto &type_map = mem.at(type_code);
                 for (const auto &name : names)
                 {
-                    auto erased_ptr = type_map.at(name);
-                    tensors.push_back(type_restore<T>(erased_ptr).get());
+                    auto ptr = mem.at(name);
+                    tensors.push_back(std::static_pointer_cast<Tensor<T>>(ptr).get());
                 }
             }
             catch (const std::out_of_range &)
@@ -166,6 +150,16 @@ namespace deepx::mem
             return tensors;
         }
 
+        template <typename T>
+        void delete_tensor(const string &name)
+        {
+            mem.erase(name);
+        }
+
+        void delete_arg(const string &name)
+        {
+            args.erase(name);
+        }
         void clear()
         {
             args.clear();

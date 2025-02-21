@@ -11,7 +11,9 @@ namespace deepx::op
     template<typename T>
     class Sum : public OpT<T>{
         public:
-            Sum()=default;
+            Sum(){
+                this->init("sum",dtype<T>::name(), {}, {}, false, {}, {});
+            }
             Sum(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
                 this->init("sum",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
             }
@@ -36,7 +38,9 @@ namespace deepx::op
  template<typename T>
     class Max : public OpT<T>{
         public:
-            Max()=default;
+            Max(){
+                this->init("max",dtype<T>::name(), {}, {}, false, {}, {});
+            }
             Max(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
                 this->init("max",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
             }
@@ -65,6 +69,9 @@ namespace deepx::op
     template<typename T>
     class Max_scalar : public OpT<T>{
         public:
+            Max_scalar(){
+                this->init("max_scalar",dtype<T>::name(), {}, {}, false, {}, {});
+            }
             Max_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
                 this->init("max_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
             }
@@ -75,14 +82,14 @@ namespace deepx::op
 
             void forward(mem::Mem &mem) override{
                 auto A=mem.gettensor<T>(this->args[0]);
-                auto b=mem.get<T>(this->args[1]);
+                auto b=mem.getarg<T>(this->args[1]);
                 auto output=mem.gettensor<T>(this->returns[0]);
                 deepx::tensorfunc::max(*A, b, *output);
             }
 
             void backward(mem::Mem &mem) override{
                 auto A=mem.gettensor<T>(this->args[0]);
-                auto b=mem.get<T>(this->args[1]);
+                auto b=mem.getarg<T>(this->args[1]);
                 auto A_grad=mem.gettensor<T>(this->args_grad [0]);
                 auto output_grad=mem.gettensor<T>(this->returns_grad[0]);
                 deepx::tensorfunc::max_grad(*A, b, *A_grad, *output_grad);
@@ -92,7 +99,9 @@ namespace deepx::op
     template<typename T>
     class Min : public OpT<T>{
         public:
-            Min()=default;
+            Min(){
+                this->init("min",dtype<T>::name(), {}, {}, false, {}, {});
+            }
             Min(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
                 this->init("min",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
             }
@@ -119,6 +128,9 @@ namespace deepx::op
     template<typename T>
     class Min_scalar : public OpT<T>{
         public:
+            Min_scalar(){
+                this->init("min_scalar",dtype<T>::name(), {}, {}, false, {}, {});
+            }
             Min_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
                 this->init("min_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
             }
@@ -127,14 +139,14 @@ namespace deepx::op
             }      
             void forward(mem::Mem &mem) override{
                 auto A=mem.gettensor<T>(this->args[0]);
-                auto b=mem.get<T>(this->args[1]);
+                auto b=mem.getarg<T>(this->args[1]);
                 auto output=mem.gettensor<T>(this->returns[0]);
                 deepx::tensorfunc::min(*A, b, *output);
             }
 
             void backward(mem::Mem &mem) override{
                 auto A=mem.gettensor<T>(this->args[0]);
-                auto b=mem.get<T>(this->args[1]);
+                auto b=mem.getarg<T>(this->args[1]);
                 auto A_grad=mem.gettensor<T>(this->args_grad[0]);
                 auto output_grad=mem.gettensor<T>(this->returns_grad[0]);
                 deepx::tensorfunc::min_grad(*A, b, *A_grad, *output_grad);

@@ -17,7 +17,9 @@ namespace deepx::op
     class Add : public OpT<T>
     {
     public:
-        Add()=default;
+        Add(){
+            this->init("add",dtype<T>::name(), {}, {}, false, {}, {});
+        }
         Add(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("add",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
@@ -49,7 +51,9 @@ namespace deepx::op
     class Add_scalar : public OpT<T>
     {
     public:
-        Add_scalar()=default;
+        Add_scalar(){
+            this->init("add_scalar",dtype<T>::name(), {}, {}, false, {}, {});
+        }
         Add_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("add_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
@@ -60,7 +64,7 @@ namespace deepx::op
         void forward(mem::Mem &mem) override
         {
             auto a = mem.gettensor<T>(this->args[0]);
-            auto b = mem.get<T>(this->args[1]);
+            auto b = mem.getarg<T>(this->args[1]);
             auto c = mem.gettensor<T>(this->returns[0]);
             deepx::tensorfunc::add(*a, b, *c);
         }
@@ -80,7 +84,9 @@ namespace deepx::op
     class Sub : public OpT<T>
     {
     public:
-        Sub()=default;
+        Sub(){
+            this->init("sub",dtype<T>::name(), {}, {}, false, {}, {});
+        }
         Sub(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("sub",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
@@ -112,7 +118,9 @@ namespace deepx::op
     class Mul : public OpT<T>
     {
     public:
-        Mul()=default;
+        Mul(){
+            this->init("mul",dtype<T>::name(), {}, {}, false, {}, {});
+        }
         Mul(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("mul",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
@@ -149,7 +157,9 @@ namespace deepx::op
     class Mul_scalar : public OpT<T>
     {
     public:
-        Mul_scalar()=default;
+        Mul_scalar(){
+            this->init("mul_scalar",dtype<T>::name(), {}, {}, false, {}, {});
+        }
         Mul_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("mul_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
@@ -160,7 +170,7 @@ namespace deepx::op
         void forward(mem::Mem &mem) override    
         {
             auto a = mem.gettensor<T>(this->args[0]).get();
-            auto b = mem.get<T>(this->args[1]);
+            auto b = mem.getarg<T>(this->args[1]);
             auto c = mem.gettensor<T>(this->returns[0]).get();
             deepx::tensorfunc::mul(*a, b, *c);
         }
@@ -168,7 +178,7 @@ namespace deepx::op
         void backward(mem::Mem &mem) override
         {
             // 需要用到前向传播的标量输入b
-            auto b = mem.get<T>(this->args[1]);  // 获取标量b
+            auto b = mem.getarg<T>(this->args[1]);  // 获取标量b
             auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
             auto c_grad = mem.gettensor<T>(this->returns_grad[0]).get();
             
@@ -184,7 +194,9 @@ namespace deepx::op
     class Div : public OpT<T>
     {
     public:
-        Div()=default;
+        Div(){
+            this->init("div",dtype<T>::name(), {}, {}, false, {}, {});
+        }
         Div(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("div",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
@@ -227,7 +239,9 @@ namespace deepx::op
     class Div_scalar : public OpT<T>
     {
     public:
-        Div_scalar()=default;
+        Div_scalar(){
+            this->init("div_scalar",dtype<T>::name(), {}, {}, false, {}, {});
+        }
         Div_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("div_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
@@ -238,7 +252,7 @@ namespace deepx::op
         void forward(mem::Mem &mem) override
         {
             auto a = mem.gettensor<T>(this->args[0]).get();
-            auto b = mem.get<T>(this->args[1]);
+            auto b = mem.getarg<T>(this->args[1]);
             auto c = mem.gettensor<T>(this->returns[0]).get();
             deepx::tensorfunc::div(*a, b, *c);  // 直接使用除法
         }
@@ -246,7 +260,7 @@ namespace deepx::op
         //已验证，2025-02-19，lipeng
         void backward(mem::Mem &mem) override
         {
-            auto b = mem.get<T>(this->args[1]);  // 获取标量b
+            auto b = mem.getarg<T>(this->args[1]);  // 获取标量b
             auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
             auto c_grad = mem.gettensor<T>(this->returns_grad[0]).get();
             
@@ -262,7 +276,9 @@ namespace deepx::op
     class Sqrt : public OpT<T>
     {
     public:
-        Sqrt()=default;
+        Sqrt(){
+            this->init("sqrt",dtype<T>::name(), {}, {}, false, {}, {});
+        }
         Sqrt(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("sqrt",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
@@ -293,7 +309,9 @@ namespace deepx::op
     class Exp : public OpT<T>
     {
     public:
-        Exp()=default;
+        Exp(){
+            this->init("exp",dtype<T>::name(), {}, {}, false, {}, {});
+        }
         Exp(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("exp",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
@@ -371,6 +389,9 @@ namespace deepx::op
     class Pow_scalar : public OpT<T>
     {
     public:
+        Pow_scalar(){
+            this->init("pow_scalar",dtype<T>::name(), {}, {}, false, {}, {});
+        }
         Pow_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("pow_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
@@ -380,7 +401,7 @@ namespace deepx::op
         void forward(mem::Mem &mem) override
         {
             auto a = mem.gettensor<T>(this->args[0]).get();
-            auto b = mem.get<T>(this->args[1]);
+            auto b = mem.getarg<T>(this->args[1]);
             auto c = mem.gettensor<T>(this->returns[0]);
             deepx::tensorfunc::pow(*a, b, *c);
         }   
@@ -388,7 +409,7 @@ namespace deepx::op
         {
             // 需要用到前向传播的输入、输出和标量指数
             auto a = mem.gettensor<T>(this->args[0]).get();
-            auto b = mem.get<T>(this->args[1]);  // 标量指数
+            auto b = mem.getarg<T>(this->args[1]);  // 标量指数
             auto c = mem.gettensor<T>(this->returns[0]).get();  // c = a^b
             auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
             auto c_grad = mem.gettensor<T>(this->returns_grad[0]).get();

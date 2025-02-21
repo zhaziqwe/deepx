@@ -18,11 +18,11 @@ int main()
     {
         Tensor<float> tensor = New<float>({1, 2, 3});
         uniform(tensor,0.0f,1.0f);
-        mem.add("tensor" + std::to_string(i), std::make_shared<Tensor<float>>(tensor));
+        mem.addtensor("tensor" + std::to_string(i),  tensor );
     }
  
-    cout << mem.exists<float>("tensor0") << endl;
-    print(*(mem.gettensor<float>("tensor0").get()));
+    cout << mem.existstensor<float>(string("tensor0")) << endl;
+    print(*(mem.gettensor<float>(string("tensor0")).get()));
     mem.clear();
  
     return 0;

@@ -2,11 +2,43 @@
 #include "deepx/op/elementwise.hpp"
 #include "deepx/op/reduce.hpp"
 #include "deepx/op/matmul.hpp"
-
+#include "deepx/op/init.hpp"
+#include "deepx/op/new.hpp"
+#include "deepx/op/arg.hpp"
 namespace deepx::op
 {   
+    //new
+    void register_new(OpFactory &opfactory){
+        opfactory.add_op(NewTensor<float>());
+        opfactory.add_op(NewTensor<double>());
+        opfactory.add_op(ArgSet<int32_t>());
+        opfactory.add_op(ArgSet<float>());
+        opfactory.add_op(ArgSet<double>());
+    }
+    //del
+    void register_del(OpFactory &opfactory){
+        opfactory.add_op(DelTensor<float>());
+        opfactory.add_op(DelTensor<double>());
+    }
+    //init
+    void register_uniform(OpFactory &opfactory){
+        opfactory.add_op(Uniform<float>());
+        opfactory.add_op(Uniform<double>());
+    }
+    void register_constant(OpFactory &opfactory){
+        opfactory.add_op(Constant<float>());
+        opfactory.add_op(Constant<double>());
+    }
+    void register_arange(OpFactory &opfactory){
+        opfactory.add_op(Arange<float>());
+        opfactory.add_op(Arange<double>());
+    }
+    void register_init(OpFactory &opfactory){
+        register_uniform(opfactory);
+        register_constant(opfactory);
+        register_arange(opfactory);
+    }
     //elementwise
-
      void register_add(OpFactory &opfactory){
         opfactory.add_op(Add<float>());
         opfactory.add_op(Add<double>());
@@ -76,8 +108,11 @@ namespace deepx::op
         opfactory.add_op(Min<double>());
     }
     int register_all(OpFactory &opfactory){
+        register_new(opfactory);
+        register_init(opfactory);
         register_elementwise_op(opfactory);
         register_concat(opfactory);
+        register_matmul(opfactory);
         register_reduce(opfactory);
         return 0;
     }
