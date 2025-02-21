@@ -21,7 +21,7 @@ int main()
         mem.addtensor("tensor" + std::to_string(i),  tensor );
     }
  
-    cout << mem.existstensor<float>(string("tensor0")) << endl;
+    cout << mem.existstensor(string("tensor0")) << endl;
     print(*(mem.gettensor<float>(string("tensor0")).get()));
     mem.clear();
  
