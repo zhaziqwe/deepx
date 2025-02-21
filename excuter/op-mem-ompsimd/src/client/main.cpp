@@ -1,3 +1,5 @@
+#include <mutex>
+
 #include <deepx/tensorfunc/init.hpp>
 #include <deepx/tensorfunc/new.hpp>
 #include <deepx/tensorfunc/print.hpp>
@@ -12,7 +14,8 @@ using namespace deepx::mem;
 
 int main()
 {
-    Mem  mem;   
+    Mem  mem;
+    std::mutex memmutex;
     deepx::Tensor<float> tensor =  New<float>({1, 2, 3});
     uniform(tensor,-1.0f,1.0f);
     mem.addtensor("tensor", tensor);
@@ -25,12 +28,10 @@ int main()
     deepx::op::OpFactory opfactory;
     deepx::op::register_all(opfactory);
     opfactory.print();
-    server.func = [&mem, &opfactory](const char *buffer)
+    server.func = [&mem, &opfactory, &memmutex](const char *buffer)
     {
         deepx::op::Op op;
         op.load(buffer);
-
-
         if (opfactory.ops.find(op.name)==opfactory.ops.end()){
             cout<<"<op> "<<op.name<<" not found"<<endl;
             return;
@@ -43,7 +44,9 @@ int main()
         auto src = type_map.find(op.dtype)->second;
  
         (*src).init(op.name, op.dtype, op.args, op.returns, op.require_grad, op.args_grad, op.returns_grad);
+        memmutex.lock();
         (*src).forward(mem);
+        memmutex.unlock();
     };
     server.start();
     return 0;
