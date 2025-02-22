@@ -1,5 +1,6 @@
-#ifndef __SERVER_HPP__
-#define __SERVER_HPP__
+#ifndef __CLIENT_UDPSERVER_HPP__
+#define __CLIENT_UDPSERVER_HPP__
+
 #include <iostream>
 #include <string.h>
 #include <arpa/inet.h>
