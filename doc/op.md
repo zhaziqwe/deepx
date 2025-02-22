@@ -22,66 +22,7 @@
 损失函数：NegativeLogLikelihoodLoss, SoftmaxCrossEntropyLoss
 其他融合操作：AffineGrid, CenterCropPad, Col2Im, Compress, DFT, ImageDecoder, Loop, NonMaxSuppression, Optional, OptionalGetElement, OptionalHasElement, RegexFullMatch, Scan, TfIdfVectorizer, Upsample
 
-## op通讯指令格式
 
-### 设置常量
-+ int数组
-argset@int 1 2 3->v_1
-+ int
-argset@int 10->int_10
-+ float数组
-argset@float 1.0 2.0 3.0->v_3
-+ float
-argset@float 10.0->float_10
-
-
-
-### 创建张量
-newtensor@int32 1 2 3->a
-
-### 填充张量
-
-constant@int32 int_10->a
-
-### 打印张量
-print a
-
-### 逐元素操作
-add@float32 a b->a requires_grad=true
-add_scalar@float32 a 10->a requires_grad=true
-mul@float32 a(a_grad) b(b_grad)->a(a_grad) requires_grad=true
-mul_scalar@float32 a 10->a requires_grad=true
-div@float32 a b->a requires_grad=true
-div_scalar@float32 a 10->a requires_grad=true
-sqrt@float32 a->a requires_grad=true
-exp@float32 a->a requires_grad=true
-
-
-### 广播操作
-broadcast@float32 a b->a requires_grad=true
-
-
-### 矩阵操作
-matmul@float32 a b->a requires_grad=true
-
-
-### 归约操作
-sum@float32 a->a requires_grad=true
-max@float32 a->a requires_grad=true
-min@float32 a->a requires_grad=true
-
-
-### 形状操作
-reshape@float32 a 1 2 3->a requires_grad=true
-flatten@float32 a->a requires_grad=true
-transpose@float32 a 1 2->a requires_grad=true
-unsqueeze@float32 a 1->a requires_grad=true
-squeeze@float32 a 1->a requires_grad=true
-
-### 类型操作
-cast@float32 a->a requires_grad=true
-cast_like@float32 a b->a requires_grad=true
- 
 
 
 
