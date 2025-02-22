@@ -19,19 +19,6 @@ namespace deepx::mem
 
         std::unordered_map<std::string, std::shared_ptr<TensorBase>> mem;
         int tempidx = 0;
-
-        // template <typename T>
-        // static std::shared_ptr<void> type_erase(const std::shared_ptr<Tensor<T>> &ptr)
-        // {
-        //     return std::static_pointer_cast<void>(ptr);
-        // }
-
-        // template <typename T>
-        // static std::shared_ptr<Tensor<T>> type_restore(const std::shared_ptr<void> &ptr)
-        // {
-        //     return std::static_pointer_cast<Tensor<T>>(ptr);
-        // }
-
     public:
         Mem() = default;
         ~Mem() = default;
@@ -62,7 +49,7 @@ namespace deepx::mem
         {
             if (args.find(name) != args.end())
             {
-                cerr << "Argument already exists: " << name << endl;
+                cerr << "arg already exists: " << name << endl;
             }
             args[name] = value;
         }
@@ -72,7 +59,7 @@ namespace deepx::mem
         {
             if (args.find(name) == args.end())
             {
-                cerr << "Argument not found: " << name << endl;
+                cerr << "arg not found: " << name << endl;
                 return T();
             }
             return any_cast<T>(args.at(name));
@@ -83,7 +70,7 @@ namespace deepx::mem
         {
             if (args.find(name) != args.end())
             {
-                cerr << "Vector already exists: " << name << endl;
+                cerr << "vector already exists: " << name << endl;
                 return;
             }
             args[name] = value;
@@ -94,7 +81,7 @@ namespace deepx::mem
         {
             if (args.find(name) == args.end())
             {
-                cerr << "Vector not found: " << name << endl;
+                cerr << "vector not found: " << name << endl;
                 return vector<T>();
             }
             auto v = any_cast<vector<T>>(args.at(name));
@@ -108,7 +95,7 @@ namespace deepx::mem
         {
             if (mem.find(name) != mem.end())
             {
-                cerr << "Tensor already exists: " << name << endl;
+                cerr << "tensor already exists: " << name << endl;
                 return;
             }
             auto ptr = std::make_shared<Tensor<T>>(std::move(tensor));
@@ -120,7 +107,7 @@ namespace deepx::mem
         {
             if (mem.find(name) != mem.end())
             {
-                cerr << "Tensor already exists: " << name << endl;
+                cerr << "tensor already exists: " << name << endl;
                 return;
             }
             auto ptr = std::make_shared<Tensor<T>>(tensor);
@@ -160,7 +147,7 @@ namespace deepx::mem
             {
                 if (mem.find(name) == mem.end())
                 {
-                    cerr << "Tensor not found: " << name << endl;
+                    cerr << "tensor not found: " << name << endl;
                     continue;
                 }
                 auto ptr = mem.at(name);
