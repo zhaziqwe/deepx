@@ -228,7 +228,15 @@ class Qwen2Model(nn.Module):
 # model_norm_weight.data
 # model_norm_weight.shape
 
- 
+class DeviceConfig:
+    def __init__(self, device_type="auto"):
+        self.device = self._get_device(device_type)
+        self.is_cuda = self.device.type == 'cuda'
+    
+    def _get_device(self, device_type):
+        if device_type == "auto":
+            return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        return torch.device(device_type)
 
 class DeepXModelLoader:
     def __init__(self, model_path):
@@ -263,32 +271,47 @@ class DeepXModelLoader:
         return torch.from_numpy(data.reshape(shape))
 
 class Qwen2Inference(nn.Module):
-    def __init__(self, config):
+    def __init__(self, config, device_config):
         super().__init__()
-        self.model = Qwen2Model(config)
-        self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
+        self.device_config = device_config
+        self.model = Qwen2Model(config).to(device_config.device)
+        self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False).to(device_config.device)
 
     def forward(self, input_ids, attention_mask=None):
         hidden_states = self.model(input_ids, attention_mask)
         return self.lm_head(hidden_states)
 
-def load_model(model_path):
-    # 初始化配置
-    config = ModelConfig()  # 替换原来的loader.config
-    # 构建模型
-    model = Qwen2Inference(config)
+def load_model(model_path, device_type="auto"):
+    config = ModelConfig()
+    device_config = DeviceConfig(device_type)
     
-    # 加载权重
+    model = Qwen2Inference(config, device_config)
+    
+    # 加载权重到指定设备
     state_dict = {}
     loader = DeepXModelLoader(model_path)
     tensor_dir = os.path.join(model_path, "tensors")
     for filename in os.listdir(tensor_dir):
         if filename.endswith(".shape"):
-            # 修复名称转换逻辑
-            filename = filename[:-6]
-            param = loader.load_tensor(filename)
-            state_dict[filename] = param
-    model.load_state_dict(state_dict, strict=False)
+            param_name = filename[:-6]
+            torch_name = param_name.replace('model_layers_', 'model.layers.')
+            torch_name = torch_name.replace('_self_attn_', '.self_attn.')
+            param = loader.load_tensor(param_name).to(device_config.device)
+            state_dict[torch_name] = param
+    
+    model.load_state_dict(state_dict, strict=True)
+    
+    # 应用动态量化
+    if device_config.device.type == 'cuda':
+        model = torch.quantization.quantize_dynamic(
+            model,
+            {torch.nn.Linear},
+            dtype=torch.qint8
+        )
+    
+    if device_config.is_cuda:
+        torch.cuda.empty_cache()
+    
     return model
 
 def run_inference(text, model, loader):
@@ -309,18 +332,22 @@ def generate(
     temperature: float = 0.7,
     top_p: float = 0.9
 ):
+    device = model.device_config.device
     inputs = tokenizer(prompt, return_tensors="pt")
-    input_ids = inputs["input_ids"]
+    input_ids = inputs["input_ids"].to(device)
     attention_mask = inputs.get("attention_mask", None)
+    if attention_mask is not None:
+        attention_mask = attention_mask.to(device)
     
     generated = input_ids
     
+    penalty_alpha = 0.6  # 重复惩罚系数
     for _ in range(max_length):
-        with torch.no_grad():
-            # 确保传递attention_mask
+        with torch.autocast(device_type='cuda', dtype=torch.bfloat16):
             outputs = model(input_ids=generated, attention_mask=attention_mask)
             
         logits = outputs[:, -1, :] / temperature
+        
         probs = torch.softmax(logits, dim=-1)
         
         # 修正Top-p采样逻辑（关键修改）
@@ -345,18 +372,20 @@ def generate(
         probs = probs / probs.sum(dim=-1, keepdim=True)
         
         next_token = torch.multinomial(probs, num_samples=1)
-        generated = torch.cat([generated, next_token], dim=-1)
+        print(tokenizer.decode(next_token[0].cpu().numpy()), end="", flush=True)
+        generated = torch.cat([generated, next_token.to(device)], dim=-1)
         
         if next_token.item() == tokenizer.eos_token_id:
             break
             
         # 更新attention_mask
-        attention_mask = torch.cat([
-            attention_mask,
-            torch.ones((1, 1), device=attention_mask.device)
-        ], dim=1) if attention_mask is not None else None
+        if attention_mask is not None:
+            attention_mask = torch.cat([
+                attention_mask,
+                torch.ones((1, 1), device=device)
+            ], dim=1)
             
-    return tokenizer.decode(generated[0], skip_special_tokens=True)
+    return tokenizer.decode(generated[0].cpu().numpy(), skip_special_tokens=True)
 
 def preprocess_input(text: str, tokenizer):
     inputs = tokenizer(
@@ -387,12 +416,13 @@ class InferenceContext:
 # 使用示例
 if __name__ == "__main__":
     model_path = "/home/lipeng/model/deepseek-ai/deepx"
-    model = load_model(model_path)
+    device_type = "cpu"  # 可选： "cpu" 或 "auto"
+    
+    model = load_model(model_path, device_type)
     loader = DeepXModelLoader(model_path)
     
     with InferenceContext():
         while True:
             text = input("Input: ")
-            # 使用新生成函数
             result = generate(model, loader.tokenizer, text)
             print(f"Response: {result}")
