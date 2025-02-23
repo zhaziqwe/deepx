@@ -4,6 +4,7 @@ import os
 import json
 import yaml
 import argparse
+import shutil
 
 
 class TensorInfo:
@@ -67,16 +68,17 @@ class SafeTensorExporter:
 
         # 保存全局配置
         self._save_config()
+        self._copy_tokenizer_files()
 
     def _save_tensor(self, name, tensor):
         """保存单个张量的元数据和二进制数据"""
-        base_path = os.path.join(self.output_dir, *name.split('.'))
+        # 将名称中的点转换为下划线，并创建统一路径
+        base_path = os.path.join(self.output_dir, "tensors", name)
         os.makedirs(os.path.dirname(base_path), exist_ok=True)
 
         # 处理bfloat16类型
         dtype_str = str(tensor.dtype).replace("torch.", "")
         if dtype_str == "bfloat16":
-            # 转换为numpy支持的float32格式
             tensor = tensor.float()
             dtype_str = "float32"
         
@@ -102,6 +104,22 @@ class SafeTensorExporter:
                 'model_config': self.config,
                 'format_version': 'deepx'
             }, f, default_flow_style=False)
+
+    def _copy_tokenizer_files(self):
+        """复制tokenizer相关文件到输出目录"""
+        required_files = [
+            "tokenizer.json",
+            "tokenizer_config.json",
+            "special_tokens_map.json",
+            "vocab.json",
+            "merges.txt",
+            "added_tokens.json"
+        ]
+        
+        for filename in required_files:
+            src = os.path.join(self.model_dir, filename)
+            if os.path.exists(src):
+                shutil.copy2(src, os.path.join(self.output_dir, filename))
 
 
 class SafeTensorLoader:
