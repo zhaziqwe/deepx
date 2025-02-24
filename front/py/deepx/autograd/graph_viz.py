@@ -1,8 +1,8 @@
 import graphviz
 from .graph import Graph
-from .tensornode import TensorNode
-from .opnode import OpNode
-from .constargnode import ConstArgNode
+from ._tensornode import TensorNode
+from ._opnode import OpNode
+from ._constargnode import ConstArgNode
 
 def graph_method(f):
     """装饰器:将函数注册为Graph类的方法"""

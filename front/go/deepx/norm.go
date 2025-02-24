@@ -22,8 +22,8 @@ func NewLayerNorm(name string, normalized_shape int, dtype Dtype, g *Graph) *Lay
 }
 
 func (m *LayerNorm) LayerNorm(x *Tensor) *Tensor {
-	op := x.LayerNorm(m.weight, m.bias)
-	return op
+
+	return nil
 }
 
 // BatchNorm 批归一化
@@ -52,8 +52,7 @@ func NewBatchNorm(name string, num_features int, dtype Dtype, g *Graph) *BatchNo
 }
 
 func (m *BatchNorm) BatchNorm(x *Tensor) *Tensor {
-	op := x.BatchNorm(m.weight, m.bias, m.running_mean, m.running_var)
-	return op
+	return nil
 }
 
 // InstanceNorm 实例归一化
@@ -78,8 +77,7 @@ func NewInstanceNorm(name string, num_features int, dtype Dtype, g *Graph) *Inst
 }
 
 func (m *InstanceNorm) InstanceNorm(x *Tensor) *Tensor {
-	op := x.InstanceNorm(m.weight, m.bias)
-	return op
+	return nil
 }
 
 // GroupNorm 组归一化
@@ -110,8 +108,7 @@ func NewGroupNorm(name string, num_groups, num_channels int, dtype Dtype, g *Gra
 }
 
 func (m *GroupNorm) GroupNorm(x *Tensor) *Tensor {
-	op := x.GroupNorm(m.weight, m.bias, m.num_groups)
-	return op
+	return nil
 }
 
 // RMSNorm Root Mean Square Layer Normalization
@@ -137,6 +134,5 @@ func NewRMSNorm(name string, normalized_shape int, dtype Dtype, g *Graph) *RMSNo
 }
 
 func (m *RMSNorm) RMSNorm(x *Tensor) *Tensor {
-	op := x.RMSNorm(m.weight, m.eps)
-	return op
+	return nil
 }

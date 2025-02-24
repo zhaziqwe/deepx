@@ -1,4 +1,8 @@
 from .tensor import Tensor
+from .shape import Shape
+from .devicetype import Device,DeviceType
+from .init import zeros, ones, arange,rand,randn,eye
+
 # from .creation import zeros, ones, arange
 # from .elementwise import add, sub, mul, div
 # from .matmul import matmul, dot
@@ -9,8 +13,10 @@ from .tensor import Tensor
 # from .dtype import DType, _dtype_to_typestr
 
 __all__ = [
+    'Device','DeviceType',
+    'Shape',
     'Tensor',
-    # 'zeros', 'ones', 'arange',
+     'zeros', 'ones', 'arange','rand','randn','eye',
     # 'add', 'sub', 'mul', 'div',
     # 'matmul', 'dot',
     # 'sum', 'mean', 'max', 'min',

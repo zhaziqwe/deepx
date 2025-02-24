@@ -1,8 +1,26 @@
-from ..tensor import Tensor
-from .tensornode import TensorNode
-from .opnode import OpNode
-from .constargnode import ConstArgNode
+from ..tensor.tensor import Tensor
+from ._tensornode import TensorNode
+from ._opnode import OpNode
+from ._constargnode import ConstArgNode
+
 class Graph:
+    # 类属性存储默认实例
+    _default_graph = None
+    
+    @classmethod
+    def get_default(cls):
+        """获取或创建默认计算图（线程不安全）"""
+        if cls._default_graph is None:
+            cls._default_graph = Graph()
+        return cls._default_graph
+    
+    @classmethod
+    def set_default(cls, graph):
+        """设置新的默认计算图（用于上下文管理）"""
+        if not isinstance(graph, Graph):
+            raise TypeError("Must be a Graph instance")
+        cls._default_graph = graph
+
     def __init__(self):
         self.nodes = []
         self.inputs = []
@@ -30,3 +48,6 @@ class Graph:
         node=ConstArgNode(value)
         self.nodes.append(node)
         return node
+
+# 初始化默认图
+Graph._default_graph = Graph()

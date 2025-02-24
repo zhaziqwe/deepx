@@ -1,10 +1,6 @@
-from .tensor import Tensor
-from ..graph.ops import OpNode
+from .tensor import Tensor,tensor_method
+ 
 
-def tensor_method(f):
-    """装饰器：将函数注册为Tensor类的方法"""
-    setattr(Tensor, f.__name__, f)
-    return f
 
 @tensor_method
 def add(self, other):

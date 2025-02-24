@@ -65,10 +65,10 @@ func (m *MultiHeadAttention) Forward(q, k, v *Tensor) *Tensor {
 
 	// 5. Scale
 	d_k := float32(head_dim)
-	scores = scores.Scale(1.0 / float32(math.Sqrt(float64(d_k))))
+	scores = scores.MulScalar(1.0 / float32(math.Sqrt(float64(d_k))))
 
 	// 6. Softmax
-	attn := scores.Softmax()
+	attn := scores.Softmax(1)
 
 	// 7. 加权求和
 	out := attn.Matmul(value)
