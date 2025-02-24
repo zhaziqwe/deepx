@@ -8,7 +8,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 from transformers import AutoTokenizer
-import re
 
 class ModelConfig:
     def __init__(self):

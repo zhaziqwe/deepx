@@ -5,6 +5,8 @@ import json
 import yaml
 import argparse
 import shutil
+import glob
+import re
 
 
 class TensorInfo:
@@ -54,19 +56,37 @@ class SafeTensorExporter:
                 return json.load(f)
         return {}
 
+    def _find_model_files(self):
+        """查找所有分片模型文件"""
+        single_file = os.path.join(self.model_dir, "model.safetensors")
+        shard_files = glob.glob(os.path.join(self.model_dir, "model-*-of-*.safetensors"))
+        
+        # 使用正则表达式提取分片编号
+        pattern = re.compile(r"model-(\d+)-of-(\d+)\.safetensors")
+        filtered_shards = []
+        for f in shard_files:
+            match = pattern.search(os.path.basename(f))
+            if match:
+                filtered_shards.append( (int(match.group(1)), f) )
+        
+        if os.path.exists(single_file):
+            return [single_file]
+        elif filtered_shards:
+            # 按分片编号排序后返回路径
+            filtered_shards.sort(key=lambda x: x[0])
+            return [f[1] for f in filtered_shards]
+        raise FileNotFoundError(f"No model files found in {self.model_dir}")
+
     def export(self):
         """导出safetensor模型到指定目录"""
-        model_path = os.path.join(self.model_dir, "model.safetensors")
-        if not os.path.exists(model_path):
-            raise FileNotFoundError(f"找不到模型文件: {model_path}")
+        model_files = self._find_model_files()
+        
+        for model_path in model_files:
+            with safe_open(model_path, framework="pt") as f:
+                for key in f.keys():
+                    tensor = f.get_tensor(key)
+                    self._save_tensor(key, tensor)
 
-        # 修改为使用PyTorch框架加载
-        with safe_open(model_path, framework="pt") as f:  # 改为pt框架
-            for key in f.keys():
-                tensor = f.get_tensor(key)
-                self._save_tensor(key, tensor)
-
-        # 保存全局配置
         self._save_config()
         self._copy_tokenizer_files()
 
@@ -135,34 +155,57 @@ class SafeTensorLoader:
                 return json.load(f)
         return {}
 
+    def _find_model_files(self):
+        """查找所有分片模型文件"""
+        single_file = os.path.join(self.model_dir, "model.safetensors")
+        shard_files = glob.glob(os.path.join(self.model_dir, "model-*-of-*.safetensors"))
+        
+        # 统一使用正则表达式匹配
+        pattern = re.compile(r"model-(\d+)-of-(\d+)\.safetensors")
+        filtered_shards = []
+        for f in shard_files:
+            match = pattern.search(os.path.basename(f))
+            if match:
+                filtered_shards.append( (int(match.group(1)), f) )
+        
+        if os.path.exists(single_file):
+            return [single_file]
+        elif filtered_shards:
+            filtered_shards.sort(key=lambda x: x[0])
+            return [f[1] for f in filtered_shards]
+        else:
+            raise FileNotFoundError(f"No model files found in {self.model_dir}")
+
     def load(self):
         """加载safetensor模型文件"""
         tensors = {}
         metadata = {}
+        
+        model_files = self._find_model_files()
+        
+        for model_path in model_files:
+            with safe_open(model_path, framework="pt") as f:
+                # 合并metadata
+                file_metadata = f.metadata() if hasattr(f, 'metadata') else {}
+                metadata.update(file_metadata)
+                
+                for key in f.keys():
+                    pt_tensor = f.get_tensor(key).cpu().detach()
 
-        model_path = os.path.join(self.model_dir, "model.safetensors")
-        if not os.path.exists(model_path):
-            raise FileNotFoundError(f"找不到模型文件: {model_path}")
+                    # 构造TensorInfo
+                    tensor_info = TensorInfo(
+                        dtype=str(pt_tensor.dtype).replace("torch.", ""),
+                        ndim=pt_tensor.ndim,
+                        shape=tuple(pt_tensor.shape),
+                        size=pt_tensor.numel(),
+                        strides=pt_tensor.stride() if pt_tensor.is_contiguous() else None
+                    )
 
-        with safe_open(model_path, framework="pt") as f:  # 修改为pt框架
-            metadata = f.metadata() if hasattr(f, 'metadata') else {}
-            for key in f.keys():
-                pt_tensor = f.get_tensor(key).cpu().detach()  # 获取PyTorch张量
+                    # 转换为字节流（保持内存对齐）
+                    byte_buffer = pt_tensor.numpy().tobytes() if pt_tensor.device == "cpu" \
+                        else pt_tensor.cpu().numpy().tobytes()
 
-                # 构造TensorInfo
-                tensor_info = TensorInfo(
-                    dtype=str(pt_tensor.dtype).replace("torch.", ""),
-                    ndim=pt_tensor.ndim,
-                    shape=tuple(pt_tensor.shape),
-                    size=pt_tensor.numel(),
-                    strides=pt_tensor.stride() if pt_tensor.is_contiguous() else None
-                )
-
-                # 转换为字节流（保持内存对齐）
-                byte_buffer = pt_tensor.numpy().tobytes() if pt_tensor.device == "cpu" \
-                    else pt_tensor.cpu().numpy().tobytes()
-
-                tensors[key] = Tensor(byte_buffer, tensor_info)
+                    tensors[key] = Tensor(byte_buffer, tensor_info)
 
         metadata["model_config"] = self.config
         return tensors, metadata
