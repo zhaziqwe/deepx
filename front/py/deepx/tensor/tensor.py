@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Optional, Union, Tuple
-from deepx import Shape
-from deepx import Device
+from .shape import Shape
+from .devicetype import Device
 from deepx.autograd.graph import Graph
 
 class Tensor:

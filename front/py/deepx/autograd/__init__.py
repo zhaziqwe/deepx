@@ -1,3 +1,6 @@
 from .graph import Graph
-
-__all__ = ['Graph']
+from .op import Op
+__all__ = [
+    'Graph',
+    'Op',
+   ]
