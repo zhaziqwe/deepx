@@ -13,11 +13,17 @@ namespace deepx::tensorfunc
     template <typename T>
     void arange(Tensor<T> &tensor, T start, T step);
 
- 
-    // template void arange<double>(Tensor<double> &tensor, double start, double step);
-    // template void arange<half>(Tensor<half> &tensor, half start, half step);
-    // template void arange<nv_bfloat16>(Tensor<nv_bfloat16> &tensor, nv_bfloat16 start, nv_bfloat16 step);
+   template <typename T>
+    void uniform(Tensor<T> &tensor,const T low = 0,const T high = 1);
     
+
+    template <typename T>
+    void constant(Tensor<T> &tensor,const T value);
+  
+
+    template <typename T>
+    void arange(Tensor<T> &tensor, const T start,const T step = 1);
+ 
 }
 
 #endif
