@@ -3,27 +3,38 @@ from deepx.autograd.graph import Graph,DataNode,OpNode
 from .deepxir import DeepxIR
 OpNode.register("add")
 
-@tensor_method
-def add(self, other):
-    resultnode = self.graph.add_tensor("", self)
-    opnode = self.graph.add_op("add")
-    opnode.add_input(self.node)
-    opnode.add_input(other.node)
-    resultnode.add_input(opnode)
-    if self.graph.eager:
-        ir=DeepxIR("add", self._dtype, [self.node.name, other.node.name], [resultnode.name])
+def add(a:Tensor,b:Tensor,out:Tensor):
+    opnode = a.graph.add_op("add")
+    opnode.add_input(a.node)
+    opnode.add_input(b.node)
+    out.node.add_input(opnode)
+    if a.graph.eager:
+        ir=DeepxIR("add", a.dtype, [a.node.name, b.node.name], [out.node.name])
         print(ir)
-    return resultnode
+
+@tensor_method
+def add_(self, other):
+    result = Tensor(dtype=self.dtype,shape=self.shape)   
+    result._node = self.graph.add_tensor("", self)
+    add(self,other,result)
+    return result
 
 OpNode.register("mul")
 
+def mul(a:Tensor,b:Tensor,out:Tensor):
+    opnode = a.graph.add_op("mul")
+    opnode.add_input(a.node)
+    opnode.add_input(b.node)
+    out.node.add_input(opnode)
+    if a.graph.eager:
+        ir=DeepxIR("mul", a.dtype, [a.node.name, b.node.name], [out.node.name])
+        print(ir)
+        
 @tensor_method
-def mul(self, other):
-    result = self.graph.add_tensor("", self.dtype, self.shape, self.requires_grad)
-    op = self.graph.add_op("mul")
-    op.add_input(self.node)
-    op.add_input(other.node)
-    result.add_input(op)
+def mul_(self, other):
+    result = Tensor(dtype=self.dtype,shape=self.shape)   
+    result._node = self.graph.add_tensor("", self)
+    mul(self,other,result)
     return result 
 
 

@@ -27,8 +27,6 @@ class Tensor:
             self._dtype = infer_dtype(data)
         else:
             self._dtype = dtype
-            self._data = data.astype(DTYPE_MAP[dtype], casting='safe')
-        self._node.dtype = dtype
         # shape
         if shape is not None:
             if isinstance(shape, (tuple, list)) and all(isinstance(i, int) for i in shape):
@@ -51,10 +49,7 @@ class Tensor:
             self._device = device
         else:
             self._device = Device.CPU  # 默认设备
-        
-        self._dtype = dtype
- 
-        self.data = data
+
     # shape
     @property
     def shape(self):
@@ -78,6 +73,7 @@ class Tensor:
     
     
     #dtype device
+    @property
     def dtype(self):
         return self._dtype
 
