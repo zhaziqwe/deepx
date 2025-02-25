@@ -1,6 +1,7 @@
-from deepx.autograd.op import Op
+from deepx.tensor.op import Op
 # 正向传播示例
 op = Op(
+    name="add",
     args=["t1", "t2"], 
     returns=["t3"],
     grad=True,
@@ -16,10 +17,11 @@ print(op.to_grad_ir("float32"))
 
 # 标量操作示例
 scalar_op = Op(
+    name="scalar",
     args=["t1", "a1"],  # a1为参数
     returns=["t3"],
     grad=True,
-    args_grad=["t1_grad"],
+    args_grad=["t1_grad",""],
     returns_grad=["t3_grad"]
 )
 print(scalar_op.to_ir("float32"))

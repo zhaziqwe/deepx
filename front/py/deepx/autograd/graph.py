@@ -1,4 +1,4 @@
-from ._tensornode import TensorNode
+from ._datanode import TensorNode
 from ._opnode import OpNode
 from ._constargnode import ConstArgNode
 
