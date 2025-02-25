@@ -1,6 +1,5 @@
 from typing import Any, Tuple, List, Optional
-from deepx  import Tensor
-from deepx.autograd.graph import Graph  
+from .graph import Graph  
 
 class Op:
     def __init__(self,args:List[str],returns:List[str],grad:bool,args_grad:List[str],returns_grad:List[str]):
@@ -11,9 +10,11 @@ class Op:
         self._grad=grad
         self._args_grad=args_grad
         self._returns_grad=returns_grad
-    def forward(self, *input:Tensor) -> Tuple[Tensor, ...]:
+
+    def forward(self, *input) -> Tuple:
         raise NotImplementedError
-    def backward(self, *grad_outputs: Tensor) -> Tuple[Optional[Tensor], ...]:
+ 
+    def backward(self, *grad_outputs) -> Tuple:
         raise NotImplementedError
 
     def to_ir(self, dtype: str, is_backward: bool = False) -> str:

@@ -6,23 +6,35 @@ class NodeType(IntEnum):
     CONST_ARG = 2
 
 class Node:
-    def __init__(self, name=None, ntype=NodeType.TENSOR):
-        self.ntype = ntype
-        self.name = name
+    def __init__(self, 
+                 ntype:NodeType=NodeType.TENSOR,
+                   name:str=None,
+                   graph =None):
+        from .graph import Graph
+        if graph == None:
+            self._graph = Graph.get_default()
+        else:
+            self._graph = graph
+
+        self._ntype = ntype
+        self._name = name
         self._inputs = {}
         self.attrs = {}
     
+    @property
     def ntype(self):
-        return self.ntype
+        return self._ntype
     
+    @property
     def name(self):
-        return self.name
-    
-    def inputs(self):
-        return self._inputs
-    
-    def input(self, name):
-        return self._inputs.get(name)
+        return self._name
+ 
+    @property
+    def input(self, name=None):
+        if name is None:
+            return self._inputs
+        else:
+            return self._inputs.get(name)
     
     def add_input(self, name, input_node):
         self._inputs[name] = input_node

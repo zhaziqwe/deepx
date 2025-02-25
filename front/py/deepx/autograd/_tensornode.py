@@ -1,5 +1,4 @@
 from .node import Node, NodeType
-from deepx import Tensor
 
 class TensorNode(Node):
     def __init__(self, name=None):
@@ -10,6 +9,7 @@ class TensorNode(Node):
         return self._tensor
     
     def set_tensor(self, tensor):
+        from deepx import Tensor
         if not isinstance(tensor, Tensor):
             raise TypeError("tensor must be an instance of Tensor")
         self._tensor = tensor
