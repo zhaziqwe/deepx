@@ -4,6 +4,7 @@ from ..autograd.graph import Graph
 class Op:
     def __init__(self, 
                 name:str,
+                dtype:str,
                 args: List[str], 
                 returns: List[str], 
                 grad: bool = False,
@@ -31,7 +32,7 @@ class Op:
                 raise ValueError("returns_grad必须与returns长度一致")
 
         self._name = name  
-        self._dtype = None
+        self._dtype = dtype
         self._args = args
         self._returns = returns
         self._grad = grad
@@ -58,33 +59,27 @@ class Op:
             for arg, grad in zip(self._args, self._args_grad)
         ]
 
-    def to_ir(self, dtype: str, is_backward: bool = False) -> str:
+    def ir(self) -> str:
         """生成IR指令的优化实现"""
-        parts = [f"{self._name}@{dtype}"]
-        arrow = "<-" if is_backward else "->"
+        parts = [f"{self._name}@{self._dtype}"]
         
         # 处理输入参数
-        param_list = []
-        for arg, grad in self.get_grad_mapping(is_backward):
-            if grad:  # 仅当存在梯度时添加括号
-                param_list.append(f"{arg}({grad})")
-            else:
-                param_list.append(arg)
-        parts.extend(param_list)
+        for i in range(len(self._args)):
+            arg_part = str(self._args[i])
+            if self._grad and self._args_grad[i]:
+                arg_part += f"({self._args_grad[i]})"
+            parts.append(arg_part)
+        
+        # 添加箭头
+        arrow = "->" if not self._grad else "<-"
+        parts.append(arrow)
         
         # 处理输出参数
-        outputs = []
-        for ret, ret_grad in zip(self._returns, self._returns_grad):
-            if is_backward and ret_grad:
-                outputs.append(f"{ret}({ret_grad})")
-            else:
-                outputs.append(ret)
+        for i in range(len(self._returns)):
+            ret_part = str(self._returns[i])
+            if self._grad and self._returns_grad[i]:
+                ret_part += f"({self._returns_grad[i]})"
+            parts.append(ret_part)
         
-        return f"{' '.join(parts)} {arrow} {','.join(outputs)}"
+        return ' '.join(parts)
 
-    # 新增梯度IR生成方法
-    def to_grad_ir(self, dtype: str) -> Optional[str]:
-        """生成反向传播IR指令"""
-        if not self._grad:
-            return None
-        return self.to_ir(dtype, is_backward=True)
