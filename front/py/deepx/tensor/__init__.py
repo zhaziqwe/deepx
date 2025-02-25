@@ -2,6 +2,7 @@ from .tensor import Tensor
 from .shape import Shape
 from .devicetype import Device,DeviceType
 from .init import zeros, ones, arange,rand,randn,eye
+from .elementwise import add, mul
 
 # from .creation import zeros, ones, arange
 # from .elementwise import add, sub, mul, div
@@ -17,7 +18,8 @@ __all__ = [
     'Shape',
     'Tensor',
      'zeros', 'ones', 'arange','rand','randn','eye',
-    # 'add', 'sub', 'mul', 'div',
+     'add', 'mul',
+    #  'mul', 'div',
     # 'matmul', 'dot',
     # 'sum', 'mean', 'max', 'min',
     # 'reshape', 'transpose',

@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Optional, Union, Tuple
 from .shape import Shape
 from .devicetype import Device
-from deepx.autograd.graph import Graph
+from deepx.autograd import Graph,DataNode
 
 class Tensor:
     def __init__(self, data=None, shape=None, device=None, dtype=None, graph=None):
@@ -37,9 +37,8 @@ class Tensor:
         if graph is None:
             self._graph = Graph.get_default()
         else:
-            self._graph = graph
-        # 计算图节点
-        self._node=  None
+            self._graph = graph 
+        self._node= self._graph.add_data(name="",data=self.data)
 
 
         self._requires_grad = False
@@ -80,6 +79,10 @@ class Tensor:
     def graph(self):
         return self._graph
      
+    @property
+    def node(self):
+        return self._node
+    
     @property
     def requires_grad(self):
         return self._requires_grad

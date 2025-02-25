@@ -1,6 +1,11 @@
 from .graph import Graph
-from ..tensor.op import Op
+from .node import Node
+from .nodetype import NodeType
+from ._datanode import DataNode
+
 __all__ = [
     'Graph',
-    'Op',
+    'Node',
+    'NodeType',
+    'DataNode',
    ]

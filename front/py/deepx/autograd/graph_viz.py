@@ -2,7 +2,7 @@ import graphviz
 from .graph import Graph
 from ._datanode import TensorNode
 from ._opnode import OpNode
-from ._constargnode import ConstArgNode
+from ._controlflownode import ConstArgNode
 
 def graph_method(f):
     """装饰器:将函数注册为Graph类的方法"""

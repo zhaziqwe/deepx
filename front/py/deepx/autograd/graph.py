@@ -1,6 +1,8 @@
-from ._datanode import TensorNode
+from ._datanode import DataNode
 from ._opnode import OpNode
-from ._constargnode import ConstArgNode
+from ._controlflownode import ControlFlowNode
+
+eager_mode=False
 
 class Graph:
     # 类属性存储默认实例
@@ -20,33 +22,38 @@ class Graph:
             raise TypeError("Must be a Graph instance")
         cls._default_graph = graph
 
-    def __init__(self):
+    def __init__(self,eager=False):
         self.nodes = []
         self.inputs = []
-        self.tensor_counter = 0  # 添加计数器
-        self.constarg_counter = 0     
-    def add_tensor(self, name, dtype, shape, requires_grad):
-        self.tensor_counter += 1
+        self.data_counter = 0
+        self.control_flow_counter = 0
+        self.eager=eager or eager_mode
+
+    def add_data(self, name, data,inputs=[]):
+        self.data_counter += 1
         if name == "":
-            name = f"tensor_{self.tensor_counter}"
-        node=TensorNode(name, dtype, shape, requires_grad)
-        for input in node.inputs:
-            node.add_input(input.name, input)
+            name = f"data_{self.data_counter}"
+        node=DataNode(name, data)
+        for input in inputs:
+            node.add_input(input)
         self.nodes.append(node)
         return node
-    def add_op(self,name,inputs):
+    def add_op(self,name,inputs=[]):
         node=OpNode(name)
         for input in inputs:
-            node.add_input(input.name, input)
+            node.add_input(input)
         self.nodes.append(node)
+        if self.eager:
+            return node.outputs[0]
         return node
-    def add_constarg(self, value):
-        self.constarg_counter += 1
+    def add_control_flow(self,name,inputs=[]):
+        self.control_flow_counter += 1
         if name == "":
-            name = f"constarg_{self.constarg_counter}"
-        node=ConstArgNode(value)
+            name = f"control_flow_{self.control_flow_counter}"
+        node=ControlFlowNode(name)
+        for input in inputs:
+            node.add_input(input)
         self.nodes.append(node)
         return node
-
 # 初始化默认图
 Graph._default_graph = Graph()
