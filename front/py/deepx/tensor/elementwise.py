@@ -1,17 +1,19 @@
 from .tensor import Tensor,tensor_method
 from deepx.autograd.graph import Graph,DataNode,OpNode
-
+from .deepxir import DeepxIR
 OpNode.register("add")
 
 @tensor_method
 def add(self, other):
-    result = self.graph.add_data("", self)
-    op = self.graph.add_op("add")
-    op.add_input(self.node)
-    op.add_input(other.node)
-    result.add_input(op)
-    
-    return result
+    resultnode = self.graph.add_tensor("", self)
+    opnode = self.graph.add_op("add")
+    opnode.add_input(self.node)
+    opnode.add_input(other.node)
+    resultnode.add_input(opnode)
+    if self.graph.eager:
+        ir=DeepxIR("add", self._dtype, [self.node.name, other.node.name], [resultnode.name])
+        print(ir)
+    return resultnode
 
 OpNode.register("mul")
 

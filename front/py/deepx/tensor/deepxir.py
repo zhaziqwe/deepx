@@ -1,7 +1,7 @@
 from typing import Any, Tuple, List, Optional
 from ..autograd.graph import Graph  
 
-class Op:
+class DeepxIR:
     def __init__(self, 
                 name:str,
                 dtype:str,
@@ -45,21 +45,7 @@ class Op:
     def backward(self, *grad_outputs) -> Tuple:
         raise NotImplementedError
 
-    def get_grad_mapping(self, is_backward: bool) -> List[Tuple[str, str]]:
-        """
-        获取参数与梯度的映射关系
-        Returns:
-            返回（参数名，梯度名）元组列表，梯度名为空表示无梯度
-        """
-        if not self._grad or not is_backward:
-            return [(arg, "") for arg in self._args]
-            
-        return [
-            (arg, grad) 
-            for arg, grad in zip(self._args, self._args_grad)
-        ]
-
-    def ir(self) -> str:
+    def __str__(self):
         """生成IR指令的优化实现"""
         parts = [f"{self._name}@{self._dtype}"]
         

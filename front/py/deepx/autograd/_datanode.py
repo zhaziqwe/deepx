@@ -2,10 +2,10 @@ from .node import Node
 from .nodetype import NodeType 
  
 class DataNode(Node):
-    def __init__(self, name=None, data=None):
+    def __init__(self, name=None, type=None, data=None):
         super().__init__(name=name, ntype=NodeType.DATA)
         self._data = data
-    
+        self._type=type
     def data(self):
         return self._data
     

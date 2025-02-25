@@ -24,7 +24,6 @@ class OpNodeMeta(type):
 class OpNode(Node, metaclass=OpNodeMeta):
     def __init__(self, name: str):
         super().__init__(name=name, ntype=NodeType.OP)
-
     @classmethod
     def register(cls, name: str) -> None:
         cls.__class__.register_op(name)

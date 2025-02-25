@@ -1,9 +1,7 @@
 from ._datanode import DataNode
 from ._opnode import OpNode
 from ._controlflownode import ControlFlowNode
-
-eager_mode=False
-
+ 
 class Graph:
     # 类属性存储默认实例
     _default_graph = None
@@ -22,29 +20,58 @@ class Graph:
             raise TypeError("Must be a Graph instance")
         cls._default_graph = graph
 
-    def __init__(self,eager=False):
+    def __init__(self,eager=True):
         self.nodes = []
         self.inputs = []
-        self.data_counter = 0
+        self.var_counter = 0
+        self.vector_counter = 0
+        self.tensor_counter = 0
         self.control_flow_counter = 0
-        self.eager=eager or eager_mode
+        self.eager=eager
+    
+    @property
+    def eager(self):
+        return self._eager
+    @eager.setter
+    def eager(self,value):
+        self._eager=value
 
-    def add_data(self, name, data,inputs=[]):
-        self.data_counter += 1
+    def add_var(self, name,data,inputs=[]):
+        self.var_counter += 1
         if name == "":
-            name = f"data_{self.data_counter}"
-        node=DataNode(name, data)
+            name = f"var_{self.var_counter}"
+        node=DataNode(name, "var", data)
         for input in inputs:
             node.add_input(input)
         self.nodes.append(node)
         return node
+    
+    def add_vector(self, name,data,inputs=[]):
+        self.vector_counter += 1
+        if name == "":
+            name = f"vector_{self.vector_counter}"
+        node=DataNode(name, "vector", data)
+        for input in inputs:
+            node.add_input(input)
+        self.nodes.append(node)
+        return node
+    
+    def add_tensor(self, name,data,inputs=[]):
+        self.tensor_counter += 1
+        if name == "":
+            name = f"tensor_{self.tensor_counter}"
+        node=DataNode(name, "tensor", data)
+        for input in inputs:
+            node.add_input(input)
+        self.nodes.append(node)
+        return node
+
+
     def add_op(self,name,inputs=[]):
         node=OpNode(name)
         for input in inputs:
             node.add_input(input)
         self.nodes.append(node)
-        if self.eager:
-            return node.outputs[0]
         return node
     def add_control_flow(self,name,inputs=[]):
         self.control_flow_counter += 1

@@ -1,6 +1,6 @@
-from deepx.tensor.op import Op
+from deepx.tensor.deepxir import DeepxIR
 # 正向传播示例
-op = Op(
+op = DeepxIR(
     name="add",
     args=["t1", "t2"], 
     returns=["t3"],
@@ -16,7 +16,7 @@ print(op.to_grad_ir("float32"))
 # 输出: add@float32 t1(t1_grad) t2(t2_grad) <- t3(t3_grad)
 
 # 标量操作示例
-scalar_op = Op(
+scalar_op = DeepxIR(
     name="scalar",
     args=["t1", "a1"],  # a1为参数
     returns=["t3"],

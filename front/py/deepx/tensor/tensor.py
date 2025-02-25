@@ -3,17 +3,32 @@ from typing import Optional, Union, Tuple
 from .shape import Shape
 from .devicetype import Device
 from deepx.autograd import Graph,DataNode
-
+from .deepxir import DeepxIR
+from .dtype import infer_dtype,DTYPE_MAP
 class Tensor:
     def __init__(self, data=None, shape=None, device=None, dtype=None, graph=None):
+        # 计算图相关
+        if graph is None:
+            self._graph = Graph.get_default()
+        else:
+            self._graph = graph 
+        self._node= self._graph.add_tensor("",data=self)
+
         # data
         if data is not None:
             import numpy as np
             if not isinstance(data, np.ndarray):
                 data = np.array(data)
-            self.data = data
+            self.data = data           
             self._shape = Shape(data.shape)
         
+        # dtype
+        if dtype is None:
+            self._dtype = infer_dtype(data)
+        else:
+            self._dtype = dtype
+            self._data = data.astype(DTYPE_MAP[dtype], casting='safe')
+        self._node.dtype = dtype
         # shape
         if shape is not None:
             if isinstance(shape, (tuple, list)) and all(isinstance(i, int) for i in shape):
@@ -22,7 +37,13 @@ class Tensor:
                 self._shape = shape
             else:
                 raise ValueError("Invalid shape")
-        
+        shapeNode=self._graph.add_vector("",data=self._shape.shape)
+        self._node.add_input(shapeNode)
+        if self._graph.eager:
+            ir1=DeepxIR("argset", 'int32',  self._shape.shape, [shapeNode.name])
+            print(ir1)
+            ir2=DeepxIR("newtensor", self._dtype, [shapeNode.name], [self._node.name])
+            print(ir2)
         # device
         if isinstance(device, str):
             self._device = Device.from_string(device)
@@ -32,17 +53,7 @@ class Tensor:
             self._device = Device.CPU  # 默认设备
         
         self._dtype = dtype
-
-        # 计算图相关
-        if graph is None:
-            self._graph = Graph.get_default()
-        else:
-            self._graph = graph 
-        self._node= self._graph.add_data(name="",data=self.data)
-
-
-        self._requires_grad = False
-
+ 
         self.data = data
     # shape
     @property
