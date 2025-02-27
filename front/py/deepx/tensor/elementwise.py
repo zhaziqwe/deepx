@@ -3,13 +3,13 @@ from .tensor import Tensor,tensor_method
 from deepx.autograd.graph import Graph,DataNode,OpNode
 from .deepxir import DeepxIR
 from deepx.scheduler import send
-#add
-OpNode.register("add")
-def add(
+
+def _A_B_op_C(
         a:Tensor,
         b: Optional[Union[Tensor, float, int]] = None, 
-        out:Optional[Tensor]=None):
-    opnode = a.graph.add_op("add")
+        op:str=None,
+        out:Tensor=None):
+    opnode = a.graph.add_op(op)
     opnode.add_input(a.node)
     varnode=None
     if isinstance(b,Tensor):
@@ -20,12 +20,20 @@ def add(
     out.node.add_input(opnode)
     if a.graph.eager:
         if isinstance(b,Tensor):
-            ir=DeepxIR("add", a.dtype, [a.node.name, b.node.name], [out.node.name])
+            ir=DeepxIR(op, a.dtype, [a.node.name, b.node.name], [out.node.name])
         else:
             varir=DeepxIR("argset", a.dtype, [b], [varnode.name])
             send(str(varir))
-            ir=DeepxIR("add_scalar", a.dtype, [a.node.name,varnode.name], [out.node.name])
+            ir=DeepxIR(op+"_scalar", a.dtype, [a.node.name,varnode.name], [out.node.name])
         send(str(ir))
+
+#add
+OpNode.register("add")
+def add(
+        a:Tensor,
+        b: Optional[Union[Tensor, float, int]] = None, 
+        out:Tensor=None):
+    _A_B_op_C(a,b,"add",out)
 
 @tensor_method
 def add_(self, other):
@@ -35,13 +43,7 @@ def add_(self, other):
 #sub
 OpNode.register("sub")
 def sub(a:Tensor,b:Tensor,out:Tensor):
-    opnode = a.graph.add_op("sub")
-    opnode.add_input(a.node)
-    opnode.add_input(b.node)
-    out.node.add_input(opnode)
-    if a.graph.eager:
-        ir=DeepxIR("sub", a.dtype, [a.node.name, b.node.name], [out.node.name])
-        send(str(ir))
+    _A_B_op_C(a,b,out)
 @tensor_method
 def sub_(self, other):
     result = Tensor(dtype=self.dtype,shape=self.shape)
@@ -51,13 +53,7 @@ def sub_(self, other):
 #mul
 OpNode.register("mul")
 def mul(a:Tensor,b:Tensor,out:Tensor):
-    opnode = a.graph.add_op("mul")
-    opnode.add_input(a.node)
-    opnode.add_input(b.node)
-    out.node.add_input(opnode)
-    if a.graph.eager:
-        ir=DeepxIR("mul", a.dtype, [a.node.name, b.node.name], [out.node.name])
-        send(str(ir))
+    _A_B_op_C(a,b,"mul",out)
 @tensor_method
 def mul_(self, other):
     result = Tensor(dtype=self.dtype,shape=self.shape)   
@@ -68,18 +64,34 @@ def mul_(self, other):
 #div
 OpNode.register("div")
 def div(a:Tensor,b:Tensor,out:Tensor):
-    opnode = a.graph.add_op("div")
-    opnode.add_input(a.node)
-    opnode.add_input(b.node)
-    out.node.add_input(opnode)
-    if a.graph.eager:
-        ir=DeepxIR("div", a.dtype, [a.node.name, b.node.name], [out.node.name])
-        send(str(ir))
+    _A_B_op_C(a,b,"div",out)
 @tensor_method
 def div_(self, other):
     result = Tensor(dtype=self.dtype,shape=self.shape)
     div(self,other,result)
     return result   
+
+
+#max
+OpNode.register("max")
+def max(a:Tensor,b:Tensor,out:Tensor):
+    _A_B_op_C(a,b,"max",out)
+
+@tensor_method
+def max_(self, other):
+    result = Tensor(dtype=self.dtype,shape=self.shape)
+    max(self,other,result)
+    return result
+#min    
+OpNode.register("min")
+def min(a:Tensor,b:Tensor,out:Tensor):
+    _A_B_op_C(a,b,"min",out)
+
+@tensor_method
+def min_(self, other):
+    result = Tensor(dtype=self.dtype,shape=self.shape)
+    min(self,other,result)
+    return result
 
 # OpNode.register("ReLU", 101)
 # OpNode.register("Placeholder", 102)

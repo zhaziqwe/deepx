@@ -1,7 +1,7 @@
 from .tensor import Tensor
 from .shape import Shape
 from .devicetype import Device,DeviceType
-from .init import zeros, ones, arange,rand,randn,eye
+from .init import full,zeros, ones, arange,rand,randn,eye
 from .elementwise import add, mul
 
 # from .creation import zeros, ones, arange

@@ -16,18 +16,11 @@ int main()
 {
     Mem  mem;
     std::mutex memmutex;
-    deepx::Tensor<float> tensor =  New<float>({1, 2, 3});
-    uniform(tensor,-1.0f,1.0f);
-    mem.addtensor("tensor", tensor);
 
-    deepx::Tensor<float> result = New<float>({1, 2, 3});
-
-    mem.addtensor("result", result);
-    print(tensor);
     client::udpserver server(8080);
     deepx::op::OpFactory opfactory;
     deepx::op::register_all(opfactory);
-    opfactory.print();
+
     server.func = [&mem, &opfactory, &memmutex](const char *buffer)
     {
         deepx::op::Op op;

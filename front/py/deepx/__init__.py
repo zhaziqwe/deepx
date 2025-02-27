@@ -5,7 +5,7 @@ __all__ = [
     'Tensor',
     'Shape',
     'Device','DeviceType',
-    'zeros', 'ones', 'arange', 'rand', 'randn', 'eye'
+    'full','zeros', 'ones', 'arange', 'rand', 'randn', 'eye'
 ]
 
 # 为了支持 import deepx as dx 的用法
