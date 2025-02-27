@@ -4,36 +4,45 @@ from deepx.autograd.graph import Graph,DataNode,OpNode
 from .deepxir import DeepxIR
 from deepx.scheduler import send
 
-def _A_B_op_C(
+def _A_B_elementwiseop_C(
         a:Tensor,
-        b: Optional[Union[Tensor, float, int]] = None, 
+        b: Tensor, 
         op:str=None,
         out:Tensor=None):
     opnode = a.graph.add_op(op)
     opnode.add_input(a.node)
-    varnode=None
-    if isinstance(b,Tensor):
-        opnode.add_input(b.node)
-    else:
-        varnode=a.graph.add_var("",b)
-        opnode.add_input(varnode)
+    opnode.add_input(b.node)
     out.node.add_input(opnode)
     if a.graph.eager:
-        if isinstance(b,Tensor):
-            ir=DeepxIR(op, a.dtype, [a.node.name, b.node.name], [out.node.name])
-        else:
-            varir=DeepxIR("argset", a.dtype, [b], [varnode.name])
-            send(str(varir))
-            ir=DeepxIR(op+"_scalar", a.dtype, [a.node.name,varnode.name], [out.node.name])
+        ir=DeepxIR(op, a.dtype, [a.node.name, b.node.name], [out.node.name])
         send(str(ir))
-
+def _A_b_elementwiseop_C(
+        a:Tensor,
+        b: Optional[Union[ float, int]] = None, 
+        op:str=None,
+        out:Tensor=None):
+    opnode = a.graph.add_op(op)
+    opnode.add_input(a.node)
+    varnode=a.graph.add_var("",b)
+    opnode.add_input(varnode)
+    out.node.add_input(opnode)
+    if a.graph.eager:
+        varir=DeepxIR("argset", a.dtype, [b], [varnode.name])
+        send(str(varir))
+        ir=DeepxIR(op+"_scalar", a.dtype, [a.node.name,varnode.name], [out.node.name])
+        send(str(ir))
 #add
 OpNode.register("add")
+OpNode.register("add_scalar")
+
 def add(
         a:Tensor,
         b: Optional[Union[Tensor, float, int]] = None, 
         out:Tensor=None):
-    _A_B_op_C(a,b,"add",out)
+    if isinstance(b,Tensor):
+        _A_B_elementwiseop_C(a,b,"add",out)
+    else:
+        _A_b_elementwiseop_C(a,b,"add",out)
 
 @tensor_method
 def add_(self, other):
@@ -42,8 +51,16 @@ def add_(self, other):
     return result
 #sub
 OpNode.register("sub")
-def sub(a:Tensor,b:Tensor,out:Tensor):
-    _A_B_op_C(a,b,out)
+OpNode.register("sub_scalar")
+
+def sub(
+        a:Tensor,
+        b: Optional[Union[Tensor, float, int]] = None, 
+        out:Tensor=None):   
+    if isinstance(b,Tensor):
+        _A_B_elementwiseop_C(a,b,"sub",out)
+    else:
+        _A_b_elementwiseop_C(a,b,"sub",out)
 @tensor_method
 def sub_(self, other):
     result = Tensor(dtype=self.dtype,shape=self.shape)
@@ -52,8 +69,16 @@ def sub_(self, other):
 
 #mul
 OpNode.register("mul")
-def mul(a:Tensor,b:Tensor,out:Tensor):
-    _A_B_op_C(a,b,"mul",out)
+OpNode.register("mul_scalar")
+
+def mul(
+        a:Tensor,
+        b: Optional[Union[Tensor, float, int]] = None, 
+        out:Tensor=None):
+    if isinstance(b,Tensor):
+        _A_B_elementwiseop_C(a,b,"mul",out)
+    else:
+        _A_b_elementwiseop_C(a,b,"mul",out)
 @tensor_method
 def mul_(self, other):
     result = Tensor(dtype=self.dtype,shape=self.shape)   
@@ -63,8 +88,16 @@ def mul_(self, other):
 
 #div
 OpNode.register("div")
-def div(a:Tensor,b:Tensor,out:Tensor):
-    _A_B_op_C(a,b,"div",out)
+OpNode.register("div_scalar")
+
+def div(
+        a:Tensor,
+        b: Optional[Union[Tensor, float, int]] = None, 
+        out:Tensor=None):
+    if isinstance(b,Tensor):
+        _A_B_elementwiseop_C(a,b,"div",out)
+    else:
+        _A_b_elementwiseop_C(a,b,"div",out)
 @tensor_method
 def div_(self, other):
     result = Tensor(dtype=self.dtype,shape=self.shape)
@@ -72,26 +105,6 @@ def div_(self, other):
     return result   
 
 
-#max
-OpNode.register("max")
-def max(a:Tensor,b:Tensor,out:Tensor):
-    _A_B_op_C(a,b,"max",out)
-
-@tensor_method
-def max_(self, other):
-    result = Tensor(dtype=self.dtype,shape=self.shape)
-    max(self,other,result)
-    return result
-#min    
-OpNode.register("min")
-def min(a:Tensor,b:Tensor,out:Tensor):
-    _A_B_op_C(a,b,"min",out)
-
-@tensor_method
-def min_(self, other):
-    result = Tensor(dtype=self.dtype,shape=self.shape)
-    min(self,other,result)
-    return result
 
 # OpNode.register("ReLU", 101)
 # OpNode.register("Placeholder", 102)

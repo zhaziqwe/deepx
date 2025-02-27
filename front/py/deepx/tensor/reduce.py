@@ -4,8 +4,9 @@ from .tensor import Tensor,tensor_method
 from deepx.autograd.graph import OpNode
 from .deepxir import DeepxIR    
 from deepx.scheduler import send
+from .elementwise import _A_b_elementwiseop_C
 
-def _A_v_op_C(
+def _A_v_reduceop_C(
         a:Tensor,
         v: Optional[Union[Tensor, float, int]] = None, 
         op:str=None,
@@ -21,12 +22,51 @@ def _A_v_op_C(
         send(str(varir))
         ir=DeepxIR(op+"_scalar", a.dtype, [a.node.name,vector_node.name], [out.node.name])
         send(str(ir))
-    
+
+
+#max
+OpNode.register("max")
+OpNode.register("max_scalar")
+
+def max(
+        a:Tensor,
+        b:Optional[Union[float,int],Union[Tensor,float,int]]=None,
+        out:Tensor=None):
+    if isinstance(b,list):
+        _A_v_reduceop_C(a,b,"max",out)
+    else:
+        _A_b_elementwiseop_C(a,b,"max_scalar",out)
+
+@tensor_method
+def max_(self, other):
+    result = Tensor(dtype=self.dtype,shape=self.shape)
+    max(self,other,result)
+    return result
+
+#min    
+OpNode.register("min")
+OpNode.register("min_scalar")
+
+def min(a:Tensor,b:Tensor,out:Tensor):
+    if isinstance(b,list):
+        _A_v_reduceop_C(a,b,"min",out)
+    else:
+        _A_b_elementwiseop_C(a,b,"min_scalar",out)
+
+@tensor_method
+def min_(self, other):
+    result = Tensor(dtype=self.dtype,shape=self.shape)
+    min(self,other,result)
+    return result
+
 
 #sum    
 OpNode.register("sum")
-def sum(a:Tensor,b:Tensor,out:Tensor):
-    _A_v_op_C(a,b,"sum",out)
+def sum(
+        a:Tensor,
+        b:list[int],
+        out:Tensor):
+    _A_v_reduceop_C(a,b,"sum",out)
 
 @tensor_method
 def sum_(self, other):
