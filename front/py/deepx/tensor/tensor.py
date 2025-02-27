@@ -5,6 +5,8 @@ from .devicetype import Device
 from deepx.autograd import Graph,DataNode
 from .deepxir import DeepxIR
 from .dtype import infer_dtype,DTYPE_MAP,default_dtype
+from deepx.scheduler import send
+
 class Tensor:
     def __init__(
             self,
@@ -48,7 +50,7 @@ class Tensor:
         self._node.add_input(shapeNode)
         if self._graph.eager:
             ir2=DeepxIR("newtensor", self._dtype, self._shape.shape, [self._node.name])
-            print(ir2)
+            send(str(ir2))
         # device
         if isinstance(device, str):
             self._device = Device.from_string(device)
@@ -100,6 +102,11 @@ class Tensor:
     @property
     def requires_grad(self):
         return self._requires_grad
+    
+    def __repr__(self) -> str:
+        ir=DeepxIR("print",'', [self._node.name], [])
+        send(str(ir))
+        return ""
 
 def tensor_method(f):
     setattr(Tensor, f.__name__, f)

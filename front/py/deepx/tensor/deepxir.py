@@ -46,8 +46,10 @@ class DeepxIR:
         raise NotImplementedError
 
     def __str__(self):
-        """生成IR指令的优化实现"""
-        parts = [f"{self._name}@{self._dtype}"]
+        if self._dtype == None or self._dtype == '':
+            parts = [self._name]
+        else:
+            parts = [f"{self._name}@{self._dtype}"]  # 常规类型显示
         
         # 处理输入参数
         for i in range(len(self._args)):

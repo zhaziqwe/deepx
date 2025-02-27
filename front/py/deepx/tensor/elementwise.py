@@ -1,25 +1,55 @@
+from typing import Optional, Union
 from .tensor import Tensor,tensor_method
 from deepx.autograd.graph import Graph,DataNode,OpNode
 from .deepxir import DeepxIR
+from deepx.scheduler import send
+#add
 OpNode.register("add")
-
-def add(a:Tensor,b:Tensor,out:Tensor):
+def add(
+        a:Tensor,
+        b: Optional[Union[Tensor, float, int]] = None, 
+        out:Optional[Tensor]=None):
     opnode = a.graph.add_op("add")
     opnode.add_input(a.node)
-    opnode.add_input(b.node)
+    varnode=None
+    if isinstance(b,Tensor):
+        opnode.add_input(b.node)
+    else:
+        varnode=a.graph.add_var("",b)
+        opnode.add_input(varnode)
     out.node.add_input(opnode)
     if a.graph.eager:
-        ir=DeepxIR("add", a.dtype, [a.node.name, b.node.name], [out.node.name])
-        print(ir)
+        if isinstance(b,Tensor):
+            ir=DeepxIR("add", a.dtype, [a.node.name, b.node.name], [out.node.name])
+        else:
+            varir=DeepxIR("argset", a.dtype, [b], [varnode.name])
+            send(str(varir))
+            ir=DeepxIR("add_scalar", a.dtype, [a.node.name,varnode.name], [out.node.name])
+        send(str(ir))
 
 @tensor_method
 def add_(self, other):
     result = Tensor(dtype=self.dtype,shape=self.shape)
     add(self,other,result)
     return result
+#sub
+OpNode.register("sub")
+def sub(a:Tensor,b:Tensor,out:Tensor):
+    opnode = a.graph.add_op("sub")
+    opnode.add_input(a.node)
+    opnode.add_input(b.node)
+    out.node.add_input(opnode)
+    if a.graph.eager:
+        ir=DeepxIR("sub", a.dtype, [a.node.name, b.node.name], [out.node.name])
+        send(str(ir))
+@tensor_method
+def sub_(self, other):
+    result = Tensor(dtype=self.dtype,shape=self.shape)
+    sub(self,other,result)
+    return result
 
+#mul
 OpNode.register("mul")
-
 def mul(a:Tensor,b:Tensor,out:Tensor):
     opnode = a.graph.add_op("mul")
     opnode.add_input(a.node)
@@ -27,8 +57,7 @@ def mul(a:Tensor,b:Tensor,out:Tensor):
     out.node.add_input(opnode)
     if a.graph.eager:
         ir=DeepxIR("mul", a.dtype, [a.node.name, b.node.name], [out.node.name])
-        print(ir)
-        
+        send(str(ir))
 @tensor_method
 def mul_(self, other):
     result = Tensor(dtype=self.dtype,shape=self.shape)   
@@ -36,11 +65,26 @@ def mul_(self, other):
     mul(self,other,result)
     return result 
 
+#div
+OpNode.register("div")
+def div(a:Tensor,b:Tensor,out:Tensor):
+    opnode = a.graph.add_op("div")
+    opnode.add_input(a.node)
+    opnode.add_input(b.node)
+    out.node.add_input(opnode)
+    if a.graph.eager:
+        ir=DeepxIR("div", a.dtype, [a.node.name, b.node.name], [out.node.name])
+        send(str(ir))
+@tensor_method
+def div_(self, other):
+    result = Tensor(dtype=self.dtype,shape=self.shape)
+    div(self,other,result)
+    return result   
 
 # OpNode.register("ReLU", 101)
 # OpNode.register("Placeholder", 102)
 # OpNode.register("Neg", 103)
-# OpNode.register("Less", 104)
+# NodeType.register("Less", 104)
 # NodeType.register("Equal", 105)
 # NodeType.register("Sigmoid", 106)
 # NodeType.register("Tanh", 107)
