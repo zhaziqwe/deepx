@@ -17,7 +17,7 @@ __all__ = [
     'Device','DeviceType',
     'Shape',
     'Tensor',
-     'zeros', 'ones', 'arange','rand','randn','eye',
+     'full','zeros', 'ones', 'arange','rand','randn','eye',
      'add', 'mul',
     #  'mul', 'div',
     # 'matmul', 'dot',

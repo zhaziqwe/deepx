@@ -14,8 +14,7 @@ def add(a:Tensor,b:Tensor,out:Tensor):
 
 @tensor_method
 def add_(self, other):
-    result = Tensor(dtype=self.dtype,shape=self.shape)   
-    result._node = self.graph.add_tensor("", self)
+    result = Tensor(dtype=self.dtype,shape=self.shape)
     add(self,other,result)
     return result
 

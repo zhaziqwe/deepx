@@ -4,15 +4,21 @@ from .shape import Shape
 from .devicetype import Device
 from deepx.autograd import Graph,DataNode
 from .deepxir import DeepxIR
-from .dtype import infer_dtype,DTYPE_MAP
+from .dtype import infer_dtype,DTYPE_MAP,default_dtype
 class Tensor:
-    def __init__(self, data=None, shape=None, device=None, dtype=None, graph=None):
+    def __init__(
+            self,
+            data=None,
+            shape=None,
+            device=None,
+            dtype:Optional[str]=None, 
+            graph:Optional[Graph]=None):
         # 计算图相关
         if graph is None:
             self._graph = Graph.get_default()
         else:
             self._graph = graph 
-        self._node= self._graph.add_tensor("",data=self)
+        self._node= self._graph.add_tensor("",t=self)
 
         # data
         if data is not None:
@@ -24,9 +30,12 @@ class Tensor:
         
         # dtype
         if dtype is None:
-            self._dtype = infer_dtype(data)
+            if data is not None:
+                self._dtype = infer_dtype(data)
+            else:
+                self._dtype = default_dtype
         else:
-            self._dtype = dtype
+            self._dtype = str(dtype)
         # shape
         if shape is not None:
             if isinstance(shape, (tuple, list)) and all(isinstance(i, int) for i in shape):
@@ -38,9 +47,7 @@ class Tensor:
         shapeNode=self._graph.add_vector("",data=self._shape.shape)
         self._node.add_input(shapeNode)
         if self._graph.eager:
-            ir1=DeepxIR("argset", 'int32',  self._shape.shape, [shapeNode.name])
-            print(ir1)
-            ir2=DeepxIR("newtensor", self._dtype, [shapeNode.name], [self._node.name])
+            ir2=DeepxIR("newtensor", self._dtype, self._shape.shape, [self._node.name])
             print(ir2)
         # device
         if isinstance(device, str):

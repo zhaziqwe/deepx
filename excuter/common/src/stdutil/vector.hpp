@@ -1,5 +1,5 @@
-#ifndef DEEPX_VECTOR_HPP
-#define DEEPX_VECTOR_HPP
+#ifndef STDUTIL_VECTOR_HPP
+#define STDUTIL_VECTOR_HPP
 
 #include <vector>
 #include <ostream>
@@ -17,4 +17,4 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec) {
     os << "]";
     return os;
 }
-#endif // DEEPX_VECTOR_HPP
+#endif // STDUTIL_VECTOR_HPP

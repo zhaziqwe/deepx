@@ -1,25 +1,21 @@
 from .tensor import Tensor, tensor_method
 import numpy as np
+from .deepxir import DeepxIR
 
-def zeros(*size, dtype=None, device=None):
-    """创建指定大小的全0张量
-    
-    参数:
-        *size: 张量形状，可以是多个整数或单个形状元组
-        dtype: 数据类型
-        device: 设备类型，如'cpu'或'cuda'
-    """
-    if len(size) == 1 and isinstance(size[0], (tuple, list)):
-        size = size[0]
-    data = np.zeros(size)
-    return Tensor(data=data, dtype=dtype, device=device)
+def full(*shape, fill_value=0, dtype=None, device=None):
+    if len(shape) == 1 and isinstance(shape[0], (tuple, list)):
+        shape = shape[0]
+    t=Tensor(data=None, shape=shape, dtype=dtype, device=device)
+    if t.graph.eager:
+        ir=DeepxIR("constant", t.dtype, [fill_value], [t.node.name])
+        print(ir)
+    return t
+
+def zeros(*shape, dtype=None, device=None):
+    return full(*shape, fill_value=0, dtype=dtype, device=device)
 
 def ones(*size, dtype=None, device=None):
-    """创建指定大小的全1张量"""
-    if len(size) == 1 and isinstance(size[0], (tuple, list)):
-        size = size[0]
-    data = np.ones(size)
-    return Tensor(data=data, dtype=dtype, device=device)
+    return full(*size, fill_value=1, dtype=dtype, device=device)
 
 def rand(*size, dtype=None, device=None):
     """创建指定大小的[0,1)均匀分布随机张量"""

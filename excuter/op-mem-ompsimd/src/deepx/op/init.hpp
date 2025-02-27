@@ -3,6 +3,7 @@
 
 #include "deepx/op/op.hpp"
 #include "deepx/tensorfunc/init.hpp"
+#include "stdutil/num.hpp"
 namespace deepx::op{
     template<typename T>
     class Uniform : public OpT<T>{
@@ -18,9 +19,15 @@ namespace deepx::op{
         }
         void forward(mem::Mem &mem) override{
             auto output = mem.gettensor<T>(this->returns[0]).get();
-            T low = mem.getarg<T>(this->args[0]);
-            T high = mem.getarg<T>(this->args[1]);
-            tensorfunc::uniform(*output,low,high);
+            if (is_float(this->args[0])){
+                T low = std::stof(this->args[0]);
+                T high = std::stof(this->args[1]);
+                tensorfunc::uniform(*output,low,high);
+            }else{
+                T low = mem.getarg<T>(this->args[0]);
+                T high = mem.getarg<T>(this->args[1]);
+                tensorfunc::uniform(*output,low,high);
+            }
         } 
         void backward(mem::Mem &mem) override{
             throw std::runtime_error("Uniform op does not support backward");
@@ -41,8 +48,13 @@ namespace deepx::op{
         }
         void forward(mem::Mem &mem) override{
             auto output = mem.gettensor<T>(this->returns[0]).get();
-            T value = mem.getarg<T>(this->args[0]);
-            tensorfunc::constant(*output,value);
+            if (is_float(this->args[0])){
+                T value = std::stof(this->args[0]);
+                tensorfunc::constant(*output,value);
+            }else{
+                T value = mem.getarg<T>(this->args[0]);
+                tensorfunc::constant(*output,value);
+            }
         }
         void backward(mem::Mem &mem) override{
             throw std::runtime_error("Constant op does not support backward");
@@ -63,9 +75,15 @@ namespace deepx::op{
         }
         void forward(mem::Mem &mem) override{
             auto output = mem.gettensor<T>(this->returns[0]).get();
-            T start = mem.getarg<T>(this->args[0]);
-            T step = mem.getarg<T>(this->args[1]);
-            tensorfunc::arange(*output,start,step);
+            if (is_float(this->args[0])){
+                T start = std::stof(this->args[0]);
+                T step = std::stof(this->args[1]);
+                tensorfunc::arange(*output,start,step);
+            }else{
+                T start = mem.getarg<T>(this->args[0]);
+                T step = mem.getarg<T>(this->args[1]);
+                tensorfunc::arange(*output,start,step);
+            }
         }
         void backward(mem::Mem &mem) override{
             throw std::runtime_error("Arange op does not support backward");

@@ -56,11 +56,11 @@ class Graph:
         self.nodes.append(node)
         return node
     
-    def add_tensor(self, name,data,inputs=[]):
+    def add_tensor(self, name,t,inputs=[]):
         self.tensor_counter += 1
         if name == "":
             name = f"tensor_{self.tensor_counter}"
-        node=DataNode(name, "tensor", data)
+        node=DataNode(name, "tensor", t)
         for input in inputs:
             node.add_input(input)
         self.nodes.append(node)

@@ -10,6 +10,7 @@ DTYPE_MAP = {
     'int32': np.int32,
     'int64': np.int64,
 }
+default_dtype = 'float32'
 
 def infer_dtype(data: Any) -> str:
     """

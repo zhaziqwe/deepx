@@ -4,6 +4,8 @@
 #include "deepx/op/op.hpp"
 #include "deepx/mem/mem.hpp"
 #include "deepx/tensorfunc/new.hpp"
+#include "stdutil/num.hpp"
+
 namespace deepx::op{
     template<typename T>
     class NewTensor : public OpT<T>{
@@ -19,9 +21,18 @@ namespace deepx::op{
         }
         void forward(mem::Mem &mem) override{
             string name= this->returns[0];
-            vector<int> shape=mem.getvector<int32_t>(this->args[0]);
-            Tensor<T> t=tensorfunc::New<T>(shape);
-            mem.addtensor(name,t);
+            if (this->args.size()==1&&is_positive_integer(this->args[0])){
+                vector<int> shape=mem.getvector<int32_t>(this->args[0]);
+                Tensor<T> t=tensorfunc::New<T>(shape);
+                mem.addtensor(name,t);
+            }else if (this->args.size()>1){
+                vector<int> shape;  
+                for (int i = 0; i < this->args.size(); i++) {
+                    shape.push_back(atoi(this->args[i].c_str()));
+                }
+                Tensor<T> t=tensorfunc::New<T>(shape);
+                mem.addtensor(name,t);
+            }
         }   
         void backward(mem::Mem &mem) override{
             throw std::runtime_error("New op does not support backward");
