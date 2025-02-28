@@ -1,4 +1,4 @@
-from deepx.tensor import Tensor,mul,add,zeros,ones,full
+from deepx import Tensor,mul,add,zeros,ones,full
 print()
 
 t1 = zeros([3,4,5],dtype='float32')

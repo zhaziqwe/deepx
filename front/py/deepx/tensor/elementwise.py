@@ -28,4 +28,23 @@ def div_(self, other):
     div(self,other,result)
     return result
 
- 
+@tensor_method
+def min_scalar_(self, other):
+    result = Tensor(dtype=self.dtype,shape=self.shape)
+    from deepx.nn.functional import min_scalar
+    min_scalar(self,other,result)
+    return result
+
+@tensor_method
+def max_scalar_(self, other):
+    result = Tensor(dtype=self.dtype,shape=self.shape)
+    from deepx.nn.functional import max_scalar
+    max_scalar(self,other,result)
+    return result   
+
+@tensor_method
+def clamp_(self, min, max):
+    result = Tensor(dtype=self.dtype,shape=self.shape)
+    from deepx.nn.functional import clamp
+    clamp(self,min,max,result)
+    return result

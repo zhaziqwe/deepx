@@ -29,7 +29,7 @@ def _A_b_elementwiseop_C(
     if a.graph.eager:
         varir=DeepxIR("argset", a.dtype, [b], [varnode.name])
         send(str(varir))
-        ir=DeepxIR(op+"_scalar", a.dtype, [a.node.name,varnode.name], [out.node.name])
+        ir=DeepxIR(op, a.dtype, [a.node.name,varnode.name], [out.node.name])
         send(str(ir))
 #add
 OpNode.register("add")
@@ -42,7 +42,7 @@ def add(
     if isinstance(b,Tensor):
         _A_B_elementwiseop_C(a,b,"add",out)
     else:
-        _A_b_elementwiseop_C(a,b,"add",out)
+        _A_b_elementwiseop_C(a,b,"add_scalar",out)
 
 
 #sub
@@ -56,7 +56,7 @@ def sub(
     if isinstance(b,Tensor):
         _A_B_elementwiseop_C(a,b,"sub",out)
     else:
-        _A_b_elementwiseop_C(a,b,"sub",out)
+        _A_b_elementwiseop_C(a,b,"sub_scalar",out)
 
 
 #mul
@@ -70,7 +70,7 @@ def mul(
     if isinstance(b,Tensor):
         _A_B_elementwiseop_C(a,b,"mul",out)
     else:
-        _A_b_elementwiseop_C(a,b,"mul",out)
+        _A_b_elementwiseop_C(a,b,"mul_scalar",out)
  
 
 #div
@@ -84,10 +84,28 @@ def div(
     if isinstance(b,Tensor):
         _A_B_elementwiseop_C(a,b,"div",out)
     else:
-        _A_b_elementwiseop_C(a,b,"div",out)
+        _A_b_elementwiseop_C(a,b,"div_scalar",out)
  
-
-
+ 
+#clamp
+OpNode.register("clamp")
+def clamp(
+        a:Tensor,
+        min: Optional[Union[ float, int]] = None, 
+        max: Optional[Union[ float, int]] = None, 
+        out:Tensor=None):   
+    opnode = a.graph.add_op("clamp")
+    opnode.add_input(a.node)
+    if min is not None:
+        min_node = a.graph.add_var("", min)
+        opnode.add_input(min_node)
+    if max is not None:
+        max_node = a.graph.add_var("", max)
+        opnode.add_input(max_node)
+    out.node.add_input(opnode)
+    if a.graph.eager:
+        varir=DeepxIR("clamp", a.dtype, [a.node.name,min,max], [out.node.name])
+        send(str(varir))
 
 # OpNode.register("ReLU", 101)
 # OpNode.register("Placeholder", 102)
@@ -98,22 +116,7 @@ def div(
 # NodeType.register("Tanh", 107)
 # NodeType.register("Reshape", 108)
 # NodeType.register("Transpose", 109)
-# NodeType.register("Sum", 110)
-# NodeType.register("Mean", 111)
-
-# # 操作节点创建函数
-# def matmul(a, b, name=None):
-#     node = OpNode("MatMul", name)
-#     node.add_input("a", a)
-#     node.add_input("b", b)
-#     return node
-
-# def add(a, b, name=None):
-#     node = OpNode("Add", name)
-#     node.add_input("a", a)
-#     node.add_input("b", b)
-#     return node
-
+  
 # def relu(x, name=None):
 #     node = OpNode("ReLU", name)
 #     node.add_input("x", x)
@@ -129,25 +132,7 @@ def div(
 #     node = OpNode("Neg")
 #     node.add_input("x", x)
 #     return node
-
-# def mul(a, b):
-#     node = OpNode("Mul")
-#     node.add_input("a", a)
-#     node.add_input("b", b)
-#     return node
-
-# def div(a, b):
-#     node = OpNode("Div")
-#     node.add_input("a", a)
-#     node.add_input("b", b)
-#     return node
-
-# def sub(a, b):
-#     node = OpNode("Sub")
-#     node.add_input("a", a)
-#     node.add_input("b", b)
-#     return node
-
+ 
 # def less(a, b):
 #     node = OpNode("Less")
 #     node.add_input("a", a)
@@ -182,17 +167,4 @@ def div(
 #     node.set_attr("dim0", dim0)
 #     node.set_attr("dim1", dim1)
 #     return node
-
-# def sum(x, dim=None, keepdim=False):
-#     node = OpNode("Sum")
-#     node.add_input("x", x)
-#     node.set_attr("dim", dim)
-#     node.set_attr("keepdim", keepdim)
-#     return node
-
-# def mean(x, dim=None, keepdim=False):
-#     node = OpNode("Mean")
-#     node.add_input("x", x)
-#     node.set_attr("dim", dim)
-#     node.set_attr("keepdim", keepdim)
-#     return node 
+ 

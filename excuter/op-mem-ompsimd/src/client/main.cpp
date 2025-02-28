@@ -19,7 +19,7 @@ int main()
 
     client::udpserver server(8080);
     deepx::op::OpFactory opfactory;
-    deepx::op::register_all(opfactory);
+    register_all(opfactory);
 
     server.func = [&mem, &opfactory, &memmutex](const char *buffer)
     {
