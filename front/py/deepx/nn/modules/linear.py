@@ -1,5 +1,6 @@
-from modules.module import Module
-from tensor import Tensor
+from .module import Module
+from deepx.tensor import Tensor
+
 class Linear(Module):
     def __init__(self, in_features, out_features, bias=True,dtype:str="float32"):
         super().__init__()  
