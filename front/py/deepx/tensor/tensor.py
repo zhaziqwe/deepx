@@ -94,10 +94,22 @@ class Tensor:
     def node(self):
         return self._node
     
-    @property
-    def requires_grad(self):
-        return self._requires_grad
+    # 重写运算符
+    def __add__(self, other):
+        return self.add_(other)
     
+    def __sub__(self, other):
+        return self.sub_(other)
+    
+    def __mul__(self, other):
+        return self.mul_(other)
+    
+    def __truediv__(self, other):
+        return self.div_(other)
+    
+    def __matmul__(self, other):
+        return self.matmul_(other)
+
     def __repr__(self) -> str:
         from deepx.nn.functional import printtensor
         s=printtensor(self)

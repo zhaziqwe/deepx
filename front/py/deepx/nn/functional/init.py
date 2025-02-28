@@ -27,8 +27,8 @@ def randn(*size, dtype=None, device=None):
     #TODO
     pass
 
-def arange(start, end=None, step=1, dtype=None, device=None):
-    #TODO
+def arange(*shape,start, end=None, step=1, dtype=None, device=None):
+    
     pass
 
 def eye(
