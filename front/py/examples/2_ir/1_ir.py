@@ -1,4 +1,4 @@
-from deepx.tensor.deepxir import DeepxIR
+from deepx.nn.deepxir import DeepxIR
 # 正向传播示例
 op = DeepxIR(
     name="add",

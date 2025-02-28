@@ -3,7 +3,7 @@ from typing import Optional, Union, Tuple
 from .shape import Shape
 from .devicetype import Device
 from deepx.autograd import Graph,DataNode
-from .deepxir import DeepxIR
+from ..nn.deepxir import DeepxIR
 from .dtype import infer_dtype,DTYPE_MAP,default_dtype
 from deepx.scheduler import send
 
@@ -13,15 +13,8 @@ class Tensor:
             data=None,
             shape=None,
             device=None,
-            dtype:Optional[str]=None, 
-            graph:Optional[Graph]=None):
-        # 计算图相关
-        if graph is None:
-            self._graph = Graph.get_default()
-        else:
-            self._graph = graph 
-        self._node= self._graph.add_tensor("",t=self)
-
+            dtype:Optional[str]=None):
+ 
         # data
         if data is not None:
             import numpy as np
@@ -46,11 +39,7 @@ class Tensor:
                 self._shape = shape
             else:
                 raise ValueError("Invalid shape")
-        shapeNode=self._graph.add_vector("",data=self._shape.shape)
-        self._node.add_input(shapeNode)
-        if self._graph.eager:
-            ir2=DeepxIR("newtensor", self._dtype, self._shape.shape, [self._node.name])
-            send(str(ir2))
+
         # device
         if isinstance(device, str):
             self._device = Device.from_string(device)
@@ -58,6 +47,12 @@ class Tensor:
             self._device = device
         else:
             self._device = Device.CPU  # 默认设备
+
+        # graph
+        self._graph =None
+        self._node=None
+        from deepx.nn.functional import newtensor
+        newtensor(self)
 
     # shape
     @property
@@ -104,9 +99,9 @@ class Tensor:
         return self._requires_grad
     
     def __repr__(self) -> str:
-        ir=DeepxIR("print",'', [self._node.name], [])
-        send(str(ir))
-        return ""
+        from deepx.nn.functional import printtensor
+        s=printtensor(self)
+        return s
 
 def tensor_method(f):
     setattr(Tensor, f.__name__, f)

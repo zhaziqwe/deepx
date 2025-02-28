@@ -1,41 +1,30 @@
-from typing import Optional
+from deepx.nn.functional import full,zeros,ones,rand,randn,arange,eye
+from deepx.tensor import tensor_method
 
-from .tensor import Tensor, tensor_method
-import numpy as np
-from .deepxir import DeepxIR
-from deepx.scheduler import send
-def full(*shape, fill_value=0, dtype=None, device=None):
-    if len(shape) == 1 and isinstance(shape[0], (tuple, list)):
-        shape = shape[0]
-    t=Tensor(data=None, shape=shape, dtype=dtype, device=device)
-    if t.graph.eager:
-        ir=DeepxIR("constant", t.dtype, [fill_value], [t.node.name])
-        send(str(ir))
-    return t
+@tensor_method
+def full_(self,fill_value):
+    full(self.shape,fill_value=fill_value,dtype=self.dtype,device=self.device,out=self)
 
-def zeros(*shape, dtype=None, device=None):
-    return full(*shape, fill_value=0, dtype=dtype, device=device)
+@tensor_method
+def zeros_(self):
+    zeros(self.shape,dtype=self.dtype,device=self.device,out=self)
 
-def ones(*size, dtype=None, device=None):
-    return full(*size, fill_value=1, dtype=dtype, device=device)
+@tensor_method
+def ones_(self):
+    ones(self.shape,dtype=self.dtype,device=self.device,out=self)
 
-def rand(*size, dtype=None, device=None):
-   #TODO
-   pass
+@tensor_method
+def rand_(self):
+    rand(self.shape,dtype=self.dtype,device=self.device,out=self)
 
-def randn(*size, dtype=None, device=None):
-    #TODO
-    pass
+@tensor_method
+def randn_(self):
+    randn(self.shape,dtype=self.dtype,device=self.device,out=self)
 
-def arange(start, end=None, step=1, dtype=None, device=None):
-    #TODO
-    pass
+@tensor_method
+def arange_(self,start,end=None,step=1):
+    arange(start,end,step,dtype=self.dtype,device=self.device,out=self)
 
-def eye(
-        n:int,
-        m:Optional[int]=None,
-        dtype:Optional[str]=None, 
-        device:Optional[str]=None):
-    #TODO
-    pass
- 
+@tensor_method
+def eye_(self,n,m=None):
+    eye(n,m,dtype=self.dtype,device=self.device,out=self)

@@ -2,7 +2,7 @@ from typing import Optional, Union
 
 from .tensor import Tensor,tensor_method
 from deepx.autograd.graph import OpNode
-from .deepxir import DeepxIR    
+from deepx.nn.deepxir import DeepxIR    
 from deepx.scheduler import send
 from .elementwise import _A_b_elementwiseop_C
 

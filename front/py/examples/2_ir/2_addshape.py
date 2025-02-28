@@ -1,4 +1,5 @@
-from deepx.tensor import Tensor,mul,add
+from deepx.tensor import Tensor
+
 print()
 
 t1 = Tensor(shape=[2,3,4],dtype="float32")

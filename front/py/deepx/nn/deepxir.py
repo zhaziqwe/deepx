@@ -1,5 +1,4 @@
-from typing import Any, Tuple, List, Optional
-from ..autograd.graph import Graph  
+from typing import Tuple, List, Optional
 
 class DeepxIR:
     def __init__(self, 
