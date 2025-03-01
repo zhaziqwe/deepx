@@ -20,17 +20,22 @@ int main()
 
     server.func = [&mem, &opfactory, &memmutex](const char *buffer)->std::string
     {
+
+        
         deepx::op::Op op;
         op.recv_at = chrono::system_clock::now();
         op.load(buffer);
+        std::string resp=to_string(op.id);
+        resp+=" recv_at:";
+        resp+=to_string(op.recv_at.time_since_epoch().count());
         if (opfactory.ops.find(op.name)==opfactory.ops.end()){
             cout<<"<op> "<<op.name<<" not found"<<endl;
-            return "error";
+            resp+="error op not found";
         }
         auto &type_map = opfactory.ops.find(op.name)->second;
         if (type_map.find(op.dtype)==type_map.end()){
             cout<<"<op>"<<op.name<<" "<<op.dtype<<" not found"<<endl;
-            return "error";
+            resp+="error dtype not found";
         }
         auto src = type_map.find(op.dtype)->second;
 
@@ -42,7 +47,8 @@ int main()
            (*src).forward(mem);
         }
         memmutex.unlock();
-        return to_string(op.id);
+        resp+=" success";
+        return resp;
     };
     server.start();
     return 0;

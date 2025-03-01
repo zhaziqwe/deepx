@@ -4,6 +4,12 @@ from deepx.nn import DeepxIR
 import time
 default_client = _default_udpconn
 
+
+_id_counter=0
 def send(ir:DeepxIR) -> Optional[dict]:
     ir._sent_at=time.time()
-    return default_client.send(str(ir))
+    global _id_counter
+    _id_counter=_id_counter+1
+    ir._id=_id_counter
+    resp=default_client.send(str(ir))
+    print(resp)

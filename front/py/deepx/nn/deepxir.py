@@ -1,7 +1,6 @@
 from typing import Tuple, List, Optional
 import time
 
-_id_counter=0
 class DeepxIR:
     def __init__(self, 
                 name:str,
@@ -39,7 +38,7 @@ class DeepxIR:
         self._grad = grad
         self._args_grad = args_grad if grad else []
         self._returns_grad = returns_grad if grad else []
-        self._id=++_id_counter
+        self._id=None
         self._created_at=time.time()
         self._sent_at=None
 
