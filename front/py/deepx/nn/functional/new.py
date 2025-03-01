@@ -10,4 +10,3 @@ def newtensor(t:Tensor):
     if t.graph.eager:
         ir2=DeepxIR("newtensor", t.dtype, t.shape, [t._node.name])
         send(str(ir2))
-    return t

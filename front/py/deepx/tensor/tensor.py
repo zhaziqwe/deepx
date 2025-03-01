@@ -1,11 +1,7 @@
-from enum import Enum
-from typing import Optional, Union, Tuple
+from typing import Optional
 from .shape import Shape
 from .devicetype import Device
-from deepx.autograd import Graph,DataNode
-from ..nn.deepxir import DeepxIR
-from .dtype import infer_dtype,DTYPE_MAP,default_dtype
-from deepx.scheduler import send
+from .dtype import infer_dtype,default_dtype
 
 class Tensor:
     def __init__(
@@ -96,19 +92,19 @@ class Tensor:
     
     # 重写运算符
     def __add__(self, other):
-        return self.add_(other)
+        return self.add(other)
     
     def __sub__(self, other):
-        return self.sub_(other)
+        return self.sub(other)
     
     def __mul__(self, other):
-        return self.mul_(other)
+        return self.mul(other)
     
     def __truediv__(self, other):
-        return self.div_(other)
+        return self.div(other)
     
     def __matmul__(self, other):
-        return self.matmul_(other)
+        return self.matmul(other)
 
     def __repr__(self) -> str:
         from deepx.nn.functional import printtensor

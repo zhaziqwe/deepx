@@ -1,20 +1,16 @@
 from .tensor import Tensor,tensor_method
 from .shape import Shape
 from .devicetype import Device,DeviceType
-from .elementwise import add_,sub_,mul_,div_
-from .matmul import matmul_
-from .init import zeros_,ones_,rand_,randn_,arange_,eye_
+from .elementwise import *  # 导入所有包含@tensor_method装饰的方法
+from .matmul import *       # 导入矩阵乘法相关方法
+from .transpose import *    # 导入转置方法
 
 __all__ = [
     'Device','DeviceType',
     'Shape',
     'Tensor',
     'tensor_method',
-    'add_','sub_','mul_','div_',
-    'matmul_',
-    'zeros_','ones_','rand_','randn_','arange_','eye_', 
-    #  'mul', 'div',
-    # 'matmul', 'dot',
+
     # 'sum', 'mean', 'max', 'min',
     # 'reshape', 'transpose',
     # 'lt', 'gt', 'eq',

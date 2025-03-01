@@ -6,6 +6,7 @@
 #include "deepx/op/new.hpp"
 #include "deepx/op/arg.hpp"
 #include "deepx/op/print.hpp"
+#include "deepx/op/transpose.hpp"
 namespace deepx::op
 {   
     //new
@@ -43,9 +44,12 @@ namespace deepx::op
         register_constant(opfactory);
         register_arange(opfactory);
     }
-    //print
+    //anytype
     void register_print(OpFactory &opfactory){
         opfactory.add_op(Print<float>());
+    }
+    void register_transpose(OpFactory &opfactory){
+        opfactory.add_op(Transpose<float>());
     }
     //elementwise
      void register_add(OpFactory &opfactory){
@@ -126,4 +130,4 @@ namespace deepx::op
         register_reduce(opfactory);
         return 0;
     }
-}   
+}
