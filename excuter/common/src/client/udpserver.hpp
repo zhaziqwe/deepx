@@ -22,7 +22,7 @@ namespace client{
         udpserver(int port);
         ~udpserver();
         void start();
-        using handlefunc = std::function<void(char *buffer)>;
+        using handlefunc = std::function<std::string(const char *buffer)>;
         handlefunc func;
     };
    

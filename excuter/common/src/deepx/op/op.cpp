@@ -2,73 +2,113 @@
 
 namespace deepx::op
 {
-    void Op::load(const char *str)
-    {
-        // 新格式示例：mul@float32 a(a_grad) b(b_grad) -> a(a_grad) requires_grad=true
+    //与deepx/front/py/deepx/nn/deepxir.py对应
+
+     // 新格式示例：mul@float32 a(a_grad) b(b_grad) -> a(a_grad) //id=1 create_time=1714512000 send_time=1714512000 recv_time=1714512000
+    void Op::load(const char* str) {
         string input(str);
-        size_t arrow_pos = input.find("->");
-        string head = input.substr(0, arrow_pos);
-        string tail = arrow_pos != string::npos ? input.substr(arrow_pos + 2) : "";
+        
+        // 分割元数据部分
+        size_t meta_pos = input.find("//");
+        string body = input.substr(0, meta_pos);
+        string meta = (meta_pos != string::npos) ? input.substr(meta_pos + 2) : "";
 
-        // 解析操作名和类型
+        // 解析操作主体
+        size_t arrow_pos = body.find("->");
+        if (arrow_pos == string::npos) {
+            arrow_pos = body.find("<-");
+            if (arrow_pos != string::npos) {
+                grad = true;  // 反向传播标记
+            }
+        }
+        
+        if (arrow_pos == string::npos) {
+            throw runtime_error("Invalid IR format: missing arrow");
+        }
+
+        string head = body.substr(0, arrow_pos);
+        string tail = body.substr(arrow_pos + 2);
+
+        // 解析操作名和数据类型
         size_t at_pos = head.find('@');
-        if (at_pos != string::npos)
-        {
+        if (at_pos != string::npos) {
             name = head.substr(0, at_pos);
-            dtype = head.substr(at_pos + 1, head.find(' ') - at_pos - 1);
-            head = head.substr(head.find(' ') + 1);
-        }
-        else
-        {
-            name = head.substr(0, head.find(' '));
-            dtype = "any";
-            head = head.substr(name.size() + 1);
+            size_t space_pos = head.find(' ', at_pos);
+            if (space_pos != string::npos) {
+                dtype = head.substr(at_pos + 1, space_pos - at_pos - 1);
+                head = head.substr(space_pos + 1);
+            } else {
+                dtype = head.substr(at_pos + 1);
+                head.clear();
+            }
+        } else {
+            size_t space_pos = head.find(' ');
+            if (space_pos != string::npos) {
+                name = head.substr(0, space_pos);
+                head = head.substr(space_pos + 1);
+                dtype = "any";
+            } else {
+                name = head;
+                head.clear();
+                dtype = "any";
+            }
         }
 
-        // 解析输入参数（支持带括号的梯度名）
+        // 解析输入参数
         stringstream head_ss(head);
         string token;
-        while (head_ss >> token)
-        {
-            size_t bracket = token.find('(');
-            if (bracket != string::npos)
-            {
+        while (head_ss >> token) {
+             size_t bracket = token.find('(');
+            if (bracket != string::npos && token.back() == ')') {
                 args.push_back(token.substr(0, bracket));
-                args_grad.push_back(token.substr(bracket + 1, token.find(')') - bracket - 1));
-                require_grad = true;
-            }
-            else
-            {
+                args_grad.push_back(token.substr(bracket + 1, token.size() - bracket - 2));
+            } else {
                 args.push_back(token);
+                args_grad.emplace_back("");  // 保持梯度与参数数量一致
             }
         }
 
-        // 解析输出参数和标志
+        // 解析输出参数
         stringstream tail_ss(tail);
-        while (tail_ss >> token)
-        {
-            if (token.find('(') != string::npos)
-            {
-                size_t bracket = token.find('(');
+        while (tail_ss >> token) {
+            size_t bracket = token.find('(');
+            if (bracket != string::npos && token.back() == ')') {
                 returns.push_back(token.substr(0, bracket));
-                returns_grad.push_back(token.substr(bracket + 1, token.find(')') - bracket - 1));
-            }
-            else if (token == "requires_grad=true")
-            {
-                require_grad = true;
-            }
-            else
-            {
+                returns_grad.push_back(token.substr(bracket + 1, token.size() - bracket - 2));
+            } else {
                 returns.push_back(token);
+                returns_grad.emplace_back("");  // 保持梯度与参数数量一致
+            }
+        }
+
+        // 解析元数据
+        if (!meta.empty()) {
+            stringstream meta_ss(meta);
+            string key, value;
+            while (meta_ss >> key) {
+                size_t eq_pos = key.find('=');
+                if (eq_pos != string::npos) {
+                    value = key.substr(eq_pos + 1);
+                    key = key.substr(0, eq_pos);
+                    
+                    if (key == "id") {
+                        id = stoi(value);
+                    } else if (key == "created_at") {
+                        created_at = system_clock::from_time_t(stod(value));
+                    } else if (key == "sent_at") {
+                        sent_at = system_clock::from_time_t(stod(value));
+                    }
+                }
             }
         }
     }
 
+ 
     void Op::init(const string &opname,
                   const string &dtype,
                   const vector<string> &args,
                   const vector<string> &returns,
-                  bool require_grad,
+                  bool grad,
                   const vector<string> &args_grad,
                   const vector<string> &returns_grad)
     {
@@ -76,9 +116,9 @@ namespace deepx::op
         this->dtype = dtype;
         this->args = args;
         this->returns = returns;
-        this->require_grad = require_grad;
+        this->grad = grad;
 
-        if (require_grad)
+        if (grad)
         {
             // 如果提供了梯度变量名,就使用提供的名字
             if (!args_grad.empty())

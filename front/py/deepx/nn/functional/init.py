@@ -7,7 +7,7 @@ from deepx.scheduler import send
 def constant(t:Tensor, fill_value):
     if t.graph.eager:
         ir=DeepxIR("constant", t.dtype, [fill_value], [t.node.name])
-        send(str(ir))
+        send(ir)
     return t
 
 def full(*shape, fill_value=0, dtype=None, device=None,t:Tensor=None):

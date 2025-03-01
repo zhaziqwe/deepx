@@ -42,7 +42,7 @@ namespace client
         while (true)
         {
             len = sizeof(cliaddr);
-            n = recvfrom(sockfd, (char *)buffer, 1024, 0, (struct sockaddr *)&cliaddr, &len);
+            n = recvfrom(sockfd, (char *)buffer, sizeof(buffer), 0, (struct sockaddr *)&cliaddr, &len);
             buffer[n] = '\0';
             
             // 新增换行拆分逻辑
@@ -52,7 +52,9 @@ namespace client
                 if (!line.empty()) {
                     cout << "~" << line << endl;
                     char *IR = const_cast<char *>(line.c_str());
-                    func(IR);
+                    string strresp=func(IR);
+                    sendto(sockfd, strresp.c_str(), strresp.size(), 0,
+                   (const struct sockaddr*)&cliaddr, len);
                 }
             }
         }

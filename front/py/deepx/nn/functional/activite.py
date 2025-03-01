@@ -7,6 +7,6 @@ def relu(t: Tensor,inplace:bool=False)->Tensor:
     if not inplace:
         out=Tensor(shape=t.shape, dtype=t.dtype, device=t.device)
     ir=DeepxIR("max_scalar",t.dtype,[t._node.name,0], [out._node.name])
-    send(str(ir))
+    send(ir)
     return out
  

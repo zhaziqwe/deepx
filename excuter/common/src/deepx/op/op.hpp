@@ -7,7 +7,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-
+#include <chrono>
 #include "deepx/tensor.hpp"
 #include "deepx/mem/mem.hpp"
 #include "deepx/dtype.hpp"
@@ -16,7 +16,7 @@ namespace deepx::op
 {
     using deepx::mem::Mem;
     using namespace std;
-
+    using namespace std::chrono;
     class Op
     {
     public:
@@ -24,10 +24,13 @@ namespace deepx::op
         string dtype;
         vector<string> args;
         vector<string> args_grad;
-        bool require_grad;
+        bool grad=false;
         vector<string> returns;
         vector<string> returns_grad;
-
+        int id;
+        system_clock::time_point created_at;
+        system_clock::time_point sent_at;
+        system_clock::time_point recv_at;
     public:
         Op() = default;
         Op(const Op &) = default;
@@ -56,7 +59,7 @@ namespace deepx::op
                   const string &dtype,
                   const vector<string> &args,
                   const vector<string> &returns,
-                  bool require_grad,
+                  bool  grad,
                   const vector<string> &args_grad,
                   const vector<string> &returns_grad);
     };

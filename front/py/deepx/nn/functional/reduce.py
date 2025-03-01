@@ -19,9 +19,9 @@ def _A_v_reduceop_C(
     out.node.add_input(opnode)
     if a.graph.eager:
         varir=DeepxIR("argset", a.dtype, v, [vector_node.name])
-        send(str(varir))
+        send(varir)
         ir=DeepxIR(op, a.dtype, [a.node.name,vector_node.name], [out.node.name])
-        send(str(ir))
+        send(ir)
 
 
 #max

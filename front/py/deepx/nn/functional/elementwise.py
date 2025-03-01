@@ -15,7 +15,7 @@ def _A_B_elementwiseop_C(
     out.node.add_input(opnode)
     if a.graph.eager:
         ir=DeepxIR(op, a.dtype, [a.node.name, b.node.name], [out.node.name])
-        send(str(ir))
+        send(ir)
 def _A_b_elementwiseop_C(
         a:Tensor,
         b: Optional[Union[ float, int]] = None, 
@@ -30,7 +30,7 @@ def _A_b_elementwiseop_C(
         varir=DeepxIR("argset", a.dtype, [b], [varnode.name])
         send(str(varir))
         ir=DeepxIR(op, a.dtype, [a.node.name,varnode.name], [out.node.name])
-        send(str(ir))
+        send(ir)
 #add
 OpNode.register("add")
 OpNode.register("add_scalar")

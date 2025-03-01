@@ -1,5 +1,7 @@
 from typing import Tuple, List, Optional
+import time
 
+_id_counter=0
 class DeepxIR:
     def __init__(self, 
                 name:str,
@@ -37,12 +39,9 @@ class DeepxIR:
         self._grad = grad
         self._args_grad = args_grad if grad else []
         self._returns_grad = returns_grad if grad else []
-
-    def forward(self, *input) -> Tuple:
-        raise NotImplementedError
- 
-    def backward(self, *grad_outputs) -> Tuple:
-        raise NotImplementedError
+        self._id=++_id_counter
+        self._created_at=time.time()
+        self._sent_at=None
 
     def __str__(self):
         if self._dtype == None or self._dtype == '':
@@ -67,6 +66,10 @@ class DeepxIR:
             if self._grad and self._returns_grad[i]:
                 ret_part += f"({self._returns_grad[i]})"
             parts.append(ret_part)
-        
+
+        parts.append("//")
+        parts.append(f"id={self._id}")
+        parts.append(f"created_at={self._created_at}")
+        parts.append(f"sent_at={self._sent_at}")
         return ' '.join(parts)
 

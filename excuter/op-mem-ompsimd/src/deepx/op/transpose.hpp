@@ -6,7 +6,6 @@
 
 
 namespace deepx::op{
- 
     template <typename T>
     class Transpose : public OpT<T> {
     public:

@@ -16,4 +16,4 @@ def matmul(
     out.node.add_input(opnode)
     if a.graph.eager:
         ir=DeepxIR("matmul", a.dtype, [a.node.name,b.node.name], [out.node.name])
-        send(str(ir))
+        send(ir)
