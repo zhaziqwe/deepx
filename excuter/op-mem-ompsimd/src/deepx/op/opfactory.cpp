@@ -17,7 +17,6 @@ namespace deepx::op
         opfactory.add_op(NewTensor<int64_t>());
         opfactory.add_op(NewTensor<float>());
         opfactory.add_op(NewTensor<double>());
-
         opfactory.add_op(ArgSet<int32_t>());
         opfactory.add_op(ArgSet<float>());
         opfactory.add_op(ArgSet<double>());
@@ -124,6 +123,7 @@ namespace deepx::op
         register_new(opfactory);
         register_init(opfactory);
         register_print(opfactory);
+        register_transpose(opfactory);
         register_elementwise_op(opfactory);
         register_concat(opfactory);
         register_matmul(opfactory);

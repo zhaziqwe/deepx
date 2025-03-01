@@ -5,6 +5,7 @@ from .matmul import matmul
 from .init import constant,full,zeros,ones,arange,rand,randn,eye
 from .reduce import max,min,sum,prod,mean
 from .transpose import transpose
+from .activite import relu
 
 __all__ = [
     "newtensor",
@@ -14,4 +15,5 @@ __all__ = [
     "matmul",
     "max","min","sum","prod","mean",
     "transpose",    
+    "relu",
 ]

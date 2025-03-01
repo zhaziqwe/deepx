@@ -85,4 +85,8 @@ class Shape:
         """使Shape可哈希，便于在字典和集合中使用"""
         return hash(self.shape)
 
+    def transpose(self,dimorder:list[int]=None):
+        if dimorder is None:
+            dimorder=list(range(self.ndimension))
+        return Shape(tuple(self.shape[i] for i in dimorder))
  

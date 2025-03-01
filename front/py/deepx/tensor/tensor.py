@@ -54,6 +54,9 @@ class Tensor:
     @property
     def shape(self):
         return self._shape.shape
+    @property
+    def Shape(self):
+        return self._shape
         
     @property
     def stride(self):
