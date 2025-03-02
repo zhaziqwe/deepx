@@ -10,9 +10,7 @@ class Module:
         self._parent: Optional[Module] = None
         self._modules: OrderedDict[str, Module] = OrderedDict()
         self._parameters: OrderedDict[str, Tensor] = OrderedDict()
-        self._buffers: OrderedDict[str, Tensor] = OrderedDict()
-        self.training = True
-        
+
     def _generate_default_name(self) -> str:
         class_name = self.__class__.__name__
         base_name = re.sub(r'(?<!^)(?=[A-Z])', '_', class_name).lower()
@@ -26,10 +24,7 @@ class Module:
         if isinstance(value, Module):
             self.register_module(name, value)
         elif isinstance(value, Tensor):
-            if value.requires_grad:
-                self.register_parameter(name, value)
-            else:
-                self.register_buffer(name, value)
+            self.register_parameter(name, value)
         super().__setattr__(name, value)
         
     def register_module(self, name: str, module: Optional['Module']) -> None:
@@ -46,14 +41,7 @@ class Module:
         else:
             self._parameters[name] = param
             param.name = self._full_name + '.' + name
-            
-    def register_buffer(self, name: str, tensor: Optional[Tensor]) -> None:
-        if tensor is None:
-            self._buffers.pop(name, None)
-        else:
-            self._buffers[name] = tensor
-            tensor.name = self._full_name + '.' + name
-    
+
     @property
     def _full_name(self) -> str:
         names = []
@@ -123,8 +111,6 @@ class Module:
         state = {}
         for name, param in self.named_parameters():
             state[name] = param.detach().clone()
-        for name, buf in self.named_buffers():
-            state[name] = buf.detach().clone()
         return state
     
     def load_state_dict(self, state_dict: Dict[str, Tensor]) -> None:
@@ -132,10 +118,7 @@ class Module:
         for name, param in self.named_parameters():
             if name in state_dict:
                 param.data.copy_(state_dict[name])
-        for name, buf in self.named_buffers():
-            if name in state_dict:
-                buf.data.copy_(state_dict[name])
-                
+     
     def __call__(self, *args, **kwargs) -> Any:
         """允许模块像函数一样调用"""
         return self.forward(*args, **kwargs)
