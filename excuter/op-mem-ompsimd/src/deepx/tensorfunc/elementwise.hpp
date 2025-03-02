@@ -506,6 +506,8 @@ namespace deepx::tensorfunc
         }
     }
 
+    //div
+    // C= A/B
     template <typename T>
     void div(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
     {
@@ -685,9 +687,10 @@ namespace deepx::tensorfunc
         }
     }
 
-
+    //div_scalar
+    // C= A/value
     template <typename T>
-    void div(const Tensor<T> &input, const T value, Tensor<T> &output)
+    void div_scalar(const Tensor<T> &input, const T value, Tensor<T> &output)
     {
         if (input.shape == output.shape)
         {
@@ -718,6 +721,48 @@ namespace deepx::tensorfunc
                 for (;j<shape_last;j++)
                 {
                     output.data[i+j] = input.data[i+j] / value;
+                } });
+        }
+        else
+        {
+            throw std::invalid_argument("shape mismatch");
+        }
+    }
+
+     //div_scalar
+    // C= A/value
+    template <typename T>
+    void div_scalar(const T value,const Tensor<T> &t, Tensor<T> &output)
+    {
+        if (t.shape == output.shape)
+        {
+            output.shape.rangeParallel(output.shape.dim - 1, [&t, &output, &value](int i)
+                                       {
+                int shape_last=output.shape[-1];
+                const ScalableTag<T> tag;
+                const size_t lanes = Lanes(tag);
+                size_t j=0;
+
+                // 1. 处理前置未对齐部分
+                while (j < shape_last && !IsAligned(tag,t.data + i + j)) {
+                    output.data[i+j] = value / t.data[i+j] ;
+                    ++j;
+                }
+
+                // 2. 处理中间对齐部分
+                size_t aligned_end=shape_last-(shape_last%lanes);
+                for (; j+lanes<=aligned_end; j +=  lanes  )
+                {
+                    auto vec = Load(tag, t.data + i + j);
+                    auto scalar = Set(tag, value);
+                    auto vec_result = Div(scalar, vec);
+                    Store(vec_result, tag, output.data + i + j);
+                }
+
+                // 3. 处理尾部剩余元素
+                for (;j<shape_last;j++)
+                {
+                    output.data[i+j] = value / t.data[i+j] ;
                 } });
         }
         else

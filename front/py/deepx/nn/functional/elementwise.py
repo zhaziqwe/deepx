@@ -58,7 +58,6 @@ def sub(
     else:
         _A_b_elementwiseop_C(a,b,"sub_scalar",out)
 
-
 #mul
 OpNode.register("mul")
 OpNode.register("mul_scalar")
@@ -78,15 +77,15 @@ OpNode.register("div")
 OpNode.register("div_scalar")
 
 def div(
-        a:Tensor,
+        a: Optional[Union[Tensor, float, int]] = None,
         b: Optional[Union[Tensor, float, int]] = None, 
         out:Tensor=None):
-    if isinstance(b,Tensor):
+    if isinstance(b,Tensor) and isinstance(a,Tensor):
         _A_B_elementwiseop_C(a,b,"div",out)
     else:
         _A_b_elementwiseop_C(a,b,"div_scalar",out)
  
- 
+
 #clamp
 OpNode.register("clamp")
 def clamp(
@@ -106,6 +105,18 @@ def clamp(
     if a.graph.eager:
         varir=DeepxIR("clamp", a.dtype, [a.node.name,min,max], [out.node.name])
         send(str(varir))
+
+#exp
+OpNode.register("exp")
+def exp(
+        a:Tensor,
+        out:Tensor=None):
+    opnode = a.graph.add_op("exp")
+    opnode.add_input(a.node)
+    out.node.add_input(opnode)
+    if a.graph.eager:
+        ir=DeepxIR("exp", a.dtype, [a.node.name], [out.node.name])
+        send(ir)
 
 # OpNode.register("ReLU", 101)
 # OpNode.register("Placeholder", 102)

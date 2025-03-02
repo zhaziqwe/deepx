@@ -21,10 +21,12 @@ class Module:
         return f"{base_name}_{count}"
     
     def __setattr__(self, name: str, value: Any) -> None:
-        if isinstance(value, Module):
-            self.register_module(name, value)
-        elif isinstance(value, Tensor):
-            self.register_parameter(name, value)
+        if not name.startswith('_'):
+            if isinstance(value, Module):
+                self.register_module(name, value)
+            elif isinstance(value, Tensor):
+                self.register_parameter(name, value)
+            # 使用父类方法设置属性，避免递归
         super().__setattr__(name, value)
         
     def register_module(self, name: str, module: Optional['Module']) -> None:

@@ -90,3 +90,9 @@ def clamp_(self, min, max):
     from deepx.nn.functional import clamp as clamp_func
     clamp_func(self,min,max,self)
     return self
+
+@tensor_method
+def exp(self):
+    result = Tensor(dtype=self.dtype,shape=self.shape)
+    from deepx.nn.functional import exp as exp_func
+    exp_func(self,result)

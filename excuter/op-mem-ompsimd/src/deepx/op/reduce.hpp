@@ -5,6 +5,7 @@
 #include "deepx/tensorfunc/reduce.hpp"
 #include "deepx/tensorfunc/broadcast.hpp"
 #include "deepx/tensorfunc/compare.hpp"
+#include "stdutil/num.hpp"
 
 namespace deepx::op
 {
@@ -82,14 +83,24 @@ namespace deepx::op
 
             void forward(mem::Mem &mem) override{
                 auto A=mem.gettensor<T>(this->args[0]);
-                auto b=mem.getarg<T>(this->args[1]);
+                T b;
+                if (!is_float(this->args[1])){
+                    b=mem.getarg<T>(this->args[1]);
+                }else{
+                    b=T(atof(this->args[1].c_str()));
+                }
                 auto output=mem.gettensor<T>(this->returns[0]);
                 deepx::tensorfunc::max(*A, b, *output);
             }
 
             void backward(mem::Mem &mem) override{
                 auto A=mem.gettensor<T>(this->args[0]);
-                auto b=mem.getarg<T>(this->args[1]);
+                T b;
+                if (!is_float(this->args[1])){
+                    b=mem.getarg<T>(this->args[1]);
+                }else{
+                    b=T(atof(this->args[1].c_str()));
+                }
                 auto A_grad=mem.gettensor<T>(this->args_grad [0]);
                 auto output_grad=mem.gettensor<T>(this->returns_grad[0]);
                 deepx::tensorfunc::max_grad(*A, b, *A_grad, *output_grad);
@@ -139,14 +150,24 @@ namespace deepx::op
             }      
             void forward(mem::Mem &mem) override{
                 auto A=mem.gettensor<T>(this->args[0]);
-                auto b=mem.getarg<T>(this->args[1]);
+                T b;
+                if (!is_float(this->args[1])){
+                    b=mem.getarg<T>(this->args[1]);
+                }else{
+                    b=T(atof(this->args[1].c_str()));
+                }
                 auto output=mem.gettensor<T>(this->returns[0]);
                 deepx::tensorfunc::min(*A, b, *output);
             }
 
             void backward(mem::Mem &mem) override{
                 auto A=mem.gettensor<T>(this->args[0]);
-                auto b=mem.getarg<T>(this->args[1]);
+                T b;
+                if (!is_float(this->args[1])){
+                    b=mem.getarg<T>(this->args[1]);
+                }else{
+                    b=T(atof(this->args[1].c_str()));
+                }
                 auto A_grad=mem.gettensor<T>(this->args_grad[0]);
                 auto output_grad=mem.gettensor<T>(this->returns_grad[0]);
                 deepx::tensorfunc::min_grad(*A, b, *A_grad, *output_grad);

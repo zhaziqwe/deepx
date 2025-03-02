@@ -112,12 +112,16 @@ namespace deepx::op
     }
     //reduce
     void register_reduce(OpFactory &opfactory){
-        opfactory.add_op(Sum<float>());
-        opfactory.add_op(Sum<double>());
         opfactory.add_op(Max<float>());
         opfactory.add_op(Max<double>());
+        opfactory.add_op(Max_scalar<float>());
+        opfactory.add_op(Max_scalar<double>());
         opfactory.add_op(Min<float>());
         opfactory.add_op(Min<double>());
+        opfactory.add_op(Min_scalar<float>());
+        opfactory.add_op(Min_scalar<double>());
+        opfactory.add_op(Sum<float>());
+        opfactory.add_op(Sum<double>());
     }
     int register_all(OpFactory &opfactory){
         register_new(opfactory);

@@ -251,10 +251,19 @@ namespace deepx::op
         //已验证，2025-02-19，lipeng
         void forward(mem::Mem &mem) override
         {
-            auto a = mem.gettensor<T>(this->args[0]).get();
-            auto b = mem.getarg<T>(this->args[1]);
-            auto c = mem.gettensor<T>(this->returns[0]).get();
-            deepx::tensorfunc::div(*a, b, *c);  // 直接使用除法
+            if (mem.existstensor(this->args[0])){
+                //C= A/b
+                auto A = mem.gettensor<T>(this->args[0]).get();
+                auto b = mem.getarg<T>(this->args[1]);
+                auto C = mem.gettensor<T>(this->returns[0]).get();
+                tensorfunc::div_scalar(*A, b, *C);  // 直接使用除法
+            }else{
+                //C=a/B
+                auto a = mem.getarg<T>(this->args[0]);
+                auto B = mem.gettensor<T>(this->args[1]).get();
+                auto C = mem.gettensor<T>(this->returns[0]).get();
+                tensorfunc::div_scalar(a, *B, *C);  // 直接使用除法
+            }          
         }
 
         //已验证，2025-02-19，lipeng

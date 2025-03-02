@@ -59,10 +59,10 @@ class Shape:
         return tuple(reversed(strides))
     
     def __str__(self):
-        return str(self.shape)
+        return f"Size({list(self.shape)})" 
     
     def __repr__(self):
-        return f"Shape(shape={self.shape})"
+        return f"Size({self.shape})"
     
     def __getitem__(self, idx):
         return self.shape[idx]
