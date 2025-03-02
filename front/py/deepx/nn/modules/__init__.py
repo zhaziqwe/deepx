@@ -1,5 +1,8 @@
-from .module import Module
+from .module import Module, Sequential
 from .linear import Linear
+
 __all__ = [
     "Module",
-    "Linear"]
+    "Linear",
+    "Sequential"
+    ]

@@ -8,9 +8,13 @@ Always respond in 中文
 2. 调度器，待设计
 3. 执行器，使用c++,cuda,metal,omp simd等,实现不同excuter的算子的前向和反向
 
+关于概念
+deepx.Tensor仅仅就是一个tensor，不像pytorch的tensor，一个tensor其实包含了自身和梯度2个tensor的数据
+
 关于c++
 我的环境为ubuntu22,项目是c++17,使用cmake编译,
 返回c++代码区分header和source文件
 由于作者是c++新手,请仔细检查指针和引用,对deepx这种密集计算任务,不要使用智能指针，但注意内存泄漏，函数返回对象等
 
 关于python
+贴近pytorch的接口风格，不要增加任何注释，我会手动添加注释
