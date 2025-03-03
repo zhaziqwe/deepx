@@ -49,7 +49,6 @@ namespace client
             string line;
             while (getline(ss, line)) {
                 if (!line.empty()) {
-                    cout << "~" << line << endl;
                     deepx::op::Op op;
                     op.recv_at = chrono::system_clock::now();
                     op.load(line);

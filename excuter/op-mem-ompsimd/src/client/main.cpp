@@ -31,7 +31,7 @@ int main()
         if (!tasks.empty()) {
             deepx::op::Op op = tasks.front();
             tasks.pop();
- 
+            cout << "~" << op.to_string()<< endl;
             std::string resp=to_string(op.id);
             resp+="recv_at:";
             resp+=to_string(op.recv_at.time_since_epoch().count());

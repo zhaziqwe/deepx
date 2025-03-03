@@ -54,7 +54,8 @@ namespace deepx::op
             throw std::runtime_error("backward not implemented");
         }
 
-        void load(const string &str) ; 
+        void load(const string &str) ;
+        std::string to_string(bool show_extra=false) const;
         void init(const string &opname,
                   const string &dtype,
                   const vector<string> &args,
