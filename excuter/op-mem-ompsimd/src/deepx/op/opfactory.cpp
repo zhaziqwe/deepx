@@ -7,6 +7,7 @@
 #include "deepx/op/arg.hpp"
 #include "deepx/op/print.hpp"
 #include "deepx/op/transpose.hpp"
+#include "deepx/op/reshape.hpp"
 namespace deepx::op
 {   
     //new
@@ -17,6 +18,21 @@ namespace deepx::op
         opfactory.add_op(NewTensor<int64_t>());
         opfactory.add_op(NewTensor<float>());
         opfactory.add_op(NewTensor<double>());
+
+        opfactory.add_op(CopyTensor<int8_t>());
+        opfactory.add_op(CopyTensor<int16_t>());
+        opfactory.add_op(CopyTensor<int32_t>());
+        opfactory.add_op(CopyTensor<int64_t>());
+        opfactory.add_op(CopyTensor<float>());
+        opfactory.add_op(CopyTensor<double>());
+
+        opfactory.add_op(CloneTensor<int8_t>());
+        opfactory.add_op(CloneTensor<int16_t>());
+        opfactory.add_op(CloneTensor<int32_t>());
+        opfactory.add_op(CloneTensor<int64_t>());
+        opfactory.add_op(CloneTensor<float>());
+        opfactory.add_op(CloneTensor<double>());
+
         opfactory.add_op(ArgSet<int32_t>());
         opfactory.add_op(ArgSet<float>());
         opfactory.add_op(ArgSet<double>());
@@ -44,11 +60,12 @@ namespace deepx::op
         register_arange(opfactory);
     }
     //anytype
-    void register_print(OpFactory &opfactory){
+    void register_anytype(OpFactory &opfactory){
         opfactory.add_op(Print<float>());
-    }
-    void register_transpose(OpFactory &opfactory){
+ 
         opfactory.add_op(Transpose<float>());
+ 
+        opfactory.add_op(Reshape<float>());
     }
     //elementwise
      void register_add(OpFactory &opfactory){
@@ -126,8 +143,7 @@ namespace deepx::op
     int register_all(OpFactory &opfactory){
         register_new(opfactory);
         register_init(opfactory);
-        register_print(opfactory);
-        register_transpose(opfactory);
+        register_anytype(opfactory);
         register_elementwise_op(opfactory);
         register_concat(opfactory);
         register_matmul(opfactory);

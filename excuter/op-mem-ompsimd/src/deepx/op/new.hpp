@@ -38,8 +38,38 @@ namespace deepx::op{
             throw std::runtime_error("New op does not support backward");
         }
     };
+    template<typename T>
+    class CopyTensor : public OpT<T>{
+        public:
+        CopyTensor(){
+            this->init("copytensor",dtype<T>::name(), {}, {}, false, {}, {});
+        }
+        void forward(mem::Mem &mem) override{
+            auto src=mem.gettensor<T>(this->args[0]);
+            auto dst=mem.gettensor<T>(this->returns[0]);
+            tensorfunc::copytensor(*src,*dst);
+        }
+        void backward(mem::Mem &mem) override{
+            throw std::runtime_error("Copy op does not support backward");
+        }   
+    };
 
-
+    template<typename T>
+    class CloneTensor : public OpT<T>{
+        public:
+        CloneTensor(){
+            this->init("clonetensor",dtype<T>::name(), {}, {}, false, {}, {});
+        }
+        void forward(mem::Mem &mem) override{
+            auto src=mem.gettensor<T>(this->args[0]);
+            string dst=this->returns[0];
+            Tensor<T> t=tensorfunc::clone(*src);
+            mem.addtensor(dst,t);
+        }
+        void backward(mem::Mem &mem) override{
+            throw std::runtime_error("Clone op does not support backward");
+        }   
+    };
 
     template<typename T>
     class DelTensor : public OpT<T>{

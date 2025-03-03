@@ -4,7 +4,7 @@ from .print import printtensor
 from .matmul import matmul
 from .init import constant,full,zeros,ones,uniform,arange,rand,randn,eye
 from .reduce import max,min,sum,prod,mean
-from .transpose import transpose
+from .transpose import transpose,reshape
 from .activite import relu
 
 __all__ = [
@@ -14,6 +14,6 @@ __all__ = [
     "add","sub","mul","div","clamp",
     "matmul",
     "max","min","sum","prod","mean",
-    "transpose",    
+    "transpose","reshape",
     "relu",
 ]

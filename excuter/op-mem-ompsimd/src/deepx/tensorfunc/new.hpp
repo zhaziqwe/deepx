@@ -66,6 +66,14 @@ namespace deepx::tensorfunc
         }
         return tensor;
     }
+
+    template <typename T>
+    void copytensor(const Tensor<T> &src,Tensor<T> &dst)
+    {
+        dst.shape=src.shape;
+        dst.copyer(src.data,dst.data,src.shape.size);
+    }
+
     template <typename T>
     Tensor<T> clone(const Tensor<T> &tensor)
     {

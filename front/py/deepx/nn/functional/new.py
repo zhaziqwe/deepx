@@ -10,3 +10,9 @@ def newtensor(t:Tensor):
     if t.graph.eager:
         ir2=DeepxIR("newtensor", t.dtype, t.shape, [t._node.name])
         send(ir2)
+def copytensor(t:Tensor,out:Tensor):
+    graph = Graph.get_default()
+    out.node.add_input(t.node)
+    if t.graph.eager:
+        ir2=DeepxIR("copytensor", t.dtype, [t.node.name], [out.node.name])
+        send(ir2)
