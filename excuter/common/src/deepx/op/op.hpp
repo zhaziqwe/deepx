@@ -72,6 +72,15 @@ namespace deepx::op
         {
             return deepx::dtype<T>::name();
         }
+        T getarg(int idx,mem::Mem &mem){
+            auto x = T(0);
+            if (mem.existarg(this->args[idx])){
+                x = mem.getarg<T>(this->args[idx]);
+            }else{
+                x = T(std::stof(this->args[idx].c_str()));
+            }
+            return x;
+        }
     };
 }
 #endif

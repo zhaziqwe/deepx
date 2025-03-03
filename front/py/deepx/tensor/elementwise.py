@@ -46,10 +46,25 @@ def div(self, other):
     div_func(self,other,result)
     return result
 
+
 @tensor_method
 def div_(self, other):
     from deepx.nn.functional import div as div_func
     div_func(self,other,self)
+    return self
+
+
+@tensor_method
+def rdiv(self, other):
+    result = Tensor(dtype=self.dtype,shape=self.shape)
+    from deepx.nn.functional import div as div_func
+    div_func(other,self,result)
+    return result
+
+@tensor_method
+def rdiv_(self, other):
+    from deepx.nn.functional import div as div_func
+    div_func(other,self,self)
     return self
 
 @tensor_method
@@ -96,3 +111,25 @@ def exp(self):
     result = Tensor(dtype=self.dtype,shape=self.shape)
     from deepx.nn.functional import exp as exp_func
     exp_func(self,result)
+    return result
+
+@tensor_method
+def exp_(self):
+    from deepx.nn.functional import exp as exp_func
+    exp_func(self,self)
+    return self
+
+@tensor_method
+def sqrt(self):
+    result = Tensor(dtype=self.dtype,shape=self.shape)
+    from deepx.nn.functional import sqrt as sqrt_func
+    sqrt_func(self,result)
+    return result
+
+@tensor_method
+def sqrt_(self):
+    from deepx.nn.functional import sqrt as sqrt_func   
+    sqrt_func(self,self)
+    return self
+
+

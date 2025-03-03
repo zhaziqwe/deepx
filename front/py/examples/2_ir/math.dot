@@ -1,0 +1,38 @@
+// Computational Graph
+digraph {
+	rankdir=TB
+	node [shape=record]
+	124185608418688 [label="tensor_1
+(2, 3)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	124185608418832 [label=constant color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	124185608678816 [label="var_1
+1" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	124185608407360 [label="tensor_2
+(2, 3)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	124185608418592 [label=add_scalar color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	124185608408224 [label="var_2
+3" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	124185608418256 [label="tensor_3
+(2, 3)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	124185608418208 [label=sqrt color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	124185608417488 [label="tensor_4
+(2, 3)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	124185608417440 [label=sqrt color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	124185608417200 [label="tensor_5
+(2, 3)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	124185608417104 [label=rdiv_scalar color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	124185608417152 [label="var_3
+1" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	124185608418832 -> 124185608418688 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124185608678816 -> 124185608418832 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124185608418592 -> 124185608407360 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124185608418688 -> 124185608418592 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124185608408224 -> 124185608418592 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124185608418208 -> 124185608418256 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124185608407360 -> 124185608418208 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124185608417440 -> 124185608417488 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124185608407360 -> 124185608417440 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124185608417104 -> 124185608417200 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124185608417152 -> 124185608417104 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124185608417488 -> 124185608417104 [arrowsize=0.8 color=gray40 penwidth=1.2]
+}

@@ -97,6 +97,10 @@ namespace deepx::op
         opfactory.add_op(Div_scalar<float>());
         opfactory.add_op(Div_scalar<double>());
     }
+    void register_rdiv_scalar(OpFactory &opfactory){
+        opfactory.add_op(RDiv_scalar<float>());
+        opfactory.add_op(RDiv_scalar<double>());
+    }
     void register_sqrt(OpFactory &opfactory){
         opfactory.add_op(Sqrt<float>());
         opfactory.add_op(Sqrt<double>());
@@ -113,6 +117,7 @@ namespace deepx::op
         register_mul_scalar(opfactory);
         register_div(opfactory);
         register_div_scalar(opfactory);
+        register_rdiv_scalar(opfactory);
         register_sqrt(opfactory);
         register_exp(opfactory);
     }

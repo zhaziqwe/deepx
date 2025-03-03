@@ -46,7 +46,8 @@ namespace deepx::op
             deepx::tensorfunc::add(*b_grad, *c_grad, *b_grad);  // b_grad += c_grad
         }
     };
- 
+    
+    //Add_scalar
     template <typename T>
     class Add_scalar : public OpT<T>
     {
@@ -63,10 +64,10 @@ namespace deepx::op
         //已验证，2025-02-19，lipeng
         void forward(mem::Mem &mem) override
         {
-            auto a = mem.gettensor<T>(this->args[0]);
-            auto b = mem.getarg<T>(this->args[1]);
-            auto c = mem.gettensor<T>(this->returns[0]);
-            deepx::tensorfunc::add(*a, b, *c);
+            auto A=mem.gettensor<T>(this->args[0]).get();
+            auto b = this->getarg(1,mem);
+            auto C = mem.gettensor<T>(this->returns[0]).get();
+            deepx::tensorfunc::add(*A, b, *C);
         }
         //已验证，2025-02-19，lipeng  
         void backward(mem::Mem &mem) override
@@ -169,16 +170,16 @@ namespace deepx::op
         //已验证，2025-02-19，lipeng
         void forward(mem::Mem &mem) override    
         {
-            auto a = mem.gettensor<T>(this->args[0]).get();
-            auto b = mem.getarg<T>(this->args[1]);
-            auto c = mem.gettensor<T>(this->returns[0]).get();
-            deepx::tensorfunc::mul(*a, b, *c);
+            auto A=mem.gettensor<T>(this->args[0]).get();
+            auto b = this->getarg(1,mem);
+            auto C = mem.gettensor<T>(this->returns[0]).get();
+            deepx::tensorfunc::mul(*A, b, *C);
         }
         //已验证，2025-02-19，lipeng
         void backward(mem::Mem &mem) override
         {
             // 需要用到前向传播的标量输入b
-            auto b = mem.getarg<T>(this->args[1]);  // 获取标量b
+            auto b = this->getarg(1,mem);
             auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
             auto c_grad = mem.gettensor<T>(this->returns_grad[0]).get();
             
@@ -235,6 +236,7 @@ namespace deepx::op
     };
 
     //Div_scalar之所以不复用Mul_scalar，是防止b接近0时，Mul_scalar(1/b)不稳定
+    //A/b=C
     template <typename T>
     class Div_scalar : public OpT<T>
     {
@@ -251,25 +253,16 @@ namespace deepx::op
         //已验证，2025-02-19，lipeng
         void forward(mem::Mem &mem) override
         {
-            if (mem.existstensor(this->args[0])){
-                //C= A/b
-                auto A = mem.gettensor<T>(this->args[0]).get();
-                auto b = mem.getarg<T>(this->args[1]);
-                auto C = mem.gettensor<T>(this->returns[0]).get();
-                tensorfunc::div_scalar(*A, b, *C);  // 直接使用除法
-            }else{
-                //C=a/B
-                auto a = mem.getarg<T>(this->args[0]);
-                auto B = mem.gettensor<T>(this->args[1]).get();
-                auto C = mem.gettensor<T>(this->returns[0]).get();
-                tensorfunc::div_scalar(a, *B, *C);  // 直接使用除法
-            }          
+            auto A = mem.gettensor<T>(this->args[0]).get();
+            auto b = this->getarg(1,mem);
+            auto C = mem.gettensor<T>(this->returns[0]).get();
+            tensorfunc::div_scalar(*A, b, *C);  // 直接使用除法
         }
 
         //已验证，2025-02-19，lipeng
         void backward(mem::Mem &mem) override
         {
-            auto b = mem.getarg<T>(this->args[1]);  // 获取标量b
+            auto b = this->getarg(1,mem);
             auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
             auto c_grad = mem.gettensor<T>(this->returns_grad[0]).get();
             
@@ -278,6 +271,53 @@ namespace deepx::op
             // ∂L/∂a = ∂L/∂c * ∂c/∂a = ∂L/∂c * (1/b)
             deepx::tensorfunc::divadd(*c_grad, b, *a_grad, T(1), *a_grad);  // a_grad += c_grad / b
             // 标量b不需要计算梯度
+        }
+    };
+ 
+
+    template <typename T>
+    class RDiv_scalar : public OpT<T>
+    {
+    public:
+        RDiv_scalar(){
+            this->init("rdiv_scalar",dtype<T>::name(), {}, {}, false, {}, {});
+        }
+        RDiv_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
+            this->init("rdiv_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+        }
+        RDiv_scalar(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
+            this->init("rdiv_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+        }   
+ 
+        void forward(mem::Mem &mem) override
+        {
+            //C=a/B
+            auto a = this->getarg(0,mem);
+            auto B = mem.gettensor<T>(this->args[1]).get();
+            auto C = mem.gettensor<T>(this->returns[0]).get();
+            tensorfunc::div_scalar(a, *B, *C);  // 直接使用除法
+                
+        }
+
+        //TODO: 未验证
+        void backward(mem::Mem &mem) override
+        {
+            // 需要用到前向传播的输入
+            auto a = this->getarg(0,mem);
+            auto B = mem.gettensor<T>(this->args[1]).get();
+            auto C = mem.gettensor<T>(this->returns[0]).get();  // C = a/B
+            auto B_grad = mem.gettensor<T>(this->args_grad[1]).get();
+            auto C_grad = mem.gettensor<T>(this->returns_grad[0]).get();
+            
+            // 标量除法的反向传播：
+            // 对于 C = a/B
+            // ∂L/∂B = ∂L/∂C * ∂C/∂B = ∂L/∂C * (-a/B²)
+            // = -C_grad * (a/B²) = -C_grad * (C/B)
+            auto temp = mem.temptensor<T>(B->shape.shape).get();
+            deepx::tensorfunc::div(*C, *B, *temp);      // temp = C/B
+            deepx::tensorfunc::muladd(*C_grad, *temp, T(-1), *B_grad, T(1), *B_grad);  // B_grad -= C_grad * temp
+            
+            // 标量a不需要计算梯度
         }
     };
 

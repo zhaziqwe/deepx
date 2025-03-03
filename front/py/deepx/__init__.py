@@ -1,23 +1,13 @@
 from .tensor import Tensor,Shape,Device,DeviceType
-from deepx.nn.functional import *
+from deepx.nn.functional import *  # 导入所有functional函数
+from deepx.nn.functional import __all__ as _func_all  # 获取functional的导出列表
+
 __all__ = [
     #tensor
     'Tensor',
     'Shape',
     'Device','DeviceType',
-    #nn.functional
-        #init
-        'full','zeros', 'ones', 'arange', 'rand', 'randn', 'eye',
-        #elementwise
-        "add","sub","mul","div","clamp",
-        #matmul
-        "matmul",
-        #reduce
-        "max","min","sum","prod","mean",
-        #transpose
-        "transpose",
-        #relu
-        "relu",
+    *_func_all
 ]
 
 # 为了支持 import deepx as dx 的用法

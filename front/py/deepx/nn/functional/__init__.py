@@ -1,4 +1,4 @@
-from .elementwise import add,sub,mul,div,clamp
+from .elementwise import *
 from .new import newtensor
 from .print import printtensor
 from .matmul import matmul
@@ -11,7 +11,7 @@ __all__ = [
     "newtensor",
     "printtensor",
     "constant","full","zeros","ones","uniform","arange","rand","randn","eye",
-    "add","sub","mul","div","clamp",
+    "add","sub","mul","div","clamp","exp","sqrt","rsqrt",
     "matmul",
     "max","min","sum","prod","mean",
     "transpose","reshape",

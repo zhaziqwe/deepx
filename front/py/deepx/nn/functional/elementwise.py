@@ -9,27 +9,47 @@ def _A_B_elementwiseop_C(
         b: Tensor, 
         op:str=None,
         out:Tensor=None):
-    opnode = a.graph.add_op(op)
+    g=a.graph
+    if g is None:
+       g=b.graph
+
+    opnode = g.add_op(op)
     opnode.add_input(a.node)
     opnode.add_input(b.node)
     out.node.add_input(opnode)
-    if a.graph.eager:
+    if g.eager:
         ir=DeepxIR(op, a.dtype, [a.node.name, b.node.name], [out.node.name])
         send(ir)
 def _A_b_elementwiseop_C(
-        a:Tensor,
-        b: Optional[Union[ float, int]] = None, 
+        a:Optional[Union[ Tensor, float, int]] = None, 
+        b: Optional[Union[ Tensor, float, int]] = None, 
         op:str=None,
         out:Tensor=None):
-    varnode=a.graph.add_var("",b)
-    opnode = a.graph.add_op(op)
-    opnode.add_input(a.node)
-    opnode.add_input(varnode)
+    if isinstance(a,Tensor):
+        g=a.graph
+    else:
+        g=b.graph
+
+    opnode = g.add_op(op)
+    if isinstance(a,Tensor):
+        opnode.add_input(a.node)
+    else:
+        varnode=g.add_var("",a)
+        opnode.add_input(varnode)
+
+    if isinstance(b,Tensor):
+        opnode.add_input(b.node)
+    else:
+        varnode=g.add_var("",b)
+        opnode.add_input(varnode)
+
     out.node.add_input(opnode)
-    if a.graph.eager:
-        varir=DeepxIR("argset", a.dtype, [b], [varnode.name])
-        send(varir)
-        ir=DeepxIR(op, a.dtype, [a.node.name,varnode.name], [out.node.name])
+    if g.eager:
+        ir=None
+        if isinstance(a,Tensor):
+            ir=DeepxIR(op, a.dtype, [a.node.name,b], [out.node.name])
+        else:
+            ir=DeepxIR(op, b.dtype, [a,b.node.name], [out.node.name])
         send(ir)
 #add
 OpNode.register("add")
@@ -75,7 +95,7 @@ def mul(
 #div
 OpNode.register("div")
 OpNode.register("div_scalar")
-
+OpNode.register("rdiv_scalar")
 def div(
         a: Optional[Union[Tensor, float, int]] = None,
         b: Optional[Union[Tensor, float, int]] = None, 
@@ -83,7 +103,12 @@ def div(
     if isinstance(b,Tensor) and isinstance(a,Tensor):
         _A_B_elementwiseop_C(a,b,"div",out)
     else:
-        _A_b_elementwiseop_C(a,b,"div_scalar",out)
+        if isinstance(a,Tensor):
+            #C=A/b
+            _A_b_elementwiseop_C(a,b,"div_scalar",out)
+        else:
+            #C=a/B
+            _A_b_elementwiseop_C(a,b,"rdiv_scalar",out)
  
 
 #clamp
@@ -117,6 +142,30 @@ def exp(
     if a.graph.eager:
         ir=DeepxIR("exp", a.dtype, [a.node.name], [out.node.name])
         send(ir)
+
+#sqrt
+OpNode.register("sqrt")
+def sqrt(
+        input:Tensor,
+        out:Optional[Tensor]=None)->Tensor:
+    if out is None:
+        out=Tensor(shape=input.shape, dtype=input.dtype, device=input.device)
+    g=input.graph
+    opnode = g.add_op("sqrt")
+    opnode.add_input(input.node)
+    out.node.add_input(opnode)
+    if g.eager:
+        ir=DeepxIR("sqrt", input.dtype, [input.node.name], [out.node.name])
+        send(ir)
+    return out
+
+def rsqrt(
+        input:Tensor,
+        out:Optional[Tensor]=None)->Tensor:
+    if out is None:
+        out=Tensor(shape=input.shape, dtype=input.dtype, device=input.device)
+    out=1/sqrt(input,out)
+    return out
 
 # OpNode.register("ReLU", 101)
 # OpNode.register("Placeholder", 102)

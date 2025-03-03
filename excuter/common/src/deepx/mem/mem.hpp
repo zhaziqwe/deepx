@@ -129,6 +129,10 @@ namespace deepx::mem
         {
             return mem.find(name) != mem.end();
         }
+        bool existarg(const string &name) const
+        {
+            return args.find(name) != args.end();
+        }
 
         template <typename T>
         shared_ptr<Tensor<T>> gettensor(const string &name) const

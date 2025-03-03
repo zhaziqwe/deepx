@@ -106,6 +106,9 @@ class Tensor:
     def __truediv__(self, other):
         return self.div(other)
     
+    def __rtruediv__(self, other):
+        return self.rdiv(other)
+
     def __matmul__(self, other):
         return self.matmul(other)
 
