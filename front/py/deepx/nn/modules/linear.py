@@ -1,6 +1,7 @@
 from .module import Module
-from deepx.tensor import Tensor
-
+from deepx  import Tensor
+from deepx.nn.functional import uniform,kaiming_uniform_,calculate_fan_in_and_fan_out
+import math
 class Linear(Module):
     r'''
     copy from torch.nn.Linear
@@ -30,14 +31,18 @@ class Linear(Module):
         # Setting a=sqrt(5) in kaiming_uniform is the same as initializing with
         # uniform(-1/sqrt(in_features), 1/sqrt(in_features)). For details, see
         # https://github.com/pytorch/pytorch/issues/57109
-        init.kaiming_uniform_(self.weight, a=math.sqrt(5))
+        kaiming_uniform_(self.weight, a=math.sqrt(5))
         if self.bias is not None:
-            fan_in, _ = init._calculate_fan_in_and_fan_out(self.weight)
+            fan_in, _ = calculate_fan_in_and_fan_out(self.weight)
             bound = 1 / math.sqrt(fan_in) if fan_in > 0 else 0
-            init.uniform_(self.bias, -bound, bound)
+            uniform(self.bias, -bound, bound)
 
     def forward(self, input: Tensor) -> Tensor:
-        return F.linear(input, self.weight, self.bias)
+        #`y = xA^T + b` 
+        if self.bias is None:
+            return  input @ self.weight.T 
+        else:
+            return  input @ self.weight.T + self.bias
 
     def extra_repr(self) -> str:
         return f"in_features={self.in_features}, out_features={self.out_features}, bias={self.bias is not None}"

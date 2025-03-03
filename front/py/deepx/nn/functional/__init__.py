@@ -10,7 +10,7 @@ from .activite import relu
 __all__ = [
     "newtensor",
     "printtensor",
-    "constant","full","zeros","ones","uniform","arange","rand","randn","eye","kaiming_uniform_",
+    "constant","full","zeros","ones","uniform","arange","rand","randn","eye","kaiming_uniform_","calculate_fan_in_and_fan_out",
     "add","sub","mul","div","clamp","exp","sqrt","rsqrt",
     "matmul",
     "max","min","sum","prod","mean",

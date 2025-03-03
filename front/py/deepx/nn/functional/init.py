@@ -72,7 +72,7 @@ def eye(
     pass
  
 
-def _calculate_fan_in_and_fan_out(tensor:Tensor):
+def calculate_fan_in_and_fan_out(tensor:Tensor):
     dimensions = tensor.dim()
     if dimensions < 2:
         raise ValueError(
@@ -98,7 +98,7 @@ def _calculate_correct_fan(tensor:Tensor, mode:str):
     if mode not in valid_modes:
         raise ValueError(f"Mode {mode} not supported, please use one of {valid_modes}")
 
-    fan_in, fan_out = _calculate_fan_in_and_fan_out(tensor)
+    fan_in, fan_out = calculate_fan_in_and_fan_out(tensor)
     return fan_in if mode == "fan_in" else fan_out
 
 #copy from torch.nn/init.py
