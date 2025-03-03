@@ -12,4 +12,3 @@ def send(ir:DeepxIR) -> Optional[dict]:
     _id_counter=_id_counter+1
     ir._id=_id_counter
     resp=default_client.send(str(ir))
-    print(resp)

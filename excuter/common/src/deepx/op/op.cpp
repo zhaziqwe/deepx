@@ -5,9 +5,7 @@ namespace deepx::op
     //与deepx/front/py/deepx/nn/deepxir.py对应
 
      // 新格式示例：mul@float32 a(a_grad) b(b_grad) -> a(a_grad) //id=1 create_time=1714512000 send_time=1714512000 recv_time=1714512000
-    void Op::load(const char* str) {
-        string input(str);
-        
+    void Op::load(const string &input) {
         // 分割元数据部分
         size_t meta_pos = input.find("//");
         string body = input.substr(0, meta_pos);

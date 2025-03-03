@@ -25,7 +25,7 @@ namespace deepx::op{
                 vector<int> shape=mem.getvector<int32_t>(this->args[0]);
                 Tensor<T> t=tensorfunc::New<T>(shape);
                 mem.addtensor(name,t);
-            }else if (this->args.size()>1){
+            }else{
                 vector<int> shape;  
                 for (int i = 0; i < this->args.size(); i++) {
                     shape.push_back(atoi(this->args[i].c_str()));

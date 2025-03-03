@@ -16,7 +16,7 @@ namespace client
             close(sockfd);
         }
     }
-    void udpserver::start()
+    void udpserver::start(queue<deepx::op::Op> &queue)
     {
         // 创建UDP套接字
         if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -26,8 +26,7 @@ namespace client
         }
 
         memset(&servaddr, 0, sizeof(servaddr));
-        memset(&cliaddr, 0, sizeof(cliaddr));
-
+ 
         // 绑定IP和端口
         servaddr.sin_family = AF_INET; // IPv4
         servaddr.sin_addr.s_addr = INADDR_ANY;
@@ -42,7 +41,7 @@ namespace client
         while (true)
         {
             len = sizeof(cliaddr);
-            n = recvfrom(sockfd, (char *)buffer, sizeof(buffer), 0, (struct sockaddr *)&cliaddr, &len);
+            n = recvfrom(sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&cliaddr, &len);
             buffer[n] = '\0';
             
             // 新增换行拆分逻辑
@@ -51,13 +50,17 @@ namespace client
             while (getline(ss, line)) {
                 if (!line.empty()) {
                     cout << "~" << line << endl;
-                    char *IR = const_cast<char *>(line.c_str());
-                    string strresp=func(IR);
-                    sendto(sockfd, strresp.c_str(), strresp.size(), 0,
-                   (const struct sockaddr*)&cliaddr, len);
+                    deepx::op::Op op;
+                    op.recv_at = chrono::system_clock::now();
+                    op.load(line);
+                    queue.push(op);
                 }
             }
         }
         close(sockfd);
+    }
+    void udpserver::resp(string str){
+         sendto(sockfd, str.c_str(), str.size(), 0,  // 改为sendto
+          (const struct sockaddr *)&cliaddr, sizeof(cliaddr));
     }
 }

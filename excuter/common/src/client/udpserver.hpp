@@ -7,25 +7,28 @@
 #include <sys/un.h>
 #include <unistd.h>
 #include <functional>
- 
+#include "deepx/op/op.hpp"
+#include <queue>
+
 namespace client{
+    using namespace std;
     class udpserver
     {
     private:
         int port;
         int sockfd;
-        struct sockaddr_in servaddr, cliaddr;
+        struct sockaddr_in servaddr,cliaddr;
         char buffer[1024];
         socklen_t len;
         ssize_t n;
     public:
         udpserver(int port);
         ~udpserver();
-        void start();
-        using handlefunc = std::function<std::string(const char *buffer)>;
+        void start(queue<deepx::op::Op> &tasks);
+        using handlefunc = std::function<void(const char *buffer)>;
         handlefunc func;
+        void resp(string str);
     };
-   
 }
 
 #endif
