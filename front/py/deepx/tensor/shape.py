@@ -1,7 +1,8 @@
 import numpy as np
-
+from typing import Optional,Union
 class Shape:
-    def __init__(self, shape):
+    def __init__(self, 
+                 shape:Optional[Union[tuple[int],list[int],int]]=None):
         # 确保 shape 是元组类型
         self._shape = tuple(shape)
         self._size = int(np.prod(self.shape)) if self.shape else 0
@@ -89,4 +90,15 @@ class Shape:
         if dimorder is None:
             dimorder=list(range(self.ndimension))
         return Shape(tuple(self.shape[i] for i in dimorder))
- 
+    
+    def matmul(self,other:'Shape')->'Shape':
+        if len(self)<2 or len(other)<2:
+            raise ValueError(f"matmul: self.ndimension()<2 or other.ndimension()<2")
+        if len(self)!=len(other):
+            raise ValueError(f"matmul: self.ndimension()!=other.ndimension()")
+        if self[-1]!=other[-2]:
+            raise ValueError(f"matmul: self.shape[-1]!=other.shape[-2]")
+        resultshape=list(self)
+        resultshape[-1]=other[-1]
+        return Shape(resultshape)
+        

@@ -1,0 +1,20 @@
+// Computational Graph
+digraph {
+	rankdir=TB
+	node [shape=record]
+	123210835404752 [label="tensor_1
+(3, 4)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	123210835403984 [label=constant color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	123210835397936 [label="var_1
+1" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	123210835883680 [label="tensor_2
+(4, 3)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	123210835886032 [label="vector_1
+(1, 0)" color=darkseagreen fillcolor=honeydew fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	123210835885120 [label=transpose color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	123210835403984 -> 123210835404752 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	123210835397936 -> 123210835403984 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	123210835885120 -> 123210835883680 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	123210835404752 -> 123210835885120 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	123210835886032 -> 123210835885120 [arrowsize=0.8 color=gray40 penwidth=1.2]
+}

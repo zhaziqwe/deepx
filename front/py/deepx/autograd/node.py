@@ -27,6 +27,11 @@ class Node:
     @property
     def name(self):
         return self._name
- 
+    
+    @property
+    def inputs(self):
+        return self._inputs
+
+    
     def add_input(self, input_node):
         self._inputs.append(input_node)

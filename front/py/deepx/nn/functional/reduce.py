@@ -11,12 +11,12 @@ def _A_v_reduceop_C(
         v: Optional[Union[list[int],tuple[int]]] = None, 
         op:str=None,
         out:Tensor=None):
+    vector_node=a.graph.add_vector("",v)
     opnode = a.graph.add_op(op)
     opnode.add_input(a.node)
-    vector_node=a.graph.add_vector("",v)
     opnode.add_input(vector_node)
-        
     out.node.add_input(opnode)
+
     if a.graph.eager:
         varir=DeepxIR("argset", a.dtype, v, [vector_node.name])
         send(varir)
@@ -26,6 +26,9 @@ def _A_v_reduceop_C(
 
 #max
 OpNode.register("max")
+OpNode.register("max_scalar")
+OpNode.register("reduce_max")
+
 def max(
         a:Tensor,
         b: Optional[Union[
@@ -34,17 +37,23 @@ def max(
             ]] = None, 
         dims:Optional[Union[list[int],tuple[int]]]=None,
         out:Tensor=None):
-    if b is not None and isinstance(b,int,float):
-        _A_b_elementwiseop_C(a,b,"max_scalar",out)
+    result=out
+    if out is None:
+        result=Tensor(shape=a.shape, dtype=a.dtype, device=a.device)
+    if b is not None and( isinstance(b,int) or isinstance(b,float)):
+        _A_b_elementwiseop_C(a,b,"max_scalar",result)
     elif b is not None and isinstance(b,Tensor):
-        _A_b_elementwiseop_C(a,b,"max_tensor",out)
+        _A_b_elementwiseop_C(a,b,"max_tensor",result)
     else:
         if dims is None:
             dims=list(range(a.ndim))
-        _A_v_reduceop_C(a,dims,"max",out)
+        _A_v_reduceop_C(a,dims,"max",result)
 
 #min    
 OpNode.register("min")
+OpNode.register("min_scalar")
+OpNode.register("reduce_min")
+
 def min(
         a:Tensor,
         b: Optional[Union[
@@ -53,14 +62,18 @@ def min(
             ]] = None, 
         dims:Optional[Union[list[int],tuple[int]]]=None,
         out:Tensor=None):
-    if b is not None and isinstance(b,int,float):
-        _A_b_elementwiseop_C(a,b,"min_scalar",out)
+    result=out
+    if out is None:
+        result=Tensor(shape=a.shape, dtype=a.dtype, device=a.device)
+    if b is not None and( isinstance(b,int) or isinstance(b,float)):
+        _A_b_elementwiseop_C(a,b,"min_scalar",result)
     elif b is not None and isinstance(b,Tensor):
-        _A_b_elementwiseop_C(a,b,"min_tensor",out)
+        _A_b_elementwiseop_C(a,b,"min_tensor",result)
     else:
         if dims is None:
             dims=list(range(a.ndim))
-        _A_v_reduceop_C(a,dims,"min",out)
+        _A_v_reduceop_C(a,dims,"min",result)
+    
  
 #sum    
 OpNode.register("sum")

@@ -7,3 +7,6 @@ t3 = t1+t2
 t4=deepx.full([3,4,5],fill_value=0.5)
 t5=t4+t3
 print(t5)
+
+gviz=t5.graph.to_dot()
+gviz.render('operator.svg',format='svg' )

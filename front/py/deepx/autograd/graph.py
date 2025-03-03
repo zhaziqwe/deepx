@@ -82,5 +82,10 @@ class Graph:
             node.add_input(input)
         self.nodes.append(node)
         return node
+def graph_method(f):
+    setattr(Graph, f.__name__, f)
+    return f
+
+
 # 初始化默认图
 Graph._default_graph = Graph()

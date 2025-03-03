@@ -21,14 +21,14 @@ def _A_b_elementwiseop_C(
         b: Optional[Union[ float, int]] = None, 
         op:str=None,
         out:Tensor=None):
+    varnode=a.graph.add_var("",b)
     opnode = a.graph.add_op(op)
     opnode.add_input(a.node)
-    varnode=a.graph.add_var("",b)
     opnode.add_input(varnode)
     out.node.add_input(opnode)
     if a.graph.eager:
         varir=DeepxIR("argset", a.dtype, [b], [varnode.name])
-        send(str(varir))
+        send(varir)
         ir=DeepxIR(op, a.dtype, [a.node.name,varnode.name], [out.node.name])
         send(ir)
 #add

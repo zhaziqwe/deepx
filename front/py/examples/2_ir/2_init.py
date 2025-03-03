@@ -8,3 +8,6 @@ t4=full([3,4,5],fill_value=0.5)
 print(t3)
 t5=t4+t3
 print(t5)
+
+str=t3.graph.to_dot()
+str.render('init.svg',format='svg')

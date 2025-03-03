@@ -8,3 +8,6 @@ t3 = t1.add(t2)
 t3=t3.add(0.5)
 
 print(t3)
+
+str=t3.graph.to_dot()
+str.render('addshape.svg',format='svg')

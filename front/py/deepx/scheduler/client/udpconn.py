@@ -28,7 +28,7 @@ class UDPConn:
             print(f"发送IR失败: {e}")
             return None
 
-    def _wait_response(self, timeout: float =5) -> any:
+    def _wait_response(self, timeout: float =10000) -> any:
         """等待并接收响应
         
         Args:

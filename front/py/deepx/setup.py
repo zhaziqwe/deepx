@@ -1,16 +1,14 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='deepxpy',
+    name='deepx',
     version='0.1.0',
     description='DeepX - 高性能深度学习框架的Python接口',
     author='igor.li',
     author_email='lipeng@mirrorsoft.cn',
     packages=find_packages(),
     install_requires=[
-        'numpy>=1.19.0',     # 用于数组操作和形状计算
         'graphviz>=0.20.1',  # 用于计算图可视化
-        'pyyaml>=5.1',       # 配置文件支持
     ],
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",

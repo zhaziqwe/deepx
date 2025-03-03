@@ -6,6 +6,7 @@ class DataNode(Node):
         super().__init__(name=name, ntype=NodeType.DATA)
         self._data = data
         self._type=type
+    @property
     def data(self):
         return self._data
     

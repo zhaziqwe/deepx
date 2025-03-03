@@ -7,3 +7,5 @@ print((t))
 relu_t=relu(t)
 print(relu_t)
 
+gviz=relu_t.graph.to_dot()
+gviz.render('relu.dot',format='svg')
