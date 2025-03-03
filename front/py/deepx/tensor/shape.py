@@ -15,6 +15,7 @@ class Shape:
             return self._shape
         else:
             return self._shape[dim]
+        
     def numel(self):
         """计算张量中所有元素的数量（与torch.Tensor.numel()行为一致）
         

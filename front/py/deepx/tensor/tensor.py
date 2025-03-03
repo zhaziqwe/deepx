@@ -62,16 +62,22 @@ class Tensor:
     def stride(self):
         return self._shape.stride
  
-    @property
+
     def dim(self):
         return self._shape.dim() if self._shape else None
-    
+
+    @property
+    def size(self):
+        return self._shape.shape if self._shape else None  
+
+    def size(self,dim:int):
+        return self._shape[dim] if self._shape else None  
+
     @property
     def ndimension(self):
         return self._shape.ndimension() if self._shape else None
-    
-    @property
-    def numel(self):
+ 
+    def numel(self)->int:
         return self._shape.numel() if self._shape else None
     
     

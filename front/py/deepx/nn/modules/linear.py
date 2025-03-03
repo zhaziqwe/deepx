@@ -2,18 +2,43 @@ from .module import Module
 from deepx.tensor import Tensor
 
 class Linear(Module):
-    def __init__(self, in_features, out_features, bias=True,dtype:str="float32"):
-        super().__init__()  
+    r'''
+    copy from torch.nn.Linear
+
+    math:`y = xA^T + b` 
+    not y=Ax+b
+    '''
+    def __init__(
+        self,
+        in_features: int,
+        out_features: int,
+        bias: bool = True,
+        dtype:str="float32",
+    ) -> None:
+        super().__init__()
         self.in_features = in_features
         self.out_features = out_features
-        self.weight = Tensor(shape=(out_features,in_features),dtype=dtype)
+        self.weight = Tensor(shape=(out_features, in_features),dtype=dtype)
+    
         if bias:
             self.bias = Tensor(shape=(out_features,),dtype=dtype)
         else:
-            self.bias = None
+            self.register_parameter("bias", None)
+        self.reset_parameters()
 
-    def forward(self, input):
-        output=input.matmul(self.weight.T)
+    def reset_parameters(self) -> None:
+        # Setting a=sqrt(5) in kaiming_uniform is the same as initializing with
+        # uniform(-1/sqrt(in_features), 1/sqrt(in_features)). For details, see
+        # https://github.com/pytorch/pytorch/issues/57109
+        init.kaiming_uniform_(self.weight, a=math.sqrt(5))
         if self.bias is not None:
-            output=output+self.bias
-        return output
+            fan_in, _ = init._calculate_fan_in_and_fan_out(self.weight)
+            bound = 1 / math.sqrt(fan_in) if fan_in > 0 else 0
+            init.uniform_(self.bias, -bound, bound)
+
+    def forward(self, input: Tensor) -> Tensor:
+        return F.linear(input, self.weight, self.bias)
+
+    def extra_repr(self) -> str:
+        return f"in_features={self.in_features}, out_features={self.out_features}, bias={self.bias is not None}"
+
