@@ -133,6 +133,10 @@ namespace deepx::mem
         template <typename T>
         shared_ptr<Tensor<T>> gettensor(const string &name) const
         {
+            if (mem.find(name)== mem.end())
+            {
+                throw std::runtime_error("tensor not found: " + name);
+            }
             auto ptr = mem.at(name);
             return std::static_pointer_cast<Tensor<T>>(ptr);
         }

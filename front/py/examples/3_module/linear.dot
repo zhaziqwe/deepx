@@ -1,0 +1,13 @@
+// Computational Graph
+digraph {
+	rankdir=TB
+	node [shape=record]
+	125633308838112 [label="tensor_1
+(5, 10)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	125633308837296 [label="tensor_2
+(5,)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	125633308838160 [label="tensor_3
+(1, 5)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	125633308838400 [label="tensor_4
+(1,)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+}

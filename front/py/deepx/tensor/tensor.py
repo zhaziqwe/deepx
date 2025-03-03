@@ -109,6 +109,11 @@ class Tensor:
     def __matmul__(self, other):
         return self.matmul(other)
 
+    #自动转置最后两个维度，适用于二维矩阵
+    @property
+    def T(self) -> str:
+        return self.transpose(1,0)
+
     def __repr__(self) -> str:
         from deepx.nn.functional import printtensor
         s=printtensor(self)

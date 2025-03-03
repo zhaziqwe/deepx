@@ -13,7 +13,7 @@ class Linear(Module):
             self.bias = None
 
     def forward(self, input):
-        output=input.matmul_(self.weight.T)
+        output=input.matmul(self.weight.T)
         if self.bias is not None:
             output=output+self.bias
         return output

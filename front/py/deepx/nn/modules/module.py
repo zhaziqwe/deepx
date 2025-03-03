@@ -3,9 +3,10 @@ from typing import (Dict, Iterator, Optional, Tuple, Union,
                     Any, List, overload)
 from collections import OrderedDict
 from deepx import Tensor
-
+from deepx.autograd import Graph
 class Module:  
     def __init__(self, name: Optional[str] = None):
+        self._graph=Graph.get_default()
         self._name = name or self._generate_default_name()
         self._parent: Optional[Module] = None
         self._modules: OrderedDict[str, Module] = OrderedDict()
@@ -19,6 +20,10 @@ class Module:
         count = self.__class__._instance_counter
         self.__class__._instance_counter += 1
         return f"{base_name}_{count}"
+    
+    @property
+    def graph(self):
+        return self._graph
     
     def __setattr__(self, name: str, value: Any) -> None:
         if not name.startswith('_'):
