@@ -17,6 +17,7 @@ DeepX 原生分布式并行的深度学习训练推理一体框架
    :maxdepth: 6
    :caption: doc 文档
    
+   front/py/deepx/about
    excuter/op-mem-ompsimd/list
    deepxIR/ir
 
@@ -25,10 +26,6 @@ DeepX 原生分布式并行的深度学习训练推理一体框架
    :caption: contrib 贡献
    
    front/py/contribute
-   front/node
-   front/graph
-   front/aboutop
-   front/op
    excuter/op-mem-ompsimd/contribute
    excuter/op-mem-ompsimd/range
 
