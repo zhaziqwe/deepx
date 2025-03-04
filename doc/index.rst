@@ -14,7 +14,7 @@ DeepX 原生分布式并行的深度学习训练推理一体框架
    benchmark/broadcast
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 6
    :caption: doc 文档
    
    excuter/op-mem-ompsimd/list
@@ -22,7 +22,7 @@ DeepX 原生分布式并行的深度学习训练推理一体框架
    deepxIR/ir
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 6
    :caption: contrib 贡献
    
    front/py/contribute
