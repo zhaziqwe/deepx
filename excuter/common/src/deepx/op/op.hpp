@@ -69,16 +69,8 @@ namespace deepx::op
                   bool  grad,
                   const vector<string> &args_grad,
                   const vector<string> &returns_grad);
-    };
 
-    template <typename T>
-    class OpT : public Op
-    {
-    public:
-        string getdtype()
-        {
-            return deepx::dtype<T>::name();
-        }
+        template<typename T>
         T getarg(int idx,mem::Mem &mem){
             auto x = T(0);
             if (mem.existarg(this->args[idx])){
@@ -87,6 +79,21 @@ namespace deepx::op
                 x = T(std::stof(this->args[idx].c_str()));
             }
             return x;
+        }
+
+        template<typename T>
+        vector<T> getvector(int from,int to,mem::Mem &mem){
+            auto v = vector<T>();
+            for (int i=from;i<to;i++){
+                v.push_back(T(std::stof(this->args[i].c_str())));
+            }
+            return v;
+        }
+
+        template<typename T>
+        string getdtype()
+        {
+            return deepx::dtype<T>::name();
         }
     };
 }

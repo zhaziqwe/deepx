@@ -8,16 +8,16 @@
 
 namespace deepx::op{
     template<typename T>
-    class NewTensor : public OpT<T>{
+    class NewTensor : public Op{
         public:
         NewTensor(){
-            this->init("newtensor",dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("newtensor",deepx::dtype<T>::name(), {}, {}, false, {}, {});
         }
         NewTensor(string args){
-            this->init("newtensor",dtype<T>::name(), args, {}, false, {}, {});
+            this->init("newtensor",deepx::dtype<T>::name(), args, {}, false, {}, {});
         }
         NewTensor(initializer_list<string> args){
-            this->init("newtensor",dtype<T>::name(), args, {}, false, {}, {});
+            this->init("newtensor",deepx::dtype<T>::name(), args, {}, false, {}, {});
         }
         void forward(mem::Mem &mem) override{
             string name= this->returns[0];
@@ -45,10 +45,10 @@ namespace deepx::op{
         }
     };
     template<typename T>
-    class CopyTensor : public OpT<T>{
+    class CopyTensor : public Op{
         public:
         CopyTensor(){
-            this->init("copytensor",dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("copytensor",deepx::dtype<T>::name(), {}, {}, false, {}, {});
         }
         void forward(mem::Mem &mem) override{
             auto src=mem.gettensor<T>(this->args[0]);
@@ -67,10 +67,10 @@ namespace deepx::op{
     };
 
     template<typename T>
-    class CloneTensor : public OpT<T>{
+    class CloneTensor : public Op{
         public:
         CloneTensor(){
-            this->init("clonetensor",dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("clonetensor",deepx::dtype<T>::name(), {}, {}, false, {}, {});
         }
         void forward(mem::Mem &mem) override{
             auto src=mem.gettensor<T>(this->args[0]);
@@ -90,13 +90,13 @@ namespace deepx::op{
     };
 
     template<typename T>
-    class DelTensor : public OpT<T>{
+    class DelTensor : public Op{
         public:
         DelTensor(){
             this->init("deltensor","any", {}, {}, false, {}, {});
         }
         DelTensor(string args){
-            this->init("deltensor","any", args, {}, false, {}, {});
+            this->init("deltensor","any", {args}, {}, false, {}, {});
         }
         DelTensor(initializer_list<string> args){
             this->init("deltensor","any", args, {}, false, {}, {});

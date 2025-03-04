@@ -166,22 +166,15 @@ def rsqrt(
         out=Tensor(shape=input.shape, dtype=input.dtype, device=input.device)
     out=1/sqrt(input,out)
     return out
-
-# OpNode.register("ReLU", 101)
+ 
 # OpNode.register("Placeholder", 102)
 # OpNode.register("Neg", 103)
 # NodeType.register("Less", 104)
 # NodeType.register("Equal", 105)
-# NodeType.register("Sigmoid", 106)
+ 
 # NodeType.register("Tanh", 107)
-# NodeType.register("Reshape", 108)
-# NodeType.register("Transpose", 109)
-  
-# def relu(x, name=None):
-#     node = OpNode("ReLU", name)
-#     node.add_input("x", x)
-#     return node
-
+ 
+ 
 # def placeholder(name=None, shape=None):
 #     node = OpNode("Placeholder", name)
 #     if shape:
@@ -204,27 +197,9 @@ def rsqrt(
 #     node.add_input("a", a)
 #     node.add_input("b", b)
 #     return node
-
-# def sigmoid(x):
-#     node = OpNode("Sigmoid")
-#     node.add_input("x", x)
-#     return node
-
+ 
 # def tanh(x):
 #     node = OpNode("Tanh")
 #     node.add_input("x", x)
-#     return node
-
-# def reshape(x, shape):
-#     node = OpNode("Reshape")
-#     node.add_input("x", x)
-#     node.set_attr("shape", shape)
-#     return node
-
-# def transpose(x, dim0, dim1):
-#     node = OpNode("Transpose")
-#     node.add_input("x", x)
-#     node.set_attr("dim0", dim0)
-#     node.set_attr("dim1", dim1)
 #     return node
  

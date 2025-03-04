@@ -7,7 +7,7 @@
 
 namespace deepx::op{
     template <typename T>
-    class Transpose : public OpT<T> {
+    class Transpose : public Op {
     public:
         Transpose() {
             this->init("transpose", "any", {}, {}, false, {}, {});

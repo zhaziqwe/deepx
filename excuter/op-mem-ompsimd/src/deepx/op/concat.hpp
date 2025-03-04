@@ -7,17 +7,16 @@
 namespace deepx::op
 {
     template <typename T>
-    class Concat : public OpT<T>
-    {
+    class Concat : public Op{
     public:
         Concat(){
-            this->init("concat",dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("concat",deepx::dtype<T>::name(), {}, {}, false, {}, {});
         }
         Concat(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-            this->init("concat",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("concat",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         Concat(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-            this->init("concat",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("concat",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
          void setexample() override {
             this->init("concat", "float32", {"T1", "T2", "3"}, {"T3"}, false, {}, {});

@@ -14,17 +14,17 @@ namespace deepx::op
 
     
     template <typename T>
-    class Add : public OpT<T>
+    class Add : public Op
     {
     public:
         Add(){
-            this->init("add",dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("add",deepx::dtype<T>::name(), {}, {}, false, {}, {});
         }
         Add(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-            this->init("add",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("add",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         Add(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-            this->init("add",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("add",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
          void setexample() override {
             this->init("add", "int32", {"T1", "T2"}, {"T3"}, false, {}, {});
@@ -55,23 +55,23 @@ namespace deepx::op
     
     //Add_scalar
     template <typename T>
-    class Add_scalar : public OpT<T>
+    class Add_scalar : public Op
     {
     public:
         Add_scalar(){
-            this->init("add_scalar",dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("add_scalar",deepx::dtype<T>::name(), {}, {}, false, {}, {});
         }
         Add_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-            this->init("add_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("add_scalar",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         Add_scalar(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-            this->init("add_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("add_scalar",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         //已验证，2025-02-19，lipeng
         void forward(mem::Mem &mem) override
         {
             auto A=mem.gettensor<T>(this->args[0]).get();
-            auto b = this->getarg(1,mem);
+            auto b = this->getarg<T>(1,mem);
             auto C = mem.gettensor<T>(this->returns[0]).get();
             deepx::tensorfunc::add(*A, b, *C);
         }
@@ -94,17 +94,17 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Sub : public OpT<T>
+    class Sub : public Op
     {
     public:
         Sub(){
-            this->init("sub",dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("sub",deepx::dtype<T>::name(), {}, {}, false, {}, {});
         }
         Sub(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-            this->init("sub",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("sub",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         Sub(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-            this->init("sub",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("sub",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         void forward(mem::Mem &mem) override
         {
@@ -134,17 +134,17 @@ namespace deepx::op
         }
     };
     template <typename T>
-    class Mul : public OpT<T>
+    class Mul : public Op
     {
     public:
         Mul(){
-            this->init("mul",dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("mul",deepx::dtype<T>::name(), {}, {}, false, {}, {});
         }
         Mul(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-            this->init("mul",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("mul",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         Mul(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-            this->init("mul",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("mul",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         void forward(mem::Mem &mem) override
         {
@@ -179,23 +179,23 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Mul_scalar : public OpT<T>
+    class Mul_scalar : public Op
     {
     public:
         Mul_scalar(){
-            this->init("mul_scalar",dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("mul_scalar",deepx::dtype<T>::name(), {}, {}, false, {}, {});
         }
         Mul_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-            this->init("mul_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("mul_scalar",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         Mul_scalar(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-            this->init("mul_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("mul_scalar",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         //已验证，2025-02-19，lipeng
         void forward(mem::Mem &mem) override    
         {
             auto A=mem.gettensor<T>(this->args[0]).get();
-            auto b = this->getarg(1,mem);
+            auto b = this->getarg<T>(1,mem);
             auto C = mem.gettensor<T>(this->returns[0]).get();
             deepx::tensorfunc::mul(*A, b, *C);
         }
@@ -203,7 +203,7 @@ namespace deepx::op
         void backward(mem::Mem &mem) override
         {
             // 需要用到前向传播的标量输入b
-            auto b = this->getarg(1,mem);
+            auto b = this->getarg<T>(1,mem);
             auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
             auto c_grad = mem.gettensor<T>(this->returns_grad[0]).get();
             
@@ -222,17 +222,17 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Div : public OpT<T>
+    class Div : public Op
     {
     public:
         Div(){
-            this->init("div",dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("div",deepx::dtype<T>::name(), {}, {}, false, {}, {});
         }
         Div(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-            this->init("div",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("div",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         Div(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-            this->init("div",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("div",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         void forward(mem::Mem &mem) override
         {
@@ -274,23 +274,23 @@ namespace deepx::op
     //Div_scalar之所以不复用Mul_scalar，是防止b接近0时，Mul_scalar(1/b)不稳定
     //A/b=C
     template <typename T>
-    class Div_scalar : public OpT<T>
+    class Div_scalar : public Op
     {
     public:
         Div_scalar(){
-            this->init("div_scalar",dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("div_scalar",deepx::dtype<T>::name(), {}, {}, false, {}, {});
         }
         Div_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-            this->init("div_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("div_scalar",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         Div_scalar(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-            this->init("div_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("div_scalar",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }   
         //已验证，2025-02-19，lipeng
         void forward(mem::Mem &mem) override
         {
             auto A = mem.gettensor<T>(this->args[0]).get();
-            auto b = this->getarg(1,mem);
+            auto b = this->getarg<T>(1,mem);
             auto C = mem.gettensor<T>(this->returns[0]).get();
             tensorfunc::div_scalar(*A, b, *C);  // 直接使用除法
         }
@@ -298,7 +298,7 @@ namespace deepx::op
         //已验证，2025-02-19，lipeng
         void backward(mem::Mem &mem) override
         {
-            auto b = this->getarg(1,mem);
+            auto b = this->getarg<T>(1,mem);
             auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
             auto c_grad = mem.gettensor<T>(this->returns_grad[0]).get();
             
@@ -318,23 +318,23 @@ namespace deepx::op
  
 
     template <typename T>
-    class RDiv_scalar : public OpT<T>
+    class RDiv_scalar : public Op
     {
     public:
         RDiv_scalar(){
-            this->init("rdiv_scalar",dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("rdiv_scalar",deepx::dtype<T>::name(), {}, {}, false, {}, {});
         }
         RDiv_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-            this->init("rdiv_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("rdiv_scalar",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         RDiv_scalar(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-            this->init("rdiv_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("rdiv_scalar",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }   
  
         void forward(mem::Mem &mem) override
         {
             //C=a/B
-            auto a = this->getarg(0,mem);
+            auto a = this->getarg<T>(0,mem);
             auto B = mem.gettensor<T>(this->args[1]).get();
             auto C = mem.gettensor<T>(this->returns[0]).get();
             tensorfunc::div_scalar(a, *B, *C);  // 直接使用除法
@@ -345,7 +345,7 @@ namespace deepx::op
         void backward(mem::Mem &mem) override
         {
             // 需要用到前向传播的输入
-            auto a = this->getarg(0,mem);
+            auto a = this->getarg<T>(0,mem);
             auto B = mem.gettensor<T>(this->args[1]).get();
             auto C = mem.gettensor<T>(this->returns[0]).get();  // C = a/B
             auto B_grad = mem.gettensor<T>(this->args_grad[1]).get();
@@ -370,17 +370,17 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Sqrt : public OpT<T>
+    class Sqrt : public Op
     {
     public:
         Sqrt(){
-            this->init("sqrt",dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("sqrt",deepx::dtype<T>::name(), {}, {}, false, {}, {});
         }
         Sqrt(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-            this->init("sqrt",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("sqrt",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         Sqrt(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-            this->init("sqrt",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("sqrt",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         void forward(mem::Mem &mem) override
         {
@@ -409,17 +409,17 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Exp : public OpT<T>
+    class Exp : public Op
     {
     public:
         Exp(){
-            this->init("exp",dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("exp",deepx::dtype<T>::name(), {}, {}, false, {}, {});
         }
         Exp(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-            this->init("exp",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("exp",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         Exp(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-            this->init("exp",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("exp",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         void forward(mem::Mem &mem) override
         {
@@ -449,14 +449,14 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Pow : public OpT<T>
+    class Pow : public Op
     {
     public:
         Pow(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-            this->init("pow",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("pow",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         Pow(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-            this->init("pow",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("pow",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         void forward(mem::Mem &mem) override
         {
@@ -501,17 +501,17 @@ namespace deepx::op
 
 
     template <typename T>
-    class Pow_scalar : public OpT<T>
+    class Pow_scalar : public Op
     {
     public:
         Pow_scalar(){
-            this->init("pow_scalar",dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("pow_scalar",deepx::dtype<T>::name(), {}, {}, false, {}, {});
         }
         Pow_scalar(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-            this->init("pow_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("pow_scalar",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         Pow_scalar(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-            this->init("pow_scalar",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("pow_scalar",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         void forward(mem::Mem &mem) override
         {
@@ -548,14 +548,14 @@ namespace deepx::op
 
 
     template <typename T>
-    class Log : public OpT<T>
+    class Log : public Op
     {
     public:
         Log(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-            this->init("log",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("log",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         Log(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-            this->init("log",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("log",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         void forward(mem::Mem &mem) override
         {
@@ -582,7 +582,7 @@ namespace deepx::op
     // public:
     //     Sin(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
     //     {
-    //         this->name = std::string("sin") + "_" + dtype<T>::name();
+    //         this->name = std::string("sin") + "_" + deepx::dtype<T>::name();
     //         this->args.push_back(a);
     //         this->returns.push_back(b);
     //         if (require_grad)
@@ -625,7 +625,7 @@ namespace deepx::op
     // public:
     //     Cos(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
     //     {
-    //         this->name = std::string("cos") + "_" + dtype<T>::name();
+    //         this->name = std::string("cos") + "_" + deepx::dtype<T>::name();
     //         this->args.push_back(a);
     //         this->returns.push_back(b);
     //         if (require_grad)
@@ -668,7 +668,7 @@ namespace deepx::op
     // public:
     //     Tan(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
     //     {
-    //         this->name = std::string("tan") + "_" + dtype<T>::name();
+    //         this->name = std::string("tan") + "_" + deepx::dtype<T>::name();
     //         this->args.push_back(a);
     //         this->returns.push_back(b);
     //         if (require_grad)
@@ -700,7 +700,7 @@ namespace deepx::op
     // public:
     //     Asin(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
     //     {
-    //         this->name = std::string("asin") + "_" + dtype<T>::name();
+    //         this->name = std::string("asin") + "_" + deepx::dtype<T>::name();
     //         this->args.push_back(a);
     //         this->returns.push_back(b);
     //         if (require_grad)
@@ -744,7 +744,7 @@ namespace deepx::op
     // public:
     //     Acos(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
     //     {
-    //         this->name = std::string("acos") + "_" + dtype<T>::name();
+    //         this->name = std::string("acos") + "_" + deepx::dtype<T>::name();
     //         this->args.push_back(a);
     //         this->returns.push_back(b);
     //         if (require_grad)
@@ -788,7 +788,7 @@ namespace deepx::op
     // public:
     //     Atan(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
     //     {
-    //         this->name = std::string("atan") + "_" + dtype<T>::name();
+    //         this->name = std::string("atan") + "_" + deepx::dtype<T>::name();
     //         this->args.push_back(a);
     //         this->returns.push_back(b);
     //         if (require_grad)
@@ -832,7 +832,7 @@ namespace deepx::op
     // public:
     //     Sinh(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
     //     {
-    //         this->name = std::string("sinh") + "_" + dtype<T>::name();
+    //         this->name = std::string("sinh") + "_" + deepx::dtype<T>::name();
     //         this->args.push_back(a);
     //         this->returns.push_back(b);
     //         if (require_grad)
@@ -875,7 +875,7 @@ namespace deepx::op
     // public:
     //     Cosh(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
     //     {
-    //         this->name = std::string("cosh") + "_" + dtype<T>::name();
+    //         this->name = std::string("cosh") + "_" + deepx::dtype<T>::name();
     //         this->args.push_back(a);
     //         this->returns.push_back(b);
     //         if (require_grad)
@@ -918,7 +918,7 @@ namespace deepx::op
     // public:
     //     Tanh(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
     //     {
-    //         this->name = std::string("tanh") + "_" + dtype<T>::name();
+    //         this->name = std::string("tanh") + "_" + deepx::dtype<T>::name();
     //         this->args.push_back(a);
     //         this->returns.push_back(b);
     //         if (require_grad)
@@ -962,7 +962,7 @@ namespace deepx::op
     // public:
     //     Asinh(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
     //     {
-    //         this->name = std::string("asinh") + "_" + dtype<T>::name();
+    //         this->name = std::string("asinh") + "_" + deepx::dtype<T>::name();
     //         this->args.push_back(a);
     //         this->returns.push_back(b);
     //         if (require_grad)
@@ -1006,7 +1006,7 @@ namespace deepx::op
     // public:
     //     Acosh(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
     //     {
-    //         this->name = std::string("acosh") + "_" + dtype<T>::name();
+    //         this->name = std::string("acosh") + "_" + deepx::dtype<T>::name();
     //         this->args.push_back(a);
     //         this->returns.push_back(b);
     //         if (require_grad)
@@ -1041,7 +1041,7 @@ namespace deepx::op
     // public:
     //     Atanh(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
     //     {
-    //         this->name = std::string("atanh") + "_" + dtype<T>::name();
+    //         this->name = std::string("atanh") + "_" + deepx::dtype<T>::name();
     //         this->args.push_back(a);
     //         this->returns.push_back(b);
     //     }
@@ -1066,7 +1066,7 @@ namespace deepx::op
     // public:
     //     Erf(string a, string b, bool require_grad = false, string a_grad = "", string b_grad = "")
     //     {
-    //         this->name = std::string("erf") + "_" + dtype<T>::name();
+    //         this->name = std::string("erf") + "_" + deepx::dtype<T>::name();
     //         this->args.push_back(a);
     //         this->returns.push_back(b);
     //         if (require_grad)

@@ -106,11 +106,11 @@ OpNode.register("mean")
 def mean(
         a:Tensor,
         dims:Optional[Union[list[int],tuple[int]]]=None,
+        keepdims:bool=False,
         out:Tensor=None):
     if dims is None:
         dims=list(range(a.ndim))
-    _A_v_reduceop_C(a,dims,"mean",out)
-
+    
 
 # #var
 # OpNode.register("var")

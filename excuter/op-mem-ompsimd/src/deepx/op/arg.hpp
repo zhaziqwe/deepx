@@ -6,21 +6,21 @@
 namespace deepx::op{
 
     template<typename T>
-    class ArgSet : public OpT<T>{
+    class ArgSet : public Op{
         public:
         ArgSet(){
-            this->init("argset",dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("argset",deepx::dtype<T>::name(), {}, {}, false, {}, {});
         }
  
         ArgSet(string name,T value){
-            this->init("argset",dtype<T>::name(), {name,value}, {}, false, {}, {});
+            this->init("argset",deepx::dtype<T>::name(), {name,value}, {}, false, {}, {});
         }
  
         ArgSet(string name,vector<T> value){
-            this->init("argset",dtype<T>::name(), {name,value}, {}, false, {}, {});
+            this->init("argset",deepx::dtype<T>::name(), {name,value}, {}, false, {}, {});
         }
         ArgSet(initializer_list<string> args){
-            this->init("argset",dtype<T>::name(), args, {}, false, {}, {});
+            this->init("argset",deepx::dtype<T>::name(), args, {}, false, {}, {});
         }
         void setexample() override {
             this->init("argset", "int32", {"3", "4", "5"}, {"shape"}, false, {}, {});
@@ -30,7 +30,7 @@ namespace deepx::op{
         }
         void forward(mem::Mem &mem) override{
             string name= this->returns[0];
-            if (dtype<T>::name()=="int32"){
+            if (deepx::dtype<T>::name()=="int32"){
                 if (this->args.size() == 1){
                     int value=atoi(this->args[0].c_str());
                     mem.addarg(name,value);
@@ -42,7 +42,7 @@ namespace deepx::op{
                     mem.addvector(name,value);
                 }
             }
-            else if (dtype<T>::name()=="float32"){
+            else if (deepx::dtype<T>::name()=="float32"){
                 if (this->args.size() == 1){
                     float value=stof(this->args[0]);
                     mem.addarg(name,value);
@@ -54,7 +54,7 @@ namespace deepx::op{
                     mem.addvector(name,value);
                 }
             }
-            else if (dtype<T>::name()=="float64"){
+            else if (deepx::dtype<T>::name()=="float64"){
                 if (this->args.size() == 1){
                     double value=stod(this->args[0]);
                     mem.addarg(name,value);
@@ -67,7 +67,7 @@ namespace deepx::op{
                 }
             }
             else{
-                throw std::runtime_error("Unsupported dtype: "+dtype<T>::name());
+                throw std::runtime_error("Unsupported dtype: "+deepx::dtype<T>::name());
             }
 
         }

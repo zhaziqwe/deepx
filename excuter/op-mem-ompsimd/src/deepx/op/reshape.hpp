@@ -9,7 +9,7 @@ namespace deepx::op
     using namespace deepx::tensorfunc;
     using namespace std;
     template <typename T>
-    class Reshape : public OpT<T>
+    class Reshape : public Op
     {
     public:
         Reshape()

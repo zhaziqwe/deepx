@@ -8,9 +8,9 @@ def printall(t):
    print("t.shape[0]=",t.shape[0])
    print("t.stride=",t.stride)
    print("t.stride[0]=",t.stride[0])
-   print("t.dim=",t.dim)
+   print("t.dim=",t.dim())
    print("t.ndimension=",t.ndimension)
-   print("t.numel=",t.numel)
+   print("t.numel=",t.numel())
    print("t.dtype=", t.dtype)
 def newtensorwithshape(shape):
    t = Tensor(shape=[2,3,4])

@@ -1,6 +1,4 @@
 from deepx.tensor import Tensor
-from deepx.nn.deepxir import DeepxIR
-from deepx.scheduler import send
 
 def relu(t: Tensor,inplace:bool=False)->Tensor:
     from .reduce import max as max_func

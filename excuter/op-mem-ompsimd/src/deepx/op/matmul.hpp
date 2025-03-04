@@ -15,17 +15,17 @@ namespace deepx::op
 
     
     template <typename T>
-    class MatMul : public OpT<T>
+    class MatMul : public Op
     {
     public:
         MatMul(){
-            this->init("matmul",dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("matmul",deepx::dtype<T>::name(), {}, {}, false, {}, {});
         }
         MatMul(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
-            this->init("matmul",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("matmul",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         MatMul(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
-            this->init("matmul",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
+            this->init("matmul",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }   
         void forward(mem::Mem &mem) override
         {
