@@ -11,8 +11,6 @@ DeepX 原生分布式并行的深度学习训练推理一体框架
    :maxdepth:4
    :caption: tutorials 教程
    
-
-
 .. toctree::
    :maxdepth:4
    :caption: doc 文档
@@ -27,10 +25,7 @@ DeepX 原生分布式并行的深度学习训练推理一体框架
    front/graph
    front/aboutop
    front/op
-   
    excuter/welcome 
-
-
 
 索引和搜索
 ==========
