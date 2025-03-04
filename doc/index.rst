@@ -4,42 +4,33 @@
    contain the root `toctree` directive.
 
 DeepX 原生分布式并行的深度学习训练推理一体框架
-=================================================
+=======================================
 
+ 
 .. toctree::
-   :maxdepth: 3
-   :caption: 核心文档
+   :maxdepth:4
+   :caption: tutorials 教程
    
-   introduction
-   architecture
-   quickstart
-   modules
-   api_reference
-   development_guide
+
 
 .. toctree::
    :maxdepth:4
-   :caption: 开发者资源
-   
-   contrib/operator_development
-   contrib/performance_optimization
-   contrib/testing_guide
-   excuter/range
-   excuter/welcome
+   :caption: doc 文档
    excuter/op-mem-ompsimd/list
+   excuter/range
+   deepxIR/ir
 
 .. toctree::
-   :maxdepth: 2
-   :caption: 项目信息
+   :maxdepth:4
+   :caption: contrib 贡献
+   front/node
+   front/graph
+   front/aboutop
+   front/op
    
-   changelog
-   about
-   op
-   graph
-   node
-   front/front
-   deepxIR/ir
-   benchmark/reduce
+   excuter/welcome 
+
+
 
 索引和搜索
 ==========
