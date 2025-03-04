@@ -23,7 +23,7 @@ DeepX 原生分布式并行的深度学习训练推理一体框架
 
 .. toctree::
    :maxdepth: 6
-   :caption: contrib 贡献
+   :caption: contrib 贡献指南
    
    front/py/contribute
    scheduler/scheduler
