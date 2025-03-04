@@ -1,6 +1,6 @@
-## excuter
+## 贡献deepx/excuter
 
-### ompsimd
+### deepx/excuter/op-mem-ompsimd
 
 ompsimd是DeepX框架的cpu执行器进程
 
