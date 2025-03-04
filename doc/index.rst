@@ -18,7 +18,6 @@ DeepX 原生分布式并行的深度学习训练推理一体框架
    :caption: doc 文档
    
    excuter/op-mem-ompsimd/list
-   excuter/range
    deepxIR/ir
 
 .. toctree::
@@ -31,6 +30,7 @@ DeepX 原生分布式并行的深度学习训练推理一体框架
    front/aboutop
    front/op
    excuter/op-mem-ompsimd/contribute
+   excuter/op-mem-ompsimd/range
 
 索引和搜索
 ==========

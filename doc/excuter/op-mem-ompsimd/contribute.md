@@ -4,7 +4,8 @@
 
 ompsimd是DeepX框架的cpu执行器进程
 
-+ 采用OMP+SIMD加速tensor计算。
++ 采用OMP+SIMD加速tensor计算
++ double和float采用openblas加速
 + 使用了jemalloc内存池管理内存。
 
 

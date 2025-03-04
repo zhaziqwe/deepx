@@ -1,8 +1,12 @@
-# range
+#### cpu的range算子辅助函数
 
-range函数是shape类中的一个函数，用于根据shape对tensor进行遍历。
+range函数是shape类中的一个函数，用于根据shape对tensor进行omp线程并行遍历的方式
 
-由于非常多的算子，调用到了range函数，所以range函数需要不同类型的参数 
+定义和实现分别在：
+
+excuter/common/src/deepx/shape.hpp
+
+excuter/common/src/deepx/shape_range.cpp
 
 | func | omp并行 | omp线程local局部对象 | 调用场景   |
 | ---- | ---- | ------ | ---------- |
@@ -10,5 +14,3 @@ range函数是shape类中的一个函数，用于根据shape对tensor进行遍�
 | 函数 | 否   | 0      | 不需要并行 |
 | 函数 | 是   | 0      | 需要并行   |
 | 函数 | 否   | 0      | 不需要并行 |
-
-## 
