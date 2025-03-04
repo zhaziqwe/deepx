@@ -26,6 +26,7 @@ DeepX 原生分布式并行的深度学习训练推理一体框架
    :caption: contrib 贡献
    
    front/py/contribute
+   scheduler/scheduler
    excuter/op-mem-ompsimd/contribute
    excuter/op-mem-ompsimd/range
 
