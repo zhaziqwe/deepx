@@ -1,4 +1,6 @@
-## ompsimd 贡献
+## excuter
+
+### ompsimd
 
 ompsimd是DeepX框架的cpu执行器进程
 
@@ -6,7 +8,7 @@ ompsimd是DeepX框架的cpu执行器进程
 + 使用了jemalloc内存池管理内存。
 
 
-### 1. 安装依赖
+#### 1. 安装依赖
 
  安装apt依赖
 
@@ -49,7 +51,7 @@ sudo ldconfig  # 更新动态链接库缓存
 sudo cp -r ../hwy /usr/local/include/
 ```
 
-### 2. 开发环境
+#### 2. 开发环境
 
 c++ 17
 
