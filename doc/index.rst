@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-DeepX 开放计算调度框架
-======================
+DeepX 原生分布式并行的深度学习训练推理一体框架
+=================================================
 
 .. toctree::
    :maxdepth: 3
