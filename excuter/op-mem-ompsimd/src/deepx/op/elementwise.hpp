@@ -26,6 +26,12 @@ namespace deepx::op
         Add(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
             this->init("add",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
+         void setexample() override {
+            this->init("add", "int32", {"T1", "T2"}, {"T3"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T3 = T1 + T2";
+        }
         void forward(mem::Mem &mem) override
         {
             auto a = mem.gettensor<T>(this->args[0]).get();
@@ -79,6 +85,12 @@ namespace deepx::op
             deepx::tensorfunc::add(*a_grad, *c_grad, *a_grad);  // a_grad += c_grad
             // 标量b不需要计算梯度
         }
+        void setexample() override {
+            this->init("add_scalar", "float32", {"T1", "1.0"}, {"T2"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T2 = T1 + 1.0";
+        }
     };
 
     template <typename T>
@@ -113,6 +125,12 @@ namespace deepx::op
             deepx::tensorfunc::add(*a_grad, *c_grad, *a_grad);  // a_grad += c_grad
             // ∂L/∂b = ∂L/∂c * ∂c/∂b = ∂L/∂c * (-1)
             deepx::tensorfunc::sub(*b_grad, *c_grad, *b_grad);  // b_grad -= c_grad
+        }
+        void setexample() override {
+            this->init("sub", "int32", {"T1", "T2"}, {"T3"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T3 = T1 - T2";
         }
     };
     template <typename T>
@@ -152,6 +170,12 @@ namespace deepx::op
             // ∂L/∂b = ∂L/∂c * ∂c/∂b = ∂L/∂c * a
             deepx::tensorfunc::muladd(*a, *c_grad, *b_grad, *b_grad);  // b_grad += a * c_grad
         }
+        void setexample() override {
+            this->init("mul", "float32", {"T1", "T2"}, {"T3"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T3 = T1 * T2";
+        }
     };
 
     template <typename T>
@@ -188,6 +212,12 @@ namespace deepx::op
             // ∂L/∂a = ∂L/∂c * ∂c/∂a = ∂L/∂c * b
             deepx::tensorfunc::muladd(*c_grad, b, *a_grad,T(1), *a_grad);  // a_grad += c_grad * b
             // 标量b不需要计算梯度
+        }
+        void setexample() override {
+            this->init("mul_scalar", "float32", {"T1", "2.0"}, {"T2"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T2 = T1 * 2.0";
         }
     };
 
@@ -233,6 +263,12 @@ namespace deepx::op
             deepx::tensorfunc::div(*c, *b, *temp_tensor);      // temp = c/b
             deepx::tensorfunc::muladd(*c_grad, *temp_tensor, T(-1), *b_grad, T(1), *b_grad);  // b_grad -= c_grad * temp
         }
+        void setexample() override {
+            this->init("div", "float32", {"T1", "T2"}, {"T3"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T3 = T1 / T2";
+        }
     };
 
     //Div_scalar之所以不复用Mul_scalar，是防止b接近0时，Mul_scalar(1/b)不稳定
@@ -271,6 +307,12 @@ namespace deepx::op
             // ∂L/∂a = ∂L/∂c * ∂c/∂a = ∂L/∂c * (1/b)
             deepx::tensorfunc::divadd(*c_grad, b, *a_grad, T(1), *a_grad);  // a_grad += c_grad / b
             // 标量b不需要计算梯度
+        }
+        void setexample() override {
+            this->init("div_scalar", "float32", {"T1", "2.0"}, {"T2"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T2 = T1 / 2.0";
         }
     };
  
@@ -319,6 +361,12 @@ namespace deepx::op
             
             // 标量a不需要计算梯度
         }
+        void setexample() override {
+            this->init("rdiv_scalar", "float32", {"1", "T2"}, {"T3"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T3 =1 / T2";
+        }
     };
 
     template <typename T>
@@ -352,6 +400,12 @@ namespace deepx::op
             // ∂L/∂a = ∂L/∂b * ∂b/∂a = ∂L/∂b * (1/(2*sqrt(a))) = b_grad/(2*b)
             deepx::tensorfunc::divadd(*b_grad, *b,T(0.5), *a_grad, T(1), *a_grad);  // a_grad += 0.5 * b_grad/b
         }
+        void setexample() override {
+            this->init("sqrt", "float32", {"T1"}, {"T2"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T2 = sqrt(T1)";
+        }   
     };
 
     template <typename T>
@@ -385,6 +439,12 @@ namespace deepx::op
             // exp的导数是exp(x)本身，所以
             // ∂L/∂a = ∂L/∂b * ∂b/∂a = ∂L/∂b * exp(a) = b_grad * b
             deepx::tensorfunc::muladd(*b_grad, *b, *a_grad, *a_grad);  // a_grad += b_grad * b
+        }
+        void setexample() override {
+            this->init("exp", "float32", {"T1"}, {"T2"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T2 = exp(T1)";
         }
     };
 
@@ -431,6 +491,12 @@ namespace deepx::op
             deepx::tensorfunc::mul(*b_grad, *c, *b_grad);  // temp = c * ln(a)
             deepx::tensorfunc::mul(*b_grad, *c_grad, *b_grad);  // b_grad = c_grad * c * ln(a)
         }
+        void setexample() override {
+            this->init("pow", "float32", {"T1", "T2"}, {"T3"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T3 = T1 ^ T2";
+        }
     };
 
 
@@ -472,6 +538,12 @@ namespace deepx::op
             deepx::tensorfunc::mul(*a_grad, *c_grad, *a_grad);  // a_grad = c_grad * b * (c/a)
             // 标量b不需要计算梯度
         }
+        void setexample() override {
+            this->init("pow_scalar", "float32", {"T1", "2.0"}, {"T2"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T2 = T1 ^ 2.0";
+        }
     };
 
 
@@ -499,6 +571,9 @@ namespace deepx::op
             deepx::tensorfunc::div(*a_grad, *b, *a_grad);
             deepx::tensorfunc::div(*b_grad, *b, *b_grad);
         }
+        void setexample() override { 
+            
+        }  
     };
    
     // template <typename T>

@@ -42,6 +42,12 @@ namespace deepx::op
             vector<int> shape = input->shape.shape;
             tensorfunc::reshape(*return_grad, *input_grad, shape);
         }
+        void setexample() override {
+            this->init("reshape", "float32", {"T1", "2","3","4"}, {"T2"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T2 = reshape(T1, [2,3,4])";
+        }
     };
 }
 

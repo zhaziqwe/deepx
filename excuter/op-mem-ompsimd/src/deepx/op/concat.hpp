@@ -19,6 +19,12 @@ namespace deepx::op
         Concat(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
             this->init("concat",dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
+         void setexample() override {
+            this->init("concat", "float32", {"T1", "T2", "3"}, {"T3"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T3 = concat([T1, T2], axis=3)";
+        }
         void forward(mem::Mem &mem) override
         {
             std::vector<Tensor<T>*> input;

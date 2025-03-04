@@ -37,6 +37,12 @@ namespace deepx::op{
         void backward(mem::Mem &mem) override{
             throw std::runtime_error("New op does not support backward");
         }
+        void setexample() override {
+            this->init("newtensor", "float32", {"shape"}, {"T1"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T1 = zeros(shape)";
+        }
     };
     template<typename T>
     class CopyTensor : public OpT<T>{
@@ -52,6 +58,12 @@ namespace deepx::op{
         void backward(mem::Mem &mem) override{
             throw std::runtime_error("Copy op does not support backward");
         }   
+        void setexample() override {
+            this->init("copytensor", "float32", {"T1"}, {"T2"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T2 = T1.copy()";
+        }
     };
 
     template<typename T>
@@ -69,6 +81,12 @@ namespace deepx::op{
         void backward(mem::Mem &mem) override{
             throw std::runtime_error("Clone op does not support backward");
         }   
+        void setexample() override {
+            this->init("clonetensor", "float32", {"T1"}, {"T2"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T2 = T1.clone()";
+        }
     };
 
     template<typename T>
@@ -89,6 +107,12 @@ namespace deepx::op{
         }
         void backward(mem::Mem &mem) override{
             throw std::runtime_error("Del op does not support backward");
+        }
+        void setexample() override {
+            this->init("deltensor", "any", {"T1"}, {}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "del T1";
         }
     };
 }

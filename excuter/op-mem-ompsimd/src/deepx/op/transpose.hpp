@@ -44,6 +44,12 @@ namespace deepx::op{
             auto output_grad = mem.gettensor<T>(this->returns_grad[0]).get();
             tensorfunc::transpose(*output_grad, *input_grad, dimOrder);
         }
+        void setexample() override {
+            this->init("transpose", "float32", {"T1", "1","0"}, {"T2"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T2 = transpose(T1, dimorder=[1,0])";
+        }
     };
 }
 

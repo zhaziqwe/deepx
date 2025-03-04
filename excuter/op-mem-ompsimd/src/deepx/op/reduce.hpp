@@ -34,6 +34,12 @@ namespace deepx::op
                 auto A_grad = mem.gettensor<T>(this->args_grad[0]);
                 tensorfunc::broadcast(*output_grad, *A_grad);
             }
+            void setexample() override {
+                this->init("sum", "float32", {"T1", "1","2"}, {"T2"}, false, {}, {});
+            }
+            string math_formula() const override {
+                return "T2 = sum(T1, dims=[1,2])";
+            }
     };
  
  template<typename T>
@@ -64,6 +70,12 @@ namespace deepx::op
                 auto B_grad=mem.gettensor<T>(this->args_grad[1]);
                 auto output_grad=mem.gettensor<T>(this->returns_grad[0]);
                 deepx::tensorfunc::max_grad(*A, *B,  *A_grad, *B_grad, *output_grad);
+            }
+            void setexample() override {
+                this->init("max", "float32", {"T1"},  {"T2"}, false, {}, {});
+            }
+            string math_formula() const override {
+                return "T3 = max(T1,T2)";
             }
     };
 
@@ -105,6 +117,29 @@ namespace deepx::op
                 auto output_grad=mem.gettensor<T>(this->returns_grad[0]);
                 deepx::tensorfunc::max_grad(*A, b, *A_grad, *output_grad);
             }
+            void setexample() override {
+                this->init("max_scalar", "float32", {"T1", "0.0"}, {"T2"}, false, {}, {});
+            }
+            string math_formula() const override {
+                return "T2 = max(T1, 0.0)";
+            }
+    };
+
+    //todo
+    template<typename T>
+    class Max_reduce: public OpT<T>{
+        public:
+            Max_reduce(){
+                this->init("max_reduce",dtype<T>::name(), {}, {}, false, {}, {});
+            };
+            void forward(mem::Mem &mem) override{
+                
+            }
+
+            void backward(mem::Mem &mem) override{
+               
+            };
+
     };
 
     template<typename T>
@@ -133,6 +168,12 @@ namespace deepx::op
                 auto B_grad=mem.gettensor<T>(this->args_grad[1]);
                 auto output_grad=mem.gettensor<T>(this->returns_grad[0]);
                 deepx::tensorfunc::min_grad(*A, *B, *A_grad, *B_grad, *output_grad);
+            }
+             void setexample() override {
+                this->init("min", "float32", {"A", "B"}, {"C"}, false, {}, {});
+            }
+            string math_formula() const override {
+                return "C = min(A,B)";
             }
     };
 
@@ -171,6 +212,12 @@ namespace deepx::op
                 auto A_grad=mem.gettensor<T>(this->args_grad[0]);
                 auto output_grad=mem.gettensor<T>(this->returns_grad[0]);
                 deepx::tensorfunc::min_grad(*A, b, *A_grad, *output_grad);
+            }
+            void setexample() override {
+                this->init("min_scalar", "float32", {"A", "1.0"}, {"B"}, false, {}, {});
+            }
+            string math_formula() const override {
+                return "B= min(A, 1.0)";
             }
     };
 }

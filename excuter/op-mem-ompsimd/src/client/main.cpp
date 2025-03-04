@@ -18,6 +18,17 @@ int main()
     client::udpserver server(8080);
     deepx::op::OpFactory opfactory;
     register_all(opfactory);
+    
+    opfactory.print_markdown();
+
+    // 将op table输出到markdown文件
+    string docdir="../../../doc/excuter/op-mem-ompsimd/";
+    std::ofstream md_file(docdir+"支持算子列表.md");
+    if (md_file.is_open()){
+        md_file << opfactory.print_markdown();
+        md_file.close();
+    }
+    
 
     queue<deepx::op::Op> tasks;
     // 启动一个新线程来运行UDP服务器

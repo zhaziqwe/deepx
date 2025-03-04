@@ -32,6 +32,12 @@ namespace deepx::op{
         void backward(mem::Mem &mem) override{
             throw std::runtime_error("Uniform op does not support backward");
         }
+        void setexample() override {
+            this->init("uniform", "float32", {"-1.0", "1.0"}, {"T1"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "uniform(-1.0, 1.0,T1)";  // 均匀分布初始化
+        }
     };
 
     template<typename T>
@@ -58,6 +64,12 @@ namespace deepx::op{
         }
         void backward(mem::Mem &mem) override{
             throw std::runtime_error("Constant op does not support backward");
+        }
+        void setexample() override {
+            this->init("constant", "float32", {"0.0"}, {"T1"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T1 = full(shape, 0.0)";  // 常量初始化
         }
     };
 
@@ -87,6 +99,12 @@ namespace deepx::op{
         }
         void backward(mem::Mem &mem) override{
             throw std::runtime_error("Arange op does not support backward");
+        }
+        void setexample() override {
+            this->init("arange", "float32", {"0.0","1.0"}, {"T1"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "arange(start=0.0, step=1.0,T1)";  // 等差数列
         }
     };
 }

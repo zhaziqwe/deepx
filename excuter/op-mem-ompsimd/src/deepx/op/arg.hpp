@@ -22,6 +22,12 @@ namespace deepx::op{
         ArgSet(initializer_list<string> args){
             this->init("argset",dtype<T>::name(), args, {}, false, {}, {});
         }
+        void setexample() override {
+            this->init("argset", "int32", {"3", "4", "5"}, {"shape"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "shape = [3, 4, 5]";
+        }
         void forward(mem::Mem &mem) override{
             string name= this->returns[0];
             if (dtype<T>::name()=="int32"){

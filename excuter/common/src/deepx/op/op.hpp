@@ -54,6 +54,12 @@ namespace deepx::op
             throw std::runtime_error("backward not implemented");
         }
 
+        virtual string math_formula() const {
+            return "";
+        }
+        virtual void setexample(){
+            
+        }
         void load(const string &str) ;
         std::string to_string(bool show_extra=false) const;
         void init(const string &opname,

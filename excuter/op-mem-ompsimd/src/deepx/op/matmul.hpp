@@ -59,6 +59,12 @@ namespace deepx::op
             deepx::tensorfunc::transpose(*a, *a_T, dimOrder_a);
             deepx::tensorfunc::matmuladd(*a_T, *c_grad, T(1), T(1), *b_grad);
         }
+        void setexample() override {
+            this->init("matmul", "float32", {"T1", "T2"}, {"T3"}, false, {}, {});
+        }
+        string math_formula() const override {
+            return "T3 = T1 @ T2";  // 使用@表示矩阵乘法
+        }
     };
 
 }
