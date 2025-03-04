@@ -1,6 +1,6 @@
-## 贡献deepx/front
+## front
 
-### deepx/front/py
+### py
 
 deepx-py库是DeepX框架的Python库，方便用户搭建深度学习模型，输出计算图，主要用于深度学习模型的开发和训练。
 
