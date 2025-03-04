@@ -24,6 +24,9 @@ DeepX 原生分布式并行的深度学习训练推理一体框架
    contrib/operator_development
    contrib/performance_optimization
    contrib/testing_guide
+   excuter/range
+   excuter/welcome
+   excuter/op-mem-ompsimd/支持算子列表
 
 .. toctree::
    :maxdepth: 2
