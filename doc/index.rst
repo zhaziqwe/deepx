@@ -26,11 +26,17 @@ DeepX 原生分布式并行的深度学习训练推理一体框架
    contrib/testing_guide
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: 项目信息
    
    changelog
    about
+   op
+   graph
+   node
+   front/front
+   deepxIR/ir
+   benchmark/reduce
 
 索引和搜索
 ==========
