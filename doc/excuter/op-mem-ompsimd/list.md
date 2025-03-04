@@ -1,3 +1,5 @@
+## excuter/op-mem-ompsimd 支持算子列表
+
 | Operation | Data Types | Math Formula | IR Instruction |
 |-----------|------------|--------------|----------------|
 | sum | float32, float64 | T2 = sum(T1, dims=[1,2]) | sum@float32 T1 1 2 -> T2 |
