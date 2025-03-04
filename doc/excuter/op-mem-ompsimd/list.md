@@ -1,4 +1,6 @@
-## excuter/op-mem-ompsimd 支持算子列表
+## excuter/op-mem-ompsimd 支持算子列表 
+
+本页面由 `excuter/op-mem-ompsimd/src/deepx/op/opfactory.hpp` 生成，请勿手动修改 
 
 | Operation | Data Types | Math Formula | IR Instruction |
 |-----------|------------|--------------|----------------|

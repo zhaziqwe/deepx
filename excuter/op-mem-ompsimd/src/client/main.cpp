@@ -23,7 +23,7 @@ int main()
 
     // 将op table输出到markdown文件
     string docdir="../../../doc/excuter/op-mem-ompsimd/";
-    std::ofstream md_file(docdir+"支持算子列表.md");
+    std::ofstream md_file(docdir+"list.md");
     if (md_file.is_open()){
         md_file << opfactory.print_markdown();
         md_file.close();

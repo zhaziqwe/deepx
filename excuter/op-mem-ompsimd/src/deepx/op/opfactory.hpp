@@ -27,8 +27,8 @@ namespace deepx::op
         // 输出为markdown表格格式
         string print_markdown() const {
             std::stringstream ss;
-            ss <<"## excuter/op-mem-ompsimd 支持算子列表 \n";
-            ss << "（本页面由 `excuter/op-mem-ompsimd/src/deepx/op/opfactory.hpp` 生成，请勿手动修改）";
+            ss <<"## excuter/op-mem-ompsimd 支持算子列表 \n\n";
+            ss << "本页面由 `excuter/op-mem-ompsimd/src/deepx/op/opfactory.hpp` 生成，请勿手动修改 \n\n";
             ss << "| Operation | Data Types | Math Formula | IR Instruction |\n";
             ss << "|-----------|------------|--------------|----------------|\n";
  
