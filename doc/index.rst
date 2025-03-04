@@ -18,7 +18,7 @@ DeepX 原生分布式并行的深度学习训练推理一体框架
    development_guide
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth:4
    :caption: 开发者资源
    
    contrib/operator_development
