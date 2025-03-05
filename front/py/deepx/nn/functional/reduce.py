@@ -122,7 +122,19 @@ def mean(
         dims:Optional[Union[list[int],tuple[int]]]=None,
         keepdim:bool=False,
         out:Union[str]=''):
-    result=1/sum(a,dims,keepdim,out)
+    # 如果dims为None,则对所有维度求平均
+    if dims is None:
+        dims = list(range(a.ndim))
+    
+    # 计算需要平均的元素总数
+    total = 1
+    for i in dims:
+        # 处理负数索引
+        if i < 0:
+            i = i + a.ndim
+        total *= a.shape[i]
+        
+    result = sum(a, dims, keepdim, out)/total
     return result
 # #var
 # OpNode.register("var")

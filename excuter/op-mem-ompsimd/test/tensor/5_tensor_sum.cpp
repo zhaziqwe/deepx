@@ -10,20 +10,27 @@
 #include "deepx/vector_combination.hpp"
 #include "deepx/shape_reduce.hpp"
 #include "deepx/tensorfunc/new.hpp"
+#include "deepx/tensorfunc/init.hpp"
 #include "deepx/tensorfunc/print.hpp"
 #include "deepx/tensorfunc/file.hpp"
+
+#include <omp.h>
+
 using namespace deepx;
 using namespace deepx::tensorfunc;
 void test_sum()
 {
+    omp_set_num_threads(1); 
+
     Shape shape({2, 3, 4});
     deepx::Tensor<float> tensor= New<float>(shape.shape);
-    std::iota(tensor.data ,tensor.data+tensor.shape.size,0);
+    constant(tensor,float(1));
+    print(tensor);
+    cout<<""<<endl;
     std::vector<std::vector<int>> result = combination(3);
     for (const auto &comb : result)
     {
-        Shape sShape = reduceShape(shape, comb);
-        std::cout << comb <<  std::endl;
+        std::cout <<"sum(t,"<< comb <<")"<< std::endl;
         Shape sumshape=reduceShape(shape,comb);
         Tensor<float> r = New<float>(sumshape.shape);
         sum(tensor, comb, r);

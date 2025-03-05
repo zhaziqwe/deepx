@@ -10,7 +10,18 @@ namespace deepx
   std::vector<int> reduceDimMap(const Shape &shape, const std::vector<int> &dims)
     {
         // Step 1: 确定输出形状
-        std::vector<int> sumDims(dims.data(), dims.data() + dims.size());
+        std::vector<int> sumDims;
+        if (dims.empty())
+        {
+            for (int i = 0; i < shape.dim; ++i)
+            {
+                sumDims.push_back(i);
+            }
+        }
+        else
+        {
+            sumDims = std::vector<int>(dims.data(), dims.data() + dims.size());
+        }
         std::sort(sumDims.begin(), sumDims.end());
         // 去重
         sumDims.erase(std::unique(sumDims.begin(), sumDims.end()), sumDims.end());
@@ -34,6 +45,7 @@ namespace deepx
     }
     std::vector<int> reduceShape(const Shape &a, const std::vector<int> &dims)
     {
+        
         // 创建一个映射数组，标记哪些维度需要求和
         std::vector<int> reduceMap = reduceDimMap(a, dims);
 

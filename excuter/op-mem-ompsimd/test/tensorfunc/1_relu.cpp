@@ -5,8 +5,6 @@
 #include "deepx/tensorfunc/new.hpp"
 #include "deepx/tensorfunc/init.hpp"
 #include "deepx/tensor.hpp"
-#include "deepx/tensorfunc/activite.hpp"
-
 #include "deepx/op/op.hpp"
 #include "deepx/op/reduce.hpp"
  
