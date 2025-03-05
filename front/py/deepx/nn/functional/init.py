@@ -33,12 +33,12 @@ def full(*shape, fill_value=0, dtype=None, device=None,
     return constant(outtensor, fill_value)
 
 def zeros(*shape, dtype=None, device=None,
-         out:Union[Tensor,str]=''):
-    return full(*shape, fill_value=0, dtype=dtype, device=device,out=out)
+         name:Union[str]=''):
+    return full(*shape, fill_value=0, dtype=dtype, device=device,out=name)
 
 def ones(*size, dtype=None, device=None,
-         out:Union[Tensor,str]=''):
-    return full(*size, fill_value=1, dtype=dtype, device=device,out=out)
+         name:Union[str]=''):
+    return full(*size, fill_value=1, dtype=dtype, device=device,out=name)
 
 OpNode.register("uniform")
 def uniform(t:Tensor,low=0, high=1)->Tensor:

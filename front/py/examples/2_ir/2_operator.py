@@ -9,4 +9,4 @@ t5=t4+t3
 print(t5)
 
 gviz=t5.graph.to_dot()
-gviz.render('operator.svg',format='svg' )
+gviz.render('operator.dot',format='svg' )

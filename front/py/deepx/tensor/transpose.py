@@ -1,3 +1,4 @@
+from typing import Union
 from  .tensor import Tensor,tensor_method
 
 @tensor_method
@@ -13,12 +14,18 @@ def transpose_(self,*axes):
     return self
 
 @tensor_method
-def reshape(self,*shape,inplace:bool=False)->Tensor:
+def reshape(self,*shape,inplace:bool=True,out:Union[Tensor,str]='')->Tensor:
     from deepx.nn.functional import reshape as reshape_func
     result=None
     if inplace:
         result=self
     else:
-        result=Tensor(shape=shape, dtype=self.dtype, device=self.device)    
+        if isinstance(out,str):
+            result=Tensor(shape=shape, dtype=self.dtype, device=self.device)    
+            result.addtograph(out)
+        elif  isinstance(out,Tensor):
+            result=out
+        else:
+            raise ""
     reshape_func(self,shape,result)
     return result

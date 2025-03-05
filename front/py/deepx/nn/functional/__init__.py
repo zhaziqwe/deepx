@@ -3,7 +3,7 @@ from .new import newtensor
 from .print import printtensor
 from .matmul import matmul
 from .init import *
-from .reduce import max,min,sum,prod,mean
+from .reduce import reduce_max,reduce_min,sum,prod,mean
 from .transpose import transpose,reshape
 from .activite import relu
 

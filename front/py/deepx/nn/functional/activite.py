@@ -4,7 +4,7 @@ from deepx import Tensor
 def relu(
         t: Tensor,
         inplace:bool=False,
-        out:Optional[Union[Tensor,str]]=None)->Tensor:
+        out:Union[Tensor,str]='')->Tensor:
     
     outtensor=None
     if inplace:
@@ -15,7 +15,7 @@ def relu(
             outtensor.addtograph(out)
         else:
             outtensor=out
-    from .reduce import max as max_func
+    from .elementwise import max as max_func
     max_func(t,0,outtensor)
     return outtensor
  
@@ -23,7 +23,7 @@ def relu(
 def sigmoid(
         t: Tensor,
         inplace:bool=False,
-        out:Optional[Union[Tensor,str]]=None)->Tensor:
+        out:Union[Tensor,str]='')->Tensor:
     outtensor=None
     if inplace:
         outtensor=t

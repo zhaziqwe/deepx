@@ -197,6 +197,43 @@ def rsqrt(
     outtensor=1/sqrt(input,outtensor)
     return outtensor
  
+
+OpNode.register("max")
+OpNode.register("max_scalar")
+def max(
+        a:Tensor,
+        b:Union[int,float,Tensor,]=0,
+        out:Union[Tensor,str]=''):
+    result=None
+    if isinstance(out,str):
+        result=Tensor(shape=a.shape, dtype=a.dtype, device=a.device)
+        result.addtograph(out)
+    else:
+        result=out
+    if  isinstance(b,int) or isinstance(b,float):
+        _A_b_elementwiseop_C(a,b,"max_scalar",result)
+    else:
+        _A_b_elementwiseop_C(a,b,"max_tensor",result)
+    return result
+
+OpNode.register("min")
+OpNode.register("min_scalar")
+def min(
+        a:Tensor,
+        b:Union[int,float,Tensor,]=0,
+        out:Union[Tensor,str]=''):
+    result=None
+    if isinstance(out,str):
+        result=Tensor(shape=a.shape, dtype=a.dtype, device=a.device)
+        result.addtograph(out)
+    else:
+        result=out
+    if  isinstance(b,int) or isinstance(b,float):
+        _A_b_elementwiseop_C(a,b,"min_scalar",result)
+    else:
+        _A_b_elementwiseop_C(a,b,"min_tensor",result)
+    return result
+
 # OpNode.register("Placeholder", 102)
 # OpNode.register("Neg", 103)
 # NodeType.register("Less", 104)
