@@ -5,7 +5,7 @@ from deepx.scheduler import send
 
 OpNode.register("print")
 def printtensor(t:Tensor):
-    ir=DeepxIR("print",'', [t._node.name], [])
+    ir=DeepxIR("print",'', [t.node.name], [])
     send(ir)
     return ''
 

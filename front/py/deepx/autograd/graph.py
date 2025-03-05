@@ -38,7 +38,7 @@ class Graph:
 
     def add_var(self, name,data,inputs=[]):
         self.var_counter += 1
-        if name == "":
+        if name == "" or name is None:
             name = f"var_{self.var_counter}"
         node=DataNode(name, "var", data)
         for input in inputs:
@@ -48,7 +48,7 @@ class Graph:
     
     def add_vector(self, name,data,inputs=[]):
         self.vector_counter += 1
-        if name == "":
+        if name == "" or name is None:
             name = f"vector_{self.vector_counter}"
         node=DataNode(name, "vector", data)
         for input in inputs:
@@ -58,7 +58,7 @@ class Graph:
     
     def add_tensor(self, name,t,inputs=[]):
         self.tensor_counter += 1
-        if name == "":
+        if name == "" or name is None:
             name = f"tensor_{self.tensor_counter}"
         node=DataNode(name, "tensor", t)
         for input in inputs:

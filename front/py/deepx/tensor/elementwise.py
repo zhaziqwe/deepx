@@ -1,8 +1,13 @@
+from typing import Optional,Union
+
 from deepx.tensor import Tensor,tensor_method
 
 @tensor_method
-def add(self, other):
+def add(self,
+        other:Union[Tensor,float,int],
+        out:Optional[Union[str]]=None):
     result = Tensor(dtype=self.dtype,shape=self.shape)
+    result.addtograph(out)
     from deepx.nn.functional import add as add_func
     add_func(self,other,result)
     return result
@@ -14,8 +19,10 @@ def add_(self, other):
     return self 
 
 @tensor_method
-def sub(self, other):
+def sub(self, other:Union[Tensor,float,int],
+        out:Optional[Union[str]]=None):
     result = Tensor(dtype=self.dtype,shape=self.shape)
+    result.addtograph(out)
     from deepx.nn.functional import sub as sub_func
     sub_func(self,other,result)
     return result
@@ -27,8 +34,10 @@ def sub_(self, other):
     return self
 
 @tensor_method
-def mul(self, other):
+def mul(self,  other:Union[Tensor,float,int],
+        out:Optional[Union[str]]=None):
     result = Tensor(dtype=self.dtype,shape=self.shape)
+    result.addtograph(out)
     from deepx.nn.functional import mul as mul_func
     mul_func(self,other,result)
     return result
@@ -40,8 +49,10 @@ def mul_(self, other):
     return self
 
 @tensor_method
-def div(self, other):
+def div(self, other:Union[Tensor,float,int],
+        out:Optional[Union[str]]=None):
     result = Tensor(dtype=self.dtype,shape=self.shape)
+    result.addtograph(out)
     from deepx.nn.functional import div as div_func
     div_func(self,other,result)
     return result
@@ -55,8 +66,10 @@ def div_(self, other):
 
 
 @tensor_method
-def rdiv(self, other):
+def rdiv(self,  other:Union[Tensor,float,int],
+        out:Optional[Union[str]]=None):
     result = Tensor(dtype=self.dtype,shape=self.shape)
+    result.addtograph(out)
     from deepx.nn.functional import div as div_func
     div_func(other,self,result)
     return result
@@ -68,8 +81,10 @@ def rdiv_(self, other):
     return self
 
 @tensor_method
-def min_scalar(self, other):
+def min_scalar(self,  other:Union[Tensor,float,int],
+        out:Optional[Union[str]]=None):
     result = Tensor(dtype=self.dtype,shape=self.shape)
+    result.addtograph(out)
     from deepx.nn.functional import min_scalar as min_scalar_func
     min_scalar_func(self,other,result)
     return result
@@ -81,8 +96,10 @@ def min_scalar_(self, other):
     return self
 
 @tensor_method
-def max_scalar(self, other):
+def max_scalar(self,  other:Union[Tensor,float,int],
+        out:Optional[Union[str]]=None):
     result = Tensor(dtype=self.dtype,shape=self.shape)
+    result.addtograph(out)
     from deepx.nn.functional import max_scalar as max_scalar_func
     max_scalar_func(self,other,result)
     return result   
@@ -94,8 +111,10 @@ def max_scalar_(self, other):
     return self
 
 @tensor_method
-def clamp(self, min, max):
+def clamp(self, min:Union[float,int], max:Union[float,int],
+        out:Optional[Union[str]]=None):
     result = Tensor(dtype=self.dtype,shape=self.shape)
+    result.addtograph(out)
     from deepx.nn.functional import clamp as clamp_func
     clamp_func(self,min,max,result)
     return result
@@ -107,8 +126,9 @@ def clamp_(self, min, max):
     return self
 
 @tensor_method
-def exp(self):
+def exp(self,out:Optional[Union[str]]=None):
     result = Tensor(dtype=self.dtype,shape=self.shape)
+    result.addtograph(out)
     from deepx.nn.functional import exp as exp_func
     exp_func(self,result)
     return result
@@ -120,8 +140,9 @@ def exp_(self):
     return self
 
 @tensor_method
-def sqrt(self):
+def sqrt(self,out:Optional[Union[str]]=None):
     result = Tensor(dtype=self.dtype,shape=self.shape)
+    result.addtograph(out)
     from deepx.nn.functional import sqrt as sqrt_func
     sqrt_func(self,result)
     return result

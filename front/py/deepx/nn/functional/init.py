@@ -20,18 +20,25 @@ def constant(t:Tensor, value:Optional[Union[
         send(ir)
     return t
 
-def full(*shape, fill_value=0, dtype=None, device=None,t:Tensor=None):
+def full(*shape, fill_value=0, dtype=None, device=None,
+         out:Union[Tensor,str]=''):
     if len(shape) == 1 and isinstance(shape[0], (tuple, list)):
         shape = shape[0]
-    if t is None:
-        t=Tensor(data=None, shape=shape, dtype=dtype, device=device)
-    return constant(t, fill_value)
+    outtensor=None
+    if isinstance(out,str):
+        outtensor=Tensor(shape=shape, dtype=dtype, device=device)
+        outtensor.addtograph(out)
+    else:
+        outtensor=out
+    return constant(outtensor, fill_value)
 
-def zeros(*shape, dtype=None, device=None):
-    return full(*shape, fill_value=0, dtype=dtype, device=device)
+def zeros(*shape, dtype=None, device=None,
+         out:Union[Tensor,str]=''):
+    return full(*shape, fill_value=0, dtype=dtype, device=device,out=out)
 
-def ones(*size, dtype=None, device=None):
-    return full(*size, fill_value=1, dtype=dtype, device=device)
+def ones(*size, dtype=None, device=None,
+         out:Union[Tensor,str]=''):
+    return full(*size, fill_value=1, dtype=dtype, device=device,out=out)
 
 OpNode.register("uniform")
 def uniform(t:Tensor,low=0, high=1)->Tensor:

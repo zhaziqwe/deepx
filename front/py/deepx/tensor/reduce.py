@@ -1,3 +1,6 @@
+
+from typing import Optional,Union
+
 from deepx.tensor import Tensor,tensor_method
 from deepx.autograd.graph import OpNode
 

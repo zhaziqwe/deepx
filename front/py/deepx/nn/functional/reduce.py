@@ -64,6 +64,7 @@ def min(
         out:Tensor=None):
     result=out
     if out is None:
+        #todo
         result=Tensor(shape=a.shape, dtype=a.dtype, device=a.device)
     if b is not None and( isinstance(b,int) or isinstance(b,float)):
         _A_b_elementwiseop_C(a,b,"min_scalar",result)
@@ -86,6 +87,8 @@ def sum(
         out:Tensor=None):
     if dims is None:
         dims=list(range(a.ndim))
+    if out is None:
+        result=Tensor(shape=a.shape, dtype=a.dtype, device=a.device)
     _A_v_reduceop_C(a,dims,"sum",out)
 
 #prod

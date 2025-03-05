@@ -6,8 +6,8 @@
 #include "deepx/shape_broadcast.hpp"
 namespace deepx::tensorfunc
 {
-    template <typename T>
-    void broadcast(const Tensor<T> &tensor, Tensor<T> &result)
+    template <typename Src_T, typename Dst_T>
+    void broadcast(const Tensor<Src_T> &tensor, Tensor<Dst_T> &result)
     {
         std::vector<BroadcastMap> bm = broadcastMap(tensor.shape.shape, result.shape.shape);
 
@@ -36,8 +36,9 @@ namespace deepx::tensorfunc
                            {
             fromBroadcastIndices(bm,indices,oldIndices);
             int idx_old = tensor.shape.linearat(oldIndices);
-            result.data[idx_linear]= tensor.data[idx_old];
-             }, tensor.shape.dim );
+            result.data[idx_linear]= static_cast<Dst_T>(tensor.data[idx_old]);
+            
+            }, tensor.shape.dim );
         }
     }
 }

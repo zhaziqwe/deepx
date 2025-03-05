@@ -1,4 +1,7 @@
 import sys
+
+from deepx.autograd import Graph
+
 sys.path.append('/home/lipeng/code/git.array2d.com/ai/deepx/front/py')  # 将项目根目录添加到Python路径
 
 from deepx.tensor import Tensor
@@ -14,11 +17,13 @@ def printall(t):
    print("t.dtype=", t.dtype)
 def newtensorwithshape(shape):
    t = Tensor(shape=[2,3,4])
+   t.addtograph("t")
    printall (t)
 
 
 def newtensorwithdata():
    t = Tensor([1,2,3])
+   t.addtograph("t")
    printall (t)
 def main(caseid):
    if caseid == 0:

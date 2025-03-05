@@ -3,9 +3,10 @@ from typing import (Dict, Iterator, Optional, Tuple, Union,
                     Any, List, overload)
 from collections import OrderedDict
 from deepx import Tensor
-from deepx.autograd import Graph
+
 class Module:  
     def __init__(self, name: Optional[str] = None):
+        from deepx.autograd import Graph
         self._graph=Graph.get_default()
         self._name = name or self._generate_default_name()
         self._parent: Optional[Module] = None
@@ -24,6 +25,13 @@ class Module:
     @property
     def graph(self):
         return self._graph
+    
+    @property
+    def full_name(self):
+        if self._parent is None:
+            return self._name
+        else:
+            return f"{self._parent.full_name}.{self._name}"
     
     def __setattr__(self, name: str, value: Any) -> None:
         if not name.startswith('_'):
@@ -47,17 +55,8 @@ class Module:
             self._parameters.pop(name, None)
         else:
             self._parameters[name] = param
-            param.name = self._full_name + '.' + name
+            param.addtograph(self.full_name + '.' + name)
 
-    @property
-    def _full_name(self) -> str:
-        names = []
-        module = self
-        while module._parent is not None:
-            names.append(module._name)
-            module = module._parent
-        return '.'.join(reversed(names)) if names else self._name
-    
     def parameters(self, recurse: bool = True) -> Iterator[Tensor]:
         for name, param in self.named_parameters(recurse=recurse):
             yield param

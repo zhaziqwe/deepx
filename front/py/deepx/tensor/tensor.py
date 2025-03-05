@@ -9,7 +9,8 @@ class Tensor:
             data=None,
             shape=None,
             device=None,
-            dtype:Optional[str]=None):
+            dtype:Optional[str]=None,
+    ):
  
         # data
         if data is not None:
@@ -43,12 +44,12 @@ class Tensor:
             self._device = device
         else:
             self._device = Device.CPU  # 默认设备
-
+        self._graph = None
+        self._node = None
+    def addtograph(self,name:str):
         # graph
-        self._graph =None
-        self._node=None
         from deepx.nn.functional import newtensor
-        newtensor(self)
+        newtensor(self,name)
 
     # shape
     @property
