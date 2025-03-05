@@ -9,8 +9,7 @@ from deepx.scheduler import send
 OpNode.register("constant")
 
 def constant(t:Tensor, value:Optional[Union[
-    float,int
-]]=None) -> Tensor:
+    float,int]]=None) -> Tensor:
     opnode = t.graph.add_op("constant")
     argnode=t.graph.add_var('',value)   
     opnode.add_input(argnode)
@@ -40,6 +39,20 @@ def ones(*size, dtype=None, device=None,
          name:Union[str]=''):
     return full(*size, fill_value=1, dtype=dtype, device=device,out=name)
 
+def arange(start=0, end=None, step=1,dtype=None, device=None,name:Union[Tensor,str]=''):
+    outtensor=None
+    if isinstance(name,str):
+        shape=[end-start]
+        outtensor=Tensor(shape=shape, dtype=dtype, device=device)
+        outtensor.addtograph(name)
+    else:
+        outtensor=name
+    g=outtensor.graph
+    if g.eager:
+        ir=DeepxIR("arange", outtensor.dtype, [start,step], [outtensor.node.name])
+        send(ir)
+    return outtensor
+
 OpNode.register("uniform")
 def uniform(t:Tensor,low=0, high=1)->Tensor:
     if low >= high:
@@ -66,9 +79,6 @@ def randn(*size, dtype=None, device=None):
     #TODO
     pass
 
-def arange(*shape,start, end=None, step=1, dtype=None, device=None):
-    
-    pass
 
 def eye(
         n:int,

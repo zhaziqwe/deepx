@@ -54,13 +54,9 @@ namespace deepx::op{
         }
         void forward(mem::Mem &mem) override{
             auto output = mem.gettensor<T>(this->returns[0]).get();
-            if (is_float(this->args[0])){
-                T value = std::stof(this->args[0]);
-                tensorfunc::constant(*output,value);
-            }else{
-                T value = mem.getarg<T>(this->args[0]);
-                tensorfunc::constant(*output,value);
-            }
+             
+            T value = this->getarg<T>(0,mem);
+            tensorfunc::constant(*output,value);
         }
         void backward(mem::Mem &mem) override{
             throw std::runtime_error("Constant op does not support backward");
@@ -87,15 +83,9 @@ namespace deepx::op{
         }
         void forward(mem::Mem &mem) override{
             auto output = mem.gettensor<T>(this->returns[0]).get();
-            if (is_float(this->args[0])){
-                T start = std::stof(this->args[0]);
-                T step = std::stof(this->args[1]);
-                tensorfunc::arange(*output,start,step);
-            }else{
-                T start = mem.getarg<T>(this->args[0]);
-                T step = mem.getarg<T>(this->args[1]);
-                tensorfunc::arange(*output,start,step);
-            }
+            T start =  this->getarg<T>(0,mem);
+            T step =  this->getarg<T>(1,mem);
+            tensorfunc::arange(*output,start,step);
         }
         void backward(mem::Mem &mem) override{
             throw std::runtime_error("Arange op does not support backward");

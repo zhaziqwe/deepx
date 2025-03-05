@@ -20,10 +20,23 @@ void test_tensor_new(){
     print(tensor2);
     save(tensor2,"tensor2");
 }
+
+void test_arange() {
+    Tensor<float> tensor=New<float>({2, 3});
+    arange(tensor,float(0),float(1));
+    print(tensor);
+}
  
- 
-int main(){
-    test_tensor_new();
- 
+int main(int argc,char **argv){
+    int i=0;
+    if (argc>1){
+        i=std::atoi(argv[1]);
+    }
+    switch (i) {
+        case 1:
+            test_tensor_new();
+        case 0:
+            test_arange();
+    }
     return 0;
 }

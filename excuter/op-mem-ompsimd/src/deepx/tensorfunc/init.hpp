@@ -38,15 +38,6 @@ namespace deepx::tensorfunc
     }
 
     template <typename T>
-    void kaimingUniform(Tensor<T> &tensor, float a = std::sqrt(5))
-    {
-        std::pair<int, int> fanInAndFanOut = calculateFanInAndFanOut(tensor.shape);
-        float std = a / std::sqrt(static_cast<float>(fanInAndFanOut.first));
-        float bound = std::sqrt(3.0f) * std;
-        uniform(tensor, static_cast<T>(-bound), static_cast<T>(bound));
-    };
-
-    template <typename T>
     void arange(Tensor<T> &tensor, const T start,const T step = 1)
     {
         tensor.shape.rangeParallel(tensor.shape.dim, [&](int idx_linear)

@@ -69,7 +69,7 @@ void benchmark_sum(int i){
 
 int main(int arvc,char **argv)
 {   
-     omp_set_num_threads(1); 
+    omp_set_num_threads(1);
     int i=0;
     if (arvc>1){
         i=std::atoi(argv[1]);

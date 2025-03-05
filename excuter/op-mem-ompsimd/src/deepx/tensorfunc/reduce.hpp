@@ -39,7 +39,7 @@ namespace deepx::tensorfunc
         const ScalableTag<T> _tag;
         size_t minshape_1=Lanes(_tag);
         // if (true)
-        if (sorted_dims.rbegin()[0] == tensor.shape.dim - 1
+            if (sorted_dims.rbegin()[0] == tensor.shape.dim - 1
             ||tensor.shape.dim>sorted_dims.size()
             ||tensor.shape[-1]>=minshape_1
             )
