@@ -20,7 +20,6 @@ class Linear(Module):
         self.in_features = in_features
         self.out_features = out_features
         self.weight = Tensor(shape=(out_features, in_features),dtype=dtype)
-    
         if bias:
             self.bias = Tensor(shape=(out_features,),dtype=dtype)
         else:

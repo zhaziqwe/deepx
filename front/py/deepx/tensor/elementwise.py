@@ -140,6 +140,22 @@ def exp_(self):
     return self
 
 @tensor_method
+def pow(self,
+        b:Union[float,int],
+        out:Union[Tensor,str]=''):
+    from deepx.nn.functional import pow as pow_func
+    result=pow_func(self,b,out)
+    return result
+
+@tensor_method
+def pow_(self,
+        b:Union[float,int]):
+    from deepx.nn.functional import pow as pow_func
+    result=pow_func(self,b,self)
+    return result
+
+
+@tensor_method
 def sqrt(self,out:Optional[Union[str]]=None):
     result = Tensor(dtype=self.dtype,shape=self.shape)
     result.addtograph(out)

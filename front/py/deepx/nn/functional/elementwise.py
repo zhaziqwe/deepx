@@ -165,6 +165,29 @@ def exp(
         ir=DeepxIR("exp", a.dtype, [a.node.name], [outtensor.node.name])
         send(ir)
 
+#pow
+# todo
+OpNode.register("pow")
+def pow(
+        a:Tensor,
+        b:Union[float,int],
+        out:Union[Tensor,str]=''):
+    g=a.graph
+    opnode = g.add_op("pow")
+    opnode.add_input(a.node)
+    opnode.add_input(g.add_var('',b))
+
+    outtensor=None
+    if isinstance(out,str):
+        outtensor=Tensor(shape=a.shape, dtype=a.dtype, device=a.device)
+        outtensor.addtograph(out)
+    else:
+        outtensor=out
+    outtensor.node.add_input(opnode)
+    if a.graph.eager:
+        ir=DeepxIR("pow", a.dtype, [a.node.name,b], [outtensor.node.name])
+        send(ir)
+
 #sqrt
 OpNode.register("sqrt")
 def sqrt(
