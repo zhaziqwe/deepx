@@ -2,95 +2,95 @@
 digraph {
 	rankdir=TB
 	node [shape=record]
-	137162162111728 [label="tensor_1
+	128491990484208 [label="tensor_1
 (2, 3, 8)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552588384 [label=reshape color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
-	137158552589008 [label="vector_1
+	128488380960912 [label=reshape color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	128488380961536 [label="vector_1
 (2, 3, 8)" color=darkseagreen fillcolor=honeydew fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552589680 [label=div_scalar color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
-	137158552589776 [label="var_1
+	128488380962208 [label=div_scalar color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	128488380962304 [label="var_1
 10.0" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552589296 [label=add_scalar color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
-	137158552589488 [label="var_2
+	128488380961824 [label=add_scalar color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	128488380962016 [label="var_2
 -2.0" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552592944 [label="tensor_2
+	128488380965472 [label="tensor_2
 (8,)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552592704 [label=constant color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
-	137158552593088 [label="var_3
+	128488380965232 [label=constant color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	128488380965616 [label="var_3
 1" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552592848 [label="llama_r_m_s_norm_0.weight
+	128488380965376 [label="llama_r_m_s_norm_0.weight
 (8,)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552592800 [label=constant color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
-	137158552593184 [label="var_4
+	128488380965328 [label=constant color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	128488380965712 [label="var_4
 0.5" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552593280 [label=pow_scalar color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
-	137158552593232 [label="var_5
+	128488380965808 [label=pow_scalar color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	128488380965760 [label="var_5
 2" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552593424 [label="tensor_4
+	128488380965952 [label="tensor_4
 (2, 3, 8)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552593616 [label="tensor_5
+	128488380966144 [label="tensor_5
 (2, 3, 1)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552593856 [label="vector_2
+	128488380966384 [label="vector_2
 [2]" color=darkseagreen fillcolor=honeydew fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552593952 [label=sum color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
-	137158552594192 [label="tensor_6
+	128488380966480 [label=sum color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	128488380966720 [label="tensor_6
 (2, 3, 1)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552594288 [label=div_scalar color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
-	137158552594240 [label="var_6
+	128488380966816 [label=div_scalar color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	128488380966768 [label="var_6
 8" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552594432 [label=add_scalar color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
-	137158552594384 [label="var_7
+	128488380966960 [label=add_scalar color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	128488380966912 [label="var_7
 1e-06" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552594576 [label="tensor_7
+	128488380967104 [label="tensor_7
 (2, 3, 1)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552594816 [label="tensor_8
+	128488380967344 [label="tensor_8
 (2, 3, 1)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552595056 [label=sqrt color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
-	137158552595152 [label=rdiv_scalar color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
-	137158552595008 [label="var_8
+	128488380967584 [label=sqrt color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	128488380967680 [label=rdiv_scalar color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	128488380967536 [label="var_8
 1" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552595296 [label="tensor_9
+	128488380967824 [label="tensor_9
 (2, 3, 1)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552595536 [label=mul color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
-	137158552595632 [label="tensor_10
+	128488380968064 [label=mul color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	128488380968160 [label="tensor_10
 (2, 3, 8)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552595872 [label=mul color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
-	137158552595968 [label="tensor_11
+	128488380968400 [label=mul color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	128488380968496 [label="tensor_11
 (8,)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	137158552588384 -> 137162162111728 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552589680 -> 137162162111728 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552589296 -> 137162162111728 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137162162111728 -> 137158552588384 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552589008 -> 137158552588384 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137162162111728 -> 137158552589680 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552589776 -> 137158552589680 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137162162111728 -> 137158552589296 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552589488 -> 137158552589296 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552592704 -> 137158552592944 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552593088 -> 137158552592704 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552592800 -> 137158552592848 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552593184 -> 137158552592800 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137162162111728 -> 137158552593280 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552593232 -> 137158552593280 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552593280 -> 137158552593424 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552593952 -> 137158552593616 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552593424 -> 137158552593952 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552593856 -> 137158552593952 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552594288 -> 137158552594192 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552593616 -> 137158552594288 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552594240 -> 137158552594288 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552594192 -> 137158552594432 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552594384 -> 137158552594432 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552594432 -> 137158552594576 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552595056 -> 137158552594816 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552594576 -> 137158552595056 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552595008 -> 137158552595152 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552594816 -> 137158552595152 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552595152 -> 137158552595296 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137162162111728 -> 137158552595536 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552595296 -> 137158552595536 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552595536 -> 137158552595632 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552592848 -> 137158552595872 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552595632 -> 137158552595872 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	137158552595872 -> 137158552595968 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380960912 -> 128491990484208 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380962208 -> 128491990484208 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380961824 -> 128491990484208 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128491990484208 -> 128488380960912 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380961536 -> 128488380960912 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128491990484208 -> 128488380962208 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380962304 -> 128488380962208 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128491990484208 -> 128488380961824 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380962016 -> 128488380961824 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380965232 -> 128488380965472 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380965616 -> 128488380965232 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380965328 -> 128488380965376 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380965712 -> 128488380965328 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128491990484208 -> 128488380965808 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380965760 -> 128488380965808 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380965808 -> 128488380965952 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380966480 -> 128488380966144 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380965952 -> 128488380966480 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380966384 -> 128488380966480 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380966816 -> 128488380966720 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380966144 -> 128488380966816 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380966768 -> 128488380966816 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380966720 -> 128488380966960 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380966912 -> 128488380966960 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380966960 -> 128488380967104 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380967584 -> 128488380967344 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380967104 -> 128488380967584 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380967536 -> 128488380967680 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380967344 -> 128488380967680 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380967680 -> 128488380967824 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128491990484208 -> 128488380968064 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380967824 -> 128488380968064 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380968064 -> 128488380968160 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380965376 -> 128488380968400 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380968160 -> 128488380968400 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	128488380968400 -> 128488380968496 [arrowsize=0.8 color=gray40 penwidth=1.2]
 }

@@ -39,9 +39,32 @@ Op{args(args_grad),returns(returns_grad)|func forward,backward}
 
 大部分Op都需要同时实现forward和backward,但也有部分只为推理设计的fusionOp可以根据需要实现forward。
 
-+ cpu执行器,已实现ompsimd。其支持的算子列表[ompsimd](doc/excuter/op-mem-ompsimd/list.md)
-+ cuda执行器【实现中状态】
+关于excuter，只要能按deepxIR序列执行，并返回结果，就可以接入deepx分布式调度框架，因此，从硬件、指令、加速库、高级框架包括训练、推理引擎，都可以稍作修改，就接入deepx体系。
 
+
+#### 默认执行器
++ cpu执行器,已实现ompsimd。其支持的算子列表[ompsimd](doc/excuter/op-mem-ompsimd/list.md)
+
+#### GPU执行器
++ cuda执行器【实现中状态】
+欢迎大家提交cuda代码
+
++ rocm
+
+
+#### 张量计算框架or函数级执行器
+
+DeepX可以集成现有的张量计算框架作为执行器，充分利用现有生态系统的优化能力:
+
++ jax: 
+  - 结合DeepX的分布式调度，使JAX代码自动获得分布式执行能力
+  - 支持异构设备(GPU/TPU)加速的同时保持DeepX的分布式弹性扩展
+
++ TorchScript/aten: 
+  - 可将PyTorch生态系统的算子作为DeepX执行器
+  - 利用ATEN底层优化的同时享受DeepX分布式调度的优势
+
+这种架构使得DeepX可以整合各类先进的计算框架作为执行引擎，同时提供统一的分布式调度和执行能力，为用户提供更灵活的选择和更高的性能。
 
 ## 二.贡献指南
  
