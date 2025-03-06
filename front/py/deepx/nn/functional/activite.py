@@ -5,19 +5,8 @@ def relu(
         t: Tensor,
         inplace:bool=False,
         out:Union[Tensor,str]='')->Tensor:
-    
-    outtensor=None
-    if inplace:
-        outtensor=t
-    else:
-        if isinstance(out,str):
-            outtensor=Tensor(shape=t.shape, dtype=t.dtype, device=t.device)
-            outtensor.addtograph(out)
-        else:
-            outtensor=out
     from .elementwise import max as max_func
-    max_func(t,0,outtensor)
-    return outtensor
+    return max_func(t,0,out)
  
  # 数学公式：σ(x) = 1 / (1 + exp(-x))
 def sigmoid(

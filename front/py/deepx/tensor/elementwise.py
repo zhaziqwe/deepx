@@ -142,4 +142,12 @@ def sqrt_(self):
     from deepx.nn.functional import sqrt as sqrt_func   
     sqrt_func(self,self)
 
+@tensor_method
+def rsqrt(self,out:Union[Tensor,str]='')->Tensor:
+    from deepx.nn.functional import rsqrt as rsqrt_func
+    return rsqrt_func(self,out)
 
+@tensor_method
+def rsqrt_(self):
+    from deepx.nn.functional import rsqrt as rsqrt_func
+    rsqrt_func(self,self)
