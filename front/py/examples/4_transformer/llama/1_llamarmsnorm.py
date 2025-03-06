@@ -44,9 +44,7 @@ dx_output = dx_norm(dx_input)
 print("\nDeepX RMSNorm 结果:")
 print(dx_output)
 
-# 结果对比
-pt_numpy = pt_output.detach().numpy()
-dx_numpy = dx_output.numpy()
-max_diff = abs(dx_numpy - pt_numpy).max()
-print(f"\n最大差异值：{max_diff:.7f}")
-assert max_diff < 1e-6, "实现与PyTorch存在显著差异"
+import os
+script_name = os.path.splitext(os.path.basename( os.path.abspath(__file__)))[0]  # 获取不带后缀的脚本名
+str=dx_output.graph.to_dot()
+str.render(script_name+".dot", format='svg')

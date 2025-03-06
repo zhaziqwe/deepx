@@ -125,15 +125,15 @@ def mean(
     # 如果dim为None,则对所有维度求平均
     if dim is None:
         dim = list(range(a.ndim))
-    
-    # 计算需要平均的元素总数
+    elif isinstance(dim, int):
+        dim = [dim]
+    else:
+        dim = list(dim)
     total = 1
     for i in dim:
-        # 处理负数索引
         if i < 0:
-            i = i + a.ndim
+            dim[i] = i + a.dim()
         total *= a.shape[i]
-        
     result = sum(a, dim, keepdim, out)/total
     return result
 # #var
