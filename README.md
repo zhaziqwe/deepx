@@ -14,7 +14,14 @@ deepx的执行支持eager和auto两种模式
 python sdk提供接近pytorch的API
 也容许其他语言的sdk接入
 
-+ IR通信调度。不同于pytorch或其他py+bind c++这种单一进程的驱动控制流的方式。deepx各个程序（如front的python sdk，back的计算图编译器优化器、excuter如ompsimd）之间，通过IR实现网络通信调度，需要各自启动对应进程。
++ IR通信调度。不同于pytorch或其他py+bind c++这种单一进程的栈上函数调度执行的方式。deepx各个程序（如front的python sdk，back的计算图编译器优化器、excuter如ompsimd）之间，通过IR实现网络通信调度，需要各自启动对应进程。
+
+
+| 维度         | PyTorch类框架          | DeepX                   |
+|--------------|-----------------------|-------------------------|
+| 执行模式     | 单进程内函数栈调度     | 多进程分布式协同         |
+| 通信方式     | 内存直接访问           | IR网络计算调度协议交换          |
+| 组件耦合度   | 紧耦合（Python绑定C++）| 松耦合（gRPC/自定义协议）|
 
 ### 调度面
 
