@@ -30,7 +30,7 @@ python sdk提供接近pytorch的API
 Op{args(args_grad),returns(returns_grad)|func forward,backward}
 ```
 
-大部分Op都需要同时实现forward和backward,但也有部分只为推理设计的fusionOp可以需要实现forward。
+大部分Op都需要同时实现forward和backward,但也有部分只为推理设计的fusionOp可以根据需要实现forward。
 
 + cpu执行器,已实现ompsimd。其支持的算子列表[ompsimd](doc/excuter/op-mem-ompsimd/list.md)
 + cuda执行器【实现中状态】
