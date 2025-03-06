@@ -2,19 +2,34 @@
 digraph {
 	rankdir=TB
 	node [shape=record]
-	129492947520000 [label="t1
+	124044458592768 [label="t1
 (3, 4)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	129492947528256 [label=constant color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
-	129492947528016 [label="var_1
+	124042484217168 [label=constant color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	124042484866432 [label="var_1
 1" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	129492948007568 [label="t2
+	124042483246096 [label="tensor_2
 (4, 3)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	129492948007616 [label="vector_1
-(1, 0)" color=darkseagreen fillcolor=honeydew fontname="Sans-Serif" labeljust=l shape=box style=filled]
-	129492948007328 [label=transpose color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
-	129492947528256 -> 129492947520000 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	129492947528016 -> 129492947528256 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	129492948007328 -> 129492948007568 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	129492947520000 -> 129492948007328 [arrowsize=0.8 color=gray40 penwidth=1.2]
-	129492948007616 -> 129492948007328 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124042483246192 [label="vector_1
+[1, 0]" color=darkseagreen fillcolor=honeydew fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	124042483245904 [label=transpose color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	124042483245952 [label="t3
+(2, 3, 4)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	124042483246528 [label=constant color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	124042483246480 [label="var_2
+1" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	124042483247008 [label="tensor_4
+(2, 4, 3)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	124042483248448 [label="vector_2
+[0, 2, 1]" color=darkseagreen fillcolor=honeydew fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	124042483244848 [label=transpose color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	124042484217168 -> 124044458592768 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124042484866432 -> 124042484217168 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124042483245904 -> 124042483246096 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124044458592768 -> 124042483245904 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124042483246192 -> 124042483245904 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124042483246528 -> 124042483245952 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124042483246480 -> 124042483246528 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124042483244848 -> 124042483247008 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124042483245952 -> 124042483244848 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	124042483248448 -> 124042483244848 [arrowsize=0.8 color=gray40 penwidth=1.2]
 }

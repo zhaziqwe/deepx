@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional 
 from .shape import Shape
 from .devicetype import Device
 from .dtype import infer_dtype,default_dtype
@@ -46,11 +46,12 @@ class Tensor:
             self._device = Device.CPU  # 默认设备
         self._graph = None
         self._node = None
-    def addtograph(self,name:str):
+
+    def addtograph(self,name:str)->'Tensor':
         # graph
         from deepx.nn.functional import newtensor
         newtensor(self,name)
-
+        return self
     # shape
     @property
     def shape(self):

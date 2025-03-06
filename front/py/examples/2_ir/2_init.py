@@ -1,3 +1,23 @@
+
+############-------PyTorch-------################
+
+import torch
+torch_t1 = torch.zeros(3, 4, 5, dtype=torch.float32)
+torch_t2 = torch.ones(3, 4, 5, dtype=torch.float32)
+torch_t3 = torch_t1 + torch_t2
+torch_t4 = torch.full((3, 4, 5), 0.5)
+print(torch_t3)
+torch_t5 = torch_t4 + torch_t3
+print(torch_t5)
+
+torch_t6 = torch.zeros(3, 4, 5, dtype=torch.float32)
+torch.nn.init.kaiming_uniform_(torch_t6)
+print(torch_t6)
+
+
+
+############-------DEEPX-------################
+
 from deepx import Tensor,mul,add,zeros,ones,full,kaiming_uniform_
 print()
 
