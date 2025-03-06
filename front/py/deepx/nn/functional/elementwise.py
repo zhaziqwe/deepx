@@ -28,27 +28,14 @@ def _A_B_elementwiseop_C(
         send(ir)
     return outtensor
 def _A_b_elementwiseop_C(
-        a:Optional[Union[ Tensor, float, int]] = None, 
-        b: Optional[Union[ Tensor, float, int]] = None, 
+        a:Tensor,
+        b: Union[ float, int] ,
         op:str=None,
         out:Union[Tensor,str]="")->Tensor:
-    if isinstance(a,Tensor):
-        g=a.graph
-    else:
-        g=b.graph
-
+    g=a.graph
     opnode = g.add_op(op)
-    if isinstance(a,Tensor):
-        opnode.add_input(a.node)
-    else:
-        varnode=g.add_var("",a)
-        opnode.add_input(varnode)
-
-    if isinstance(b,Tensor):
-        opnode.add_input(b.node)
-    else:
-        varnode=g.add_var("",b)
-        opnode.add_input(varnode)
+    opnode.add_input(a.node)
+    opnode.add_input(g.add_var("",b))
 
     outtensor=None
     if isinstance(out,str):
@@ -58,13 +45,31 @@ def _A_b_elementwiseop_C(
         outtensor=out
     outtensor.node.add_input(opnode)
     if g.eager:
-        ir=None
-        if isinstance(a,Tensor):
-            ir=DeepxIR(op, a.dtype, [a.node.name,b], [outtensor.node.name])
-        else:
-            ir=DeepxIR(op, b.dtype, [a,b.node.name], [outtensor.node.name])
+        ir=DeepxIR(op, a.dtype, [a.node.name,b], [outtensor.node.name])
         send(ir)
     return outtensor
+def _a_B_elementwiseop_C(
+        a: Union[ float, int] ,
+        b: Tensor,
+        op:str=None,
+        out:Union[Tensor,str]="")->Tensor:
+    g=b.graph
+    opnode = g.add_op(op)
+    opnode.add_input(g.add_var("",a))
+    opnode.add_input(b.node)
+
+    outtensor=None
+    if isinstance(out,str):
+        outtensor=Tensor(shape=b.shape, dtype=b.dtype, device=b.device)
+        outtensor.addtograph(out)
+    else:
+        outtensor=out
+    outtensor.node.add_input(opnode)
+    if g.eager:
+        ir=DeepxIR(op, b.dtype, [a,b.node.name], [outtensor.node.name])
+        send(ir)
+    return outtensor
+
 #add
 OpNode.register("add")
 OpNode.register("add_scalar")
@@ -122,7 +127,7 @@ def div(
             return _A_b_elementwiseop_C(a,b,"div_scalar",out)
         else:
             #C=a/B
-            return _A_b_elementwiseop_C(a,b,"rdiv_scalar",out)
+            return _a_B_elementwiseop_C(a,b,"rdiv_scalar",out)
 #clamp
 OpNode.register("clamp")
 def clamp(
