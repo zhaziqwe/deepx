@@ -19,27 +19,27 @@ def constant(t:Tensor, value:Optional[Union[
         send(ir)
     return t
 
-def full(*shape, fill_value=0, dtype=None, device=None,
-         out:Union[Tensor,str]=''):
+def full(*shape, value=0, dtype=None, device=None,
+         name:Union[Tensor,str]='')->Tensor:
     if len(shape) == 1 and isinstance(shape[0], (tuple, list)):
         shape = shape[0]
     outtensor=None
-    if isinstance(out,str):
+    if isinstance(name,str):
         outtensor=Tensor(shape=shape, dtype=dtype, device=device)
-        outtensor.addtograph(out)
+        outtensor.addtograph(name)
     else:
-        outtensor=out
-    return constant(outtensor, fill_value)
+        outtensor=name
+    return constant(outtensor, value)
 
 def zeros(*shape, dtype=None, device=None,
-         name:Union[str]=''):
-    return full(*shape, fill_value=0, dtype=dtype, device=device,out=name)
+         name:Union[str]='')->Tensor:
+    return full(*shape, value=0, dtype=dtype, device=device,name=name)
 
 def ones(*size, dtype=None, device=None,
-         name:Union[str]=''):
-    return full(*size, fill_value=1, dtype=dtype, device=device,out=name)
+         name:Union[str]='')->Tensor:
+    return full(*size, value=1, dtype=dtype, device=device,name=name)
 
-def arange(start=0, end=None, step=1,dtype=None, device=None,name:Union[Tensor,str]=''):
+def arange(start=0, end=None, step=1,dtype=None, device=None,name:Union[Tensor,str]='')->Tensor:
     outtensor=None
     if isinstance(name,str):
         shape=[end-start]
@@ -89,7 +89,7 @@ def eye(
     pass
  
 
-def calculate_fan_in_and_fan_out(tensor:Tensor):
+def calculate_fan_in_and_fan_out(tensor:Tensor)->tuple[int,int]:
     dimensions = tensor.dim()
     if dimensions < 2:
         raise ValueError(
@@ -109,7 +109,7 @@ def calculate_fan_in_and_fan_out(tensor:Tensor):
 
     return fan_in, fan_out
 
-def _calculate_correct_fan(tensor:Tensor, mode:str):
+def _calculate_correct_fan(tensor:Tensor, mode:str)->tuple[int,int]:
     mode = mode.lower()
     valid_modes = ["fan_in", "fan_out"]
     if mode not in valid_modes:
@@ -193,7 +193,7 @@ def kaiming_uniform_(
     a: float = 0,
     mode: str = "fan_in",
     nonlinearity: str = "leaky_relu",
-):
+)->Tensor:
     fan = _calculate_correct_fan(tensor, mode)
     gain = calculate_gain(nonlinearity, a)
     std = gain / math.sqrt(fan)

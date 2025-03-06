@@ -6,8 +6,10 @@ t.addtograph("t")
 
 t.uniform_(low=-1,high=1)
 print((t))
-relu_t=relu(t)
+relu_t=relu(t,out='relu_t')
 print(relu_t)
 
-gviz=relu_t.graph.to_dot()
-gviz.render('relu.dot',format='svg')
+import os
+script_name = os.path.splitext(os.path.basename( os.path.abspath(__file__)))[0]  # 获取不带后缀的脚本名
+str=relu_t.graph.to_dot()
+str.render(script_name+".dot", format='svg')

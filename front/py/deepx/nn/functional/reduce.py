@@ -78,7 +78,7 @@ def reduce_max(
         a:Tensor,
         dim:list[int] = None,
         keepdim=False,
-        out:Union[Tensor,str]=''):
+        out:Union[Tensor,str]='')->Tensor:
     return _A_v_reduceop_C(a,dim,keepdim,"max",out)
  
 #min    
@@ -87,7 +87,7 @@ def reduce_min(
         a:Tensor,
         dim:list[int] = None,
         keepdim=False,
-        out:Union[Tensor,str]=''):
+        out:Union[Tensor,str]='')->Tensor:
     return _A_v_reduceop_C(a,dim,keepdim,"min",out)
     
  
@@ -106,13 +106,13 @@ def sum(
 #prod
 OpNode.register("prod")
 def prod(
-               a:Tensor,
+        a:Tensor,
         dim:Optional[Union[
             list[int],
             tuple[int],
             ]]=None,
         keepdim:bool=False,
-        out:Union[Tensor,str]=''):
+        out:Union[Tensor,str]='')->Tensor:
     return _A_v_reduceop_C(a,dim,keepdim,"prod",out)
 
 #mean
@@ -121,7 +121,7 @@ def mean(
         a:Tensor,
         dim:Optional[Union[list[int],tuple[int]]]=None,
         keepdim:bool=False,
-        out:Union[str]=''):
+        out:Union[str]='')->Tensor:
     # 如果dim为None,则对所有维度求平均
     if dim is None:
         dim = list(range(a.ndim))

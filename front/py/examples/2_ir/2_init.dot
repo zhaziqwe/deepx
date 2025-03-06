@@ -1,0 +1,53 @@
+// Computational Graph
+digraph {
+	rankdir=TB
+	node [shape=record]
+	133948203272704 [label="t1
+(3, 4, 5)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	133948203278224 [label=constant color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	133948203278464 [label="var_1
+0" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	133948204041264 [label="t2
+(3, 4, 5)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	133948204041120 [label=constant color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	133948204041216 [label="var_2
+1" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	133948204056528 [label=add color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	133948204056144 [label="t3
+(3, 4, 5)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	133948204055904 [label="t4
+(3, 4, 5)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	133948204055664 [label=constant color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	133948204055712 [label="var_3
+0.5" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	133948204055520 [label=add color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	133948204055424 [label="t5
+(3, 4, 5)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	133948204055136 [label="tensor_6
+(3, 4, 5)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	133948204054896 [label=constant color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	133948204054944 [label="var_4
+0" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	133948204055232 [label="var_5
+-0.5477225575051661" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	133948204054800 [label="var_6
+0.5477225575051661" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	133948204054704 [label=uniform color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	133948203278224 -> 133948203272704 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	133948203278464 -> 133948203278224 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	133948204041120 -> 133948204041264 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	133948204041216 -> 133948204041120 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	133948203272704 -> 133948204056528 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	133948204041264 -> 133948204056528 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	133948204056528 -> 133948204056144 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	133948204055664 -> 133948204055904 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	133948204055712 -> 133948204055664 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	133948204055904 -> 133948204055520 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	133948204056144 -> 133948204055520 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	133948204055520 -> 133948204055424 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	133948204054896 -> 133948204055136 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	133948204054704 -> 133948204055136 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	133948204054944 -> 133948204054896 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	133948204055232 -> 133948204054704 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	133948204054800 -> 133948204054704 [arrowsize=0.8 color=gray40 penwidth=1.2]
+}

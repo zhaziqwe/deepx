@@ -1,19 +1,19 @@
 from deepx.tensor import tensor_method
 
 @tensor_method
-def full_(self,fill_value):
+def full_(self,value):
     from deepx.nn.functional import constant as constant_func
-    constant_func(self,fill_value=fill_value)
+    constant_func(self,value=value)
 
 @tensor_method
 def zeros_(self):
     from deepx.nn.functional import constant as constant_func
-    constant_func(self,fill_value=0)
+    constant_func(self,value=0)
 
 @tensor_method
 def ones_(self):
     from deepx.nn.functional import constant as constant_func
-    constant_func(self,fill_value=1)
+    constant_func(self,value=1)
 
 @tensor_method
 def uniform_(self,low=0, high=1):

@@ -11,10 +11,11 @@ OpNode.register("matmul")
 def matmul(
         a:Tensor,
         b: Tensor, 
-        out:Optional[Union[Tensor,str]]=None):   
+        out:Union[Tensor,str]='')->Tensor:   
     opnode = a.graph.add_op("matmul")
     opnode.add_input(a.node)
     opnode.add_input(b.node)
+    
     outtensor=None
     if isinstance(out,str):
         outtensor=Tensor(shape=a.shape, dtype=a.dtype, device=a.device)

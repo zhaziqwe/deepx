@@ -122,7 +122,7 @@ class Tensor:
     #自动转置最后两个维度，适用于二维矩阵
     @property
     def T(self) -> str:
-        return self.transpose(1,0)
+        return self.transpose(1,0,out=self.node.name+".T")
 
     def __repr__(self) -> str:
         from deepx.nn.functional import printtensor

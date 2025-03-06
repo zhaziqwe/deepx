@@ -8,7 +8,7 @@ def _A_B_elementwiseop_C(
         a:Tensor,
         b: Tensor, 
         op:str=None,
-        out:Union[Tensor,str]=""):
+        out:Union[Tensor,str]="")->Tensor:
     g=a.graph
     if g is None:
        g=b.graph
@@ -26,11 +26,12 @@ def _A_B_elementwiseop_C(
     if g.eager:
         ir=DeepxIR(op, a.dtype, [a.node.name, b.node.name], [outtensor.node.name])
         send(ir)
+    return outtensor
 def _A_b_elementwiseop_C(
         a:Optional[Union[ Tensor, float, int]] = None, 
         b: Optional[Union[ Tensor, float, int]] = None, 
         op:str=None,
-        out:Union[Tensor,str]=""):
+        out:Union[Tensor,str]="")->Tensor:
     if isinstance(a,Tensor):
         g=a.graph
     else:
@@ -63,6 +64,7 @@ def _A_b_elementwiseop_C(
         else:
             ir=DeepxIR(op, b.dtype, [a,b.node.name], [outtensor.node.name])
         send(ir)
+    return outtensor
 #add
 OpNode.register("add")
 OpNode.register("add_scalar")
@@ -70,11 +72,11 @@ OpNode.register("add_scalar")
 def add(
         a:Tensor,
         b: Optional[Union[Tensor, float, int]] = None, 
-        out:Union[Tensor,str]=''):
+        out:Union[Tensor,str]='')->Tensor:
     if isinstance(b,Tensor):
-        _A_B_elementwiseop_C(a,b,"add",out)
+        return _A_B_elementwiseop_C(a,b,"add",out)
     else:
-        _A_b_elementwiseop_C(a,b,"add_scalar",out)
+        return _A_b_elementwiseop_C(a,b,"add_scalar",out)
 
 
 #sub
@@ -84,11 +86,11 @@ OpNode.register("sub_scalar")
 def sub(
         a:Tensor,
         b: Optional[Union[Tensor, float, int]] = None, 
-        out:Union[Tensor,str]=''):   
+        out:Union[Tensor,str]='')->Tensor:  
     if isinstance(b,Tensor):
-        _A_B_elementwiseop_C(a,b,"sub",out)
+        return _A_B_elementwiseop_C(a,b,"sub",out)
     else:
-        _A_b_elementwiseop_C(a,b,"sub_scalar",out)
+        return _A_b_elementwiseop_C(a,b,"sub_scalar",out)
 
 #mul
 OpNode.register("mul")
@@ -97,11 +99,11 @@ OpNode.register("mul_scalar")
 def mul(
         a:Tensor,
         b: Optional[Union[Tensor, float, int]] = None, 
-        out:Union[Tensor,str]=''):
+        out:Union[Tensor,str]='')->Tensor:
     if isinstance(b,Tensor):
-        _A_B_elementwiseop_C(a,b,"mul",out)
+        return _A_B_elementwiseop_C(a,b,"mul",out)
     else:
-        _A_b_elementwiseop_C(a,b,"mul_scalar",out)
+        return _A_b_elementwiseop_C(a,b,"mul_scalar",out)
  
 
 #div
@@ -111,23 +113,23 @@ OpNode.register("rdiv_scalar")
 def div(
         a: Optional[Union[Tensor, float, int]] = None,
         b: Optional[Union[Tensor, float, int]] = None, 
-        out:Union[Tensor,str]=''):
+        out:Union[Tensor,str]='')->Tensor:
     if isinstance(b,Tensor) and isinstance(a,Tensor):
-        _A_B_elementwiseop_C(a,b,"div",out)
+        return _A_B_elementwiseop_C(a,b,"div",out)
     else:
         if isinstance(a,Tensor):
             #C=A/b
-            _A_b_elementwiseop_C(a,b,"div_scalar",out)
+            return _A_b_elementwiseop_C(a,b,"div_scalar",out)
         else:
             #C=a/B
-            _A_b_elementwiseop_C(a,b,"rdiv_scalar",out)
+            return _A_b_elementwiseop_C(a,b,"rdiv_scalar",out)
 #clamp
 OpNode.register("clamp")
 def clamp(
         a:Tensor,
         min: Optional[Union[ float, int]] = None, 
         max: Optional[Union[ float, int]] = None, 
-        out:Union[Tensor,str]=''):   
+        out:Union[Tensor,str]='')->Tensor:   
     opnode = a.graph.add_op("clamp")
     opnode.add_input(a.node)
     outtensor=None
@@ -146,12 +148,12 @@ def clamp(
     if a.graph.eager:
         varir=DeepxIR("clamp", a.dtype, [a.node.name,min,max], [outtensor.node.name])
         send(str(varir))
-
+    return outtensor
 #exp
 OpNode.register("exp")
 def exp(
         a:Tensor,
-        out:Union[Tensor,str]=''):
+        out:Union[Tensor,str]='')->Tensor:
     opnode = a.graph.add_op("exp")
     opnode.add_input(a.node)
     outtensor=None
@@ -164,14 +166,14 @@ def exp(
     if a.graph.eager:
         ir=DeepxIR("exp", a.dtype, [a.node.name], [outtensor.node.name])
         send(ir)
-
+    return outtensor
 #pow
 # todo
 OpNode.register("pow")
 def pow(
         a:Tensor,
         b:Union[float,int],
-        out:Union[Tensor,str]=''):
+        out:Union[Tensor,str]='')->Tensor:
     g=a.graph
     opnode = g.add_op("pow")
     opnode.add_input(a.node)
@@ -187,7 +189,7 @@ def pow(
     if a.graph.eager:
         ir=DeepxIR("pow", a.dtype, [a.node.name,b], [outtensor.node.name])
         send(ir)
-
+    return outtensor
 #sqrt
 OpNode.register("sqrt")
 def sqrt(
@@ -206,7 +208,7 @@ def sqrt(
     if g.eager:
         ir=DeepxIR("sqrt", input.dtype, [input.node.name], [outtensor.node.name])
         send(ir)
-    return out
+    return outtensor
 
 def rsqrt(
         input:Tensor,
@@ -226,7 +228,7 @@ OpNode.register("max_scalar")
 def max(
         a:Tensor,
         b:Union[int,float,Tensor,]=0,
-        out:Union[Tensor,str]=''):
+        out:Union[Tensor,str]='')->Tensor:
     result=None
     if isinstance(out,str):
         result=Tensor(shape=a.shape, dtype=a.dtype, device=a.device)
@@ -234,17 +236,17 @@ def max(
     else:
         result=out
     if  isinstance(b,int) or isinstance(b,float):
-        _A_b_elementwiseop_C(a,b,"max_scalar",result)
+        return _A_b_elementwiseop_C(a,b,"max_scalar",result)
     else:
-        _A_b_elementwiseop_C(a,b,"max_tensor",result)
-    return result
+        return _A_b_elementwiseop_C(a,b,"max_tensor",result)
+
 
 OpNode.register("min")
 OpNode.register("min_scalar")
 def min(
         a:Tensor,
         b:Union[int,float,Tensor,]=0,
-        out:Union[Tensor,str]=''):
+        out:Union[Tensor,str]='')->Tensor:
     result=None
     if isinstance(out,str):
         result=Tensor(shape=a.shape, dtype=a.dtype, device=a.device)
@@ -252,10 +254,9 @@ def min(
     else:
         result=out
     if  isinstance(b,int) or isinstance(b,float):
-        _A_b_elementwiseop_C(a,b,"min_scalar",result)
+        return _A_b_elementwiseop_C(a,b,"min_scalar",result)
     else:
-        _A_b_elementwiseop_C(a,b,"min_tensor",result)
-    return result
+        return _A_b_elementwiseop_C(a,b,"min_tensor",result)
 
 # OpNode.register("Placeholder", 102)
 # OpNode.register("Neg", 103)

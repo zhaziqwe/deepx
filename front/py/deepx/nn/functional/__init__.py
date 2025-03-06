@@ -5,7 +5,7 @@ from .matmul import matmul
 from .init import *
 from .reduce import reduce_max,reduce_min,sum,prod,mean
 from .transpose import transpose,reshape
-from .activite import relu
+from .activite import relu,sigmoid,swish,swiglu
 
 __all__ = [
     "newtensor",
@@ -15,5 +15,5 @@ __all__ = [
     "matmul",
     "max","min","sum","prod","mean",
     "transpose","reshape",
-    "relu",
+    "relu","sigmoid","swish","swiglu",
 ]
