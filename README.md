@@ -60,7 +60,7 @@ DeepX可以集成现有的张量计算框架作为执行器，充分利用现有
   - 结合DeepX的分布式调度，使JAX代码自动获得分布式执行能力
   - 支持异构设备(GPU/TPU)加速的同时保持DeepX的分布式弹性扩展
 
-+ TorchScript/aten: 
++ LibTorch/aten: 
   - 可将PyTorch生态系统的算子作为DeepX执行器
   - 利用ATEN底层优化的同时享受DeepX分布式调度的优势
 
