@@ -31,11 +31,11 @@ namespace deepx::tensorfunc
             }
             else if constexpr (std::is_same_v<T, float>)
             {
-                format = "%.2f";
+                format = "%.4f";
             }
             else if constexpr (std::is_same_v<T, double>)
             {
-                format = "%.2f";    
+                format = "%.4f";    
             }
         }
         t.shape.print();

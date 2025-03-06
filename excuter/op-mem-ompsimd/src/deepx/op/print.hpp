@@ -15,7 +15,11 @@ namespace deepx::op{
             string name=this->args[0];
             if (mem.existstensor(name)){
                 auto t=mem.gettensor<T>(name);
-                tensorfunc::print<T>(*t);
+                if (this->args.size() == 1){
+                    tensorfunc::print<T>(*t);
+                }else{
+                    tensorfunc::print<T>(*t, this->args[1]);
+                }
             }else{
                 cout<<"<print> "<<name<<" not found"<<endl;
             }
