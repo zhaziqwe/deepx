@@ -1,5 +1,6 @@
 #include <mutex>
 #include <thread>
+#include <cstdlib>
 
 #include <deepx/tensorfunc/init.hpp>
 #include "deepx/op/op.hpp"
@@ -9,6 +10,12 @@
 
 using namespace deepx::tensorfunc;
 using namespace deepx::mem;
+
+// 从环境变量读取IR日志配置
+bool kIrLog = []() {
+    const char* env = std::getenv("DEEPX_IR_LOG");
+    return env != nullptr && (strcmp(env, "1") == 0 || strcasecmp(env, "true") == 0);
+}();
 
 int main()
 {
@@ -42,17 +49,22 @@ int main()
         if (!tasks.empty()) {
             deepx::op::Op op = tasks.front();
             tasks.pop();
-            cout << "~" << op.to_string()<< endl;
-            std::string resp=to_string(op.id);
+            
+            // 根据kIrLog标志决定是否打印op信息
+            if (kIrLog) {
+                cout << "~" << op.to_string() << endl;
+            }
+
+            std::string resp = to_string(op.id);
             resp+="recv_at:";
             resp+=to_string(op.recv_at.time_since_epoch().count());
             if (opfactory.ops.find(op.name)==opfactory.ops.end()){
-                cout<<"<op> "<<op.name<<" not found"<<endl;
+                cerr<<"<op> "<<op.name<<" not found"<<endl;
                 resp+="error op not found";
             }
             auto &type_map = opfactory.ops.find(op.name)->second;
             if (type_map.find(op.dtype)==type_map.end()){
-                cout<<"<op>"<<op.name<<" "<<op.dtype<<" not found"<<endl;
+                cerr<<"<op>"<<op.name<<" "<<op.dtype<<" not found"<<endl;
                 resp+="error dtype not found";
             }
             auto src = type_map.find(op.dtype)->second;

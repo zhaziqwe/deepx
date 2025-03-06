@@ -452,12 +452,16 @@ namespace deepx::op
     class Pow : public Op
     {
     public:
+        Pow(){
+            this->init("pow",deepx::dtype<T>::name(), {}, {}, false, {}, {});
+        }
         Pow(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
             this->init("pow",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
         Pow(initializer_list< string> args, initializer_list< string> returns, bool require_grad = false, initializer_list< string> args_grad = {}, initializer_list< string> returns_grad = {}){
             this->init("pow",deepx::dtype<T>::name(), args, returns, require_grad, args_grad, returns_grad);
         }
+        //已验证，2025-03-06，lipeng
         void forward(mem::Mem &mem) override
         {
             auto a = mem.gettensor<T>(this->args[0]).get();
@@ -515,27 +519,27 @@ namespace deepx::op
         }
         void forward(mem::Mem &mem) override
         {
-            auto a = mem.gettensor<T>(this->args[0]).get();
-            auto b = mem.getarg<T>(this->args[1]);
-            auto c = mem.gettensor<T>(this->returns[0]);
-            deepx::tensorfunc::pow(*a, b, *c);
+            auto A = mem.gettensor<T>(this->args[0]).get();
+            auto b = this->getarg<T>(1,mem);
+            auto C = mem.gettensor<T>(this->returns[0]);
+            deepx::tensorfunc::pow_scalar(*A, b, *C);
         }   
         void backward(mem::Mem &mem) override
         {
             // 需要用到前向传播的输入、输出和标量指数
-            auto a = mem.gettensor<T>(this->args[0]).get();
-            auto b = mem.getarg<T>(this->args[1]);  // 标量指数
-            auto c = mem.gettensor<T>(this->returns[0]).get();  // c = a^b
-            auto a_grad = mem.gettensor<T>(this->args_grad[0]).get();
-            auto c_grad = mem.gettensor<T>(this->returns_grad[0]).get();
+            auto A = mem.gettensor<T>(this->args[0]).get();
+            auto b = this->getarg<T>(1,mem); // 标量指数
+            auto C = mem.gettensor<T>(this->returns[0]).get();  // c = a^b
+            auto A_grad = mem.gettensor<T>(this->args_grad[0]).get();
+            auto C_grad = mem.gettensor<T>(this->returns_grad[0]).get();
             
             // 标量幂运算的反向传播：
             // 对于 c = a^b，其中b是标量
             // ∂L/∂a = ∂L/∂c * ∂c/∂a = c_grad * b * a^(b-1)
             // = c_grad * b * (c/a)  【因为c=a^b，所以a^(b-1)=c/a】
-            deepx::tensorfunc::div(*c, *a, *a_grad);     // temp = c/a
-            deepx::tensorfunc::mul(*a_grad, b, *a_grad);  // temp = b * (c/a)
-            deepx::tensorfunc::mul(*a_grad, *c_grad, *a_grad);  // a_grad = c_grad * b * (c/a)
+            deepx::tensorfunc::div(*C, *A, *A_grad);     // temp = c/a
+            deepx::tensorfunc::mul(*A_grad, b, *A_grad);  // temp = b * (c/a)
+            deepx::tensorfunc::mul(*A_grad, *C_grad, *A_grad);  // a_grad = c_grad * b * (c/a)
             // 标量b不需要计算梯度
         }
         void setexample() override {

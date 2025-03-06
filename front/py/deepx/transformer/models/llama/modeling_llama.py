@@ -1,5 +1,8 @@
 from deepx.nn.modules import Module
 from deepx import Tensor,ones,rsqrt
+
+
+# copy from https://github.com/huggingface/transformers/blob/main/src/transformers/models/llama/modeling_llama.py
 class LlamaRMSNorm(Module):
     def __init__(self, hidden_size, eps=1e-6):
         """

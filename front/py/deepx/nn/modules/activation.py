@@ -50,7 +50,6 @@ class Swiglu(Module):
         result=swish(x@W,beta=beta).mul(x@V,out=out)       
         return result
  
-    
     def forward(self, input: Tensor) -> Tensor:
         return self.swiglu(input,self.W,self.V)
  

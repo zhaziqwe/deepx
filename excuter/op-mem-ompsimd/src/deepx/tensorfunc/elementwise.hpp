@@ -810,39 +810,17 @@ namespace deepx::tensorfunc
         }
     }
 
+    //C=A^value
+    // highway 不支持POW 
     template <typename T>
-    void pow(const Tensor<T> &input, const T value, Tensor<T> &output)
+    void pow_scalar(const Tensor<T> &input, const T value, Tensor<T> &output)
     {
         if (input.shape == output.shape)
         {
-            output.shape.rangeParallel(output.shape.dim - 1, [&input, &output, &value](int i)
+            output.shape.rangeParallel(output.shape.dim , [&input, &output, &value](int i)
                                        {
-                int shape_last=output.shape[-1];
-                const ScalableTag<T> tag;
-                const size_t lanes = Lanes(tag);
-                size_t j=0;
-
-                // 1. 处理前置未对齐部分
-                while (j < shape_last && !IsAligned(tag,input.data + i + j)) {
-                    output.data[i+j] = std::pow(input.data[i+j], value);
-                    ++j;
-                }
-
-                // 2. 处理中间对齐部分
-                size_t aligned_end=shape_last-(shape_last%lanes);
-                for (; j+lanes<=aligned_end; j +=  lanes  )
-                {
-                    auto vec = Load(tag, input.data + i + j);
-                    auto scalar = Set(tag, value);
-                    auto vec_result = Pow(vec, scalar);
-                    Store(vec_result, tag, output.data + i + j);
-                }
-
-                // 3. 处理尾部剩余元素
-                for (;j<shape_last;j++)
-                {
-                    output.data[i+j] = std::pow(input.data[i+j], value);
-                } });
+                output.data[i] = std::pow(input.data[i], value);
+            });
         }
         else
         {
@@ -850,38 +828,33 @@ namespace deepx::tensorfunc
         }
     }
 
+    //C=A^B
+    template <typename T>
+    void pow(const Tensor<T> &A, Tensor<T> &B,Tensor<T> &C)
+    {
+        if (A.shape == B.shape && A.shape == C.shape)
+        {
+            C.shape.rangeParallel(C.shape.dim , [&A, &B, &C](int i){
+                    C.data[i] = std::pow(A.data[i], B.data[i]);
+            });
+        }
+        else
+        {
+            throw std::invalid_argument("shape mismatch");
+        }
+    }
+
+    //hwy库没有log函数，所以只能用std::log
+
     template <typename T>
     void log(const Tensor<T> &input, Tensor<T> &output)
     {
         if (input.shape == output.shape)
         {
-            output.shape.rangeParallel(output.shape.dim - 1, [&input, &output](int i)
-                                       {
-                int shape_last=output.shape[-1];
-                const ScalableTag<T> tag;
-                const size_t lanes = Lanes(tag);
-                size_t j=0;
-
-                // 1. 处理前置未对齐部分
-                while (j < shape_last && !IsAligned(tag,input.data + i + j)) {
-                    output.data[i+j] = std::log(input.data[i+j]);
-                    ++j;
-                }
-
-                // 2. 处理中间对齐部分
-                size_t aligned_end=shape_last-(shape_last%lanes);
-                for (; j+lanes<=aligned_end; j +=  lanes  )
-                {
-                    auto vec = Load(tag, input.data + i + j);
-                    auto vec_result = Log(vec);
-                    Store(vec_result, tag, output.data + i + j);
-                }
-
-                // 3. 处理尾部剩余元素
-                for (;j<shape_last;j++)
-                {
-                    output.data[i+j] = std::log(input.data[i+j]);
-                } 
+            output.shape.rangeParallel(output.shape.dim , [&input, &output](int i){
+                 
+                    output.data[i] = std::log(input.data[i]);
+                   
             });
         }
         else
@@ -898,7 +871,6 @@ namespace deepx::tensorfunc
         {
             output.shape.rangeParallel(output.shape.dim  , [&input, &output](int i)   
                                        {
-                 
                     output.data[i] = std::exp(input.data[i]);
                 
             });

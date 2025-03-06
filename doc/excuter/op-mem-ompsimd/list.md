@@ -7,6 +7,8 @@
 | sum | float32, float64 | T2 = sum(T1, dims=[1,2]) | sum@float32 T1 1 2 -> T2 |
 | matmul | float32, float64 | T3 = T1 @ T2 | matmul@float32 T1 T2 -> T3 |
 | concat | float32, float64 | T3 = concat([T1, T2], axis=3) | concat@float32 T1 T2 3 -> T3 |
+| pow_scalar | float32, float64 | T2 = T1 ^ 2.0 | pow_scalar@float32 T1 2.0 -> T2 |
+| pow | float32, float64 | T3 = T1 ^ T2 | pow@float32 T1 T2 -> T3 |
 | max_scalar | float32, float64 | T2 = max(T1, 0.0) | max_scalar@float32 T1 0.0 -> T2 |
 | exp | float32, float64 | T2 = exp(T1) | exp@float32 T1 -> T2 |
 | min_scalar | float32, float64 | B= min(A, 1.0) | min_scalar@float32 A 1.0 -> B |

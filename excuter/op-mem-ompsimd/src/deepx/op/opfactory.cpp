@@ -109,6 +109,14 @@ namespace deepx::op
         opfactory.add_op(Exp<float>());
         opfactory.add_op(Exp<double>());
     }
+    void register_pow(OpFactory &opfactory){
+        opfactory.add_op(Pow<float>());
+        opfactory.add_op(Pow<double>());
+    }
+    void register_pow_scalar(OpFactory &opfactory){
+        opfactory.add_op(Pow_scalar<float>());
+        opfactory.add_op(Pow_scalar<double>());
+    }
     void register_elementwise_op(OpFactory &opfactory){
         register_add(opfactory);
         register_add_scalar(opfactory);
@@ -120,6 +128,8 @@ namespace deepx::op
         register_rdiv_scalar(opfactory);
         register_sqrt(opfactory);
         register_exp(opfactory);
+        register_pow(opfactory);
+        register_pow_scalar(opfactory);
     }
     //concat
 

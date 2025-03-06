@@ -11,9 +11,7 @@ __all__ = [
     'Shape',
     'Tensor',
     'tensor_method',
-
-    # 'sum', 'mean', 'max', 'min',
-    # 'reshape', 'transpose',
+ 
     # 'lt', 'gt', 'eq',
     # 'sin', 'cos', 'tan',
     # 'DType',

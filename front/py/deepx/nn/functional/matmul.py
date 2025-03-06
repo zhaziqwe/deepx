@@ -18,7 +18,8 @@ def matmul(
     
     outtensor=None
     if isinstance(out,str):
-        outtensor=Tensor(shape=a.shape, dtype=a.dtype, device=a.device)
+        matmulshape=a.Shape.matmul(b.shape)
+        outtensor=Tensor(shape=matmulshape, dtype=a.dtype, device=a.device)
         outtensor.addtograph(out)
     else:
         outtensor=out
