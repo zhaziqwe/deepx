@@ -16,9 +16,9 @@ def ones_(self):
     constant_func(self,value=1)
 
 @tensor_method
-def uniform_(self,low=0, high=1):
+def uniform_(self,low=0, high=1,seed:int=0):
     from deepx.nn.functional import uniform as uniform_func
-    uniform_func(self,low=low, high=high)
+    uniform_func(self,low=low, high=high,seed=seed)
 
 @tensor_method
 def rand_(self):

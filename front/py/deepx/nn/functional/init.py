@@ -54,20 +54,21 @@ def arange(start=0, end=None, step=1,dtype=None, device=None,name:Union[Tensor,s
     return outtensor
 
 OpNode.register("uniform")
-def uniform(t:Tensor,low=0, high=1)->Tensor:
+def uniform(t:Tensor,low=0, high=1,seed:int=0)->Tensor:
     if low >= high:
         raise ValueError(f"low({low})必须小于high({high})")
     if t is None:
         raise ValueError("t不能为None")
     g=t.graph
-    arglow=g.add_var('',low)
-    arghigh=g.add_var('',high)
+ 
     opnode = g.add_op("uniform")
-    opnode.add_input(arglow)
-    opnode.add_input(arghigh)
+    opnode.add_input(g.add_var('',low))
+    opnode.add_input(g.add_var('',high))
+    if seed is not None:
+        opnode.add_input(g.add_var('',seed))
     t.node.add_input(opnode)
     if t.graph.eager:
-        ir=DeepxIR("uniform", t.dtype, [low, high], [t.node.name])
+        ir=DeepxIR("uniform", t.dtype, [low, high,seed], [t.node.name])
         send(ir)
     return t
 

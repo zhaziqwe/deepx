@@ -19,15 +19,13 @@ namespace deepx::op{
         }
         void forward(mem::Mem &mem) override{
             auto output = mem.gettensor<T>(this->returns[0]).get();
-            if (is_float(this->args[0])){
-                T low = std::stof(this->args[0]);
-                T high = std::stof(this->args[1]);
-                tensorfunc::uniform(*output,low,high);
-            }else{
-                T low = mem.getarg<T>(this->args[0]);
-                T high = mem.getarg<T>(this->args[1]);
-                tensorfunc::uniform(*output,low,high);
+            T low =  this->getarg<T>(0,mem);
+            T high = this->getarg<T>(1,mem);
+            uint32_t seed = 0;
+            if (this->args.size() == 3){
+                seed = this->getarg<uint32_t>(2,mem);
             }
+            tensorfunc::uniform(*output,low,high,seed);
         } 
         void backward(mem::Mem &mem) override{
             throw std::runtime_error("Uniform op does not support backward");

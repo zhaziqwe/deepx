@@ -36,7 +36,7 @@ def sigmoid(
         else:
             outtensor=out
     from .elementwise import exp
-    outtensor=1/((t*(-1)+1).exp())
+    outtensor = 1 / ((t*-1).exp()+1)
     return outtensor
 
 def swish(
@@ -56,32 +56,3 @@ def swish(
         输出张量
     """
     return x*sigmoid(x*beta,out=out)
-
-def swiglu(
-        x: Tensor,
-        W: Tensor,  # 第一个投影矩阵
-        V: Tensor,  # 第二个投影矩阵
-        beta: float = 1.0,  # swish函数的缩放因子
-        out: Union[Tensor,str] = '') -> Tensor:
-    """SwiGLU激活函数
-    
-    .. math::
-        \text{SwiGLU}(x, W, V) = \text{swish}(xW) \odot (xV)
-
-    其中:
-        - :math:`\odot` 表示逐元素乘法
-        - :math:`\text{swish}(x)` 是swish激活函数
-        - :math:`W` 和 :math:`V` 是投影矩阵
-
-    Args:
-        x: 输入张量
-        W: 第一个投影矩阵
-        V: 第二个投影矩阵  
-        beta: swish函数的缩放因子
-        out: 输出张量或名称
-
-    Returns:
-        输出张量
-    """
-    result=swish(x@W,beta=beta).mul(x@V,out=out)       
-    return result

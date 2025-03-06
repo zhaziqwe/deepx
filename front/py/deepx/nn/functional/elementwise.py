@@ -95,7 +95,7 @@ def sub(
     if isinstance(b,Tensor):
         return _A_B_elementwiseop_C(a,b,"sub",out)
     else:
-        return _A_b_elementwiseop_C(a,b,"sub_scalar",out)
+        return _A_b_elementwiseop_C(a,b*-1,"add_scalar",out)
 
 #mul
 OpNode.register("mul")
