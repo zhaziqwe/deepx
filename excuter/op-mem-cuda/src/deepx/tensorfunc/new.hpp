@@ -5,7 +5,6 @@
 #include <stdexcept>
 #include "deepx/tensor.hpp"
 
-
 // 具体的张量类
 namespace deepx::tensorfunc
 {

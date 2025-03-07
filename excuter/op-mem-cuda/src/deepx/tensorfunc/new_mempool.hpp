@@ -1,19 +1,17 @@
 #ifndef DEEPX_TENSORFUNC_NEW_MEMPOOL_HPP
 #define DEEPX_TENSORFUNC_NEW_MEMPOOL_HPP
-
-#include <jemalloc/jemalloc.h>
-
+ 
 namespace deepx::tensorfunc
 {
     class MemoryPool
     {
     public:
     static void* Malloc(size_t size) {
-        return mallocx(size, MALLOCX_ALIGN(64));  // 64字节对齐，适合SIMD
+        
     }   
 
     static void Free(void* ptr) {
-        dallocx(ptr, 0);
+       
     }
     
     // Realloc: 重新分配内存并保留原数据,主要用于tensor形状改变时的内存重分配
@@ -24,7 +22,7 @@ namespace deepx::tensorfunc
     // 返回新分配的内存指针,如果分配失败返回nullptr
 
     static void* Realloc(void* ptr, size_t size) {
-        return rallocx(ptr, size, MALLOCX_ALIGN(64));
+        
     }
 
         
@@ -34,7 +32,7 @@ namespace deepx::tensorfunc
     // 如果ptr为nullptr,返回0
     // 重新分配内存，保留原数据
     static size_t GetAllocatedSize(void* ptr) {
-        return sallocx(ptr, 0);
+        
     }
 };
 
