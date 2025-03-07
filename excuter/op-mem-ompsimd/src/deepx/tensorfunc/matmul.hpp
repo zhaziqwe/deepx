@@ -25,6 +25,8 @@ namespace deepx::tensorfunc
     }
     return true;
   }
+
+
   template <typename T>
   void matmul(const Tensor<T> &a, const Tensor<T> &b, Tensor<T> &c)
   {
@@ -287,5 +289,36 @@ namespace deepx::tensorfunc
                   ldc);          // C的leading dimension（行主序时为列数n）
     }
   }
+
+  //C=A.T @ B,可以在k维度上进行simd并行计算
+  template <typename T>
+  void matmulAT(const Tensor<T> &a, const Tensor<T> &b, Tensor<T> &c)
+  {
+    if (!check_shape(a.shape, b.shape))
+    {
+      throw std::invalid_argument("a.shape could matmul with b.shape");
+    }
+    c.shape.rangeParallel(c.shape.dim - 2, [&](const std::vector<int> &indices)
+                          {
+                        int aIdx=a.shape.linearat(indices);
+                        int bIdx=b.shape.linearat(indices);
+                        int cIdx=c.shape.linearat(indices);
+                        int m=a.shape[-2];
+                        int k=a.shape[-1];
+                        int n=b.shape[-1];
+                        for(int i=0;i<m;i++){
+                            for(int j=0;j<n;j++){
+                                T sum=0;  
+
+                                
+                                for(int l=0;l<k;l++){
+                                    sum+=a.data[aIdx+i*k+l]*b.data[bIdx+l*n+j];
+                                }
+                                c.data[cIdx+i*n+j]=sum;
+                            }
+                        } });
+  }
+
+ 
 }
 #endif // DEEPX_TENSORFUNC_MATMUL_HPP
