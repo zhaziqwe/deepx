@@ -4,12 +4,11 @@
 #include "deepx/tensor.hpp" 
 #include "deepx/tensorfunc/reduce.hpp"
 #include "deepx/tensorfunc/broadcast.hpp"
-#include "deepx/tensorfunc/compare.hpp"
-
+ 
 namespace deepx::op
 {
     template<typename T>
-    class Sum : public OpT<T>{
+    class Sum : public Op{
         public:
             Sum(){
                 this->init("sum",dtype<T>::name(), {}, {}, false, {}, {});
@@ -36,7 +35,7 @@ namespace deepx::op
     };
  
  template<typename T>
-    class Max : public OpT<T>{
+    class Max : public Op{
         public:
             Max(){
                 this->init("max",dtype<T>::name(), {}, {}, false, {}, {});
@@ -67,7 +66,7 @@ namespace deepx::op
     };
 
     template<typename T>
-    class Max_scalar : public OpT<T>{
+    class Max_scalar : public Op{
         public:
             Max_scalar(){
                 this->init("max_scalar",dtype<T>::name(), {}, {}, false, {}, {});
@@ -97,7 +96,7 @@ namespace deepx::op
     };
 
     template<typename T>
-    class Min : public OpT<T>{
+    class Min : public Op{
         public:
             Min(){
                 this->init("min",dtype<T>::name(), {}, {}, false, {}, {});
@@ -126,7 +125,7 @@ namespace deepx::op
     };
 
     template<typename T>
-    class Min_scalar : public OpT<T>{
+    class Min_scalar : public Op{
         public:
             Min_scalar(){
                 this->init("min_scalar",dtype<T>::name(), {}, {}, false, {}, {});

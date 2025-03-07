@@ -6,7 +6,7 @@
 namespace deepx::op{
 
     template<typename T>
-    class ArgSet : public OpT<T>{
+    class ArgSet : public Op{
         public:
         ArgSet(){
             this->init("argset",dtype<T>::name(), {}, {}, false, {}, {});

@@ -7,7 +7,7 @@
 namespace deepx::op
 {
     template <typename T>
-    class Concat : public OpT<T>
+    class Concat : public Op
     {
     public:
         Concat(){

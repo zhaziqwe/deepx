@@ -9,7 +9,7 @@ namespace deepx::op {
     using namespace deepx::tensorfunc;
 
     template <typename T>
-    class Transpose : public OpT<T> {
+    class Transpose : public Op {
     public:
         Transpose() {
             this->init("transpose", dtype<T>::name(), {}, {}, false, {}, {});

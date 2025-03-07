@@ -15,7 +15,7 @@ namespace deepx::op
 
     
     template <typename T>
-    class MatMul : public OpT<T>
+    class MatMul : public Op
     {
     public:
         MatMul(){

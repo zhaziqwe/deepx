@@ -14,7 +14,7 @@ namespace deepx::op
 
     
     template <typename T>
-    class Add : public OpT<T>
+    class Add : public Op
     {
     public:
         Add(){
@@ -48,7 +48,7 @@ namespace deepx::op
     };
  
     template <typename T>
-    class Add_scalar : public OpT<T>
+    class Add_scalar : public Op
     {
     public:
         Add_scalar(){
@@ -81,7 +81,7 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Sub : public OpT<T>
+    class Sub : public Op
     {
     public:
         Sub(){
@@ -115,7 +115,7 @@ namespace deepx::op
         }
     };
     template <typename T>
-    class Mul : public OpT<T>
+    class Mul : public Op
     {
     public:
         Mul(){
@@ -154,7 +154,7 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Mul_scalar : public OpT<T>
+    class Mul_scalar : public Op
     {
     public:
         Mul_scalar(){
@@ -191,7 +191,7 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Div : public OpT<T>
+    class Div : public Op
     {
     public:
         Div(){
@@ -236,7 +236,7 @@ namespace deepx::op
 
     //Div_scalar之所以不复用Mul_scalar，是防止b接近0时，Mul_scalar(1/b)不稳定
     template <typename T>
-    class Div_scalar : public OpT<T>
+    class Div_scalar : public Op
     {
     public:
         Div_scalar(){
@@ -273,7 +273,7 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Sqrt : public OpT<T>
+    class Sqrt : public Op
     {
     public:
         Sqrt(){
@@ -306,7 +306,7 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Exp : public OpT<T>
+    class Exp : public Op
     {
     public:
         Exp(){
@@ -340,7 +340,7 @@ namespace deepx::op
     };
 
     template <typename T>
-    class Pow : public OpT<T>
+    class Pow : public Op
     {
     public:
         Pow(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){
@@ -386,7 +386,7 @@ namespace deepx::op
 
 
     template <typename T>
-    class Pow_scalar : public OpT<T>
+    class Pow_scalar : public Op
     {
     public:
         Pow_scalar(){
@@ -427,7 +427,7 @@ namespace deepx::op
 
 
     template <typename T>
-    class Log : public OpT<T>
+    class Log : public Op
     {
     public:
         Log(vector< string> args, vector< string> returns, bool require_grad = false, vector< string> args_grad = {}, vector< string> returns_grad = {}){

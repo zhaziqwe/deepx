@@ -6,7 +6,7 @@
 #include "deepx/tensorfunc/new.hpp"
 namespace deepx::op{
     template<typename T>
-    class NewTensor : public OpT<T>{
+    class NewTensor : public Op{
         public:
         NewTensor(){
             this->init("newtensor",dtype<T>::name(), {}, {}, false, {}, {});
@@ -31,7 +31,7 @@ namespace deepx::op{
 
 
     template<typename T>
-    class DelTensor : public OpT<T>{
+    class DelTensor : public Op{
         public:
         DelTensor(){
             this->init("deltensor","any", {}, {}, false, {}, {});

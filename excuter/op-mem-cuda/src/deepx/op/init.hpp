@@ -5,7 +5,7 @@
 #include "deepx/tensorfunc/init.hpp"
 namespace deepx::op{
     template<typename T>
-    class Uniform : public OpT<T>{
+    class Uniform : public Op{
         public:
         Uniform(){
             this->init("uniform",dtype<T>::name(), {}, {}, false, {}, {});
@@ -28,7 +28,7 @@ namespace deepx::op{
     };
 
     template<typename T>
-    class Constant : public OpT<T>{
+    class Constant : public Op{
         public:
         Constant(){
             this->init("constant",dtype<T>::name(), {}, {}, false, {}, {});
@@ -50,7 +50,7 @@ namespace deepx::op{
     };
 
     template<typename T>
-    class Arange : public OpT<T>{
+    class Arange : public Op{
         public:
         Arange(){
             this->init("arange",dtype<T>::name(), {}, {}, false, {}, {});
