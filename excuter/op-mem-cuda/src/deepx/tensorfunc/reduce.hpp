@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <stdexcept>
 #include <deepx/vector_combination.hpp>
-#include <hwy/highway.h>
  
 #include "deepx/tensor.hpp"
 #include "deepx/shape_reduce.hpp"

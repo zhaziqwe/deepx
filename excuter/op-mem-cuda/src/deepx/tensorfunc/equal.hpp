@@ -1,8 +1,7 @@
 #ifndef DEEPX_TENSORFUNC_EQUAL_HPP
 #define DEEPX_TENSORFUNC_EQUAL_HPP
 #include <cmath>
-#include <omp.h>
-
+ 
 #include "deepx/tensor.hpp"
 #include "deepx/shape.hpp"
 namespace deepx::tensorfunc

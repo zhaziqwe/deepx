@@ -1,7 +1,6 @@
 #ifndef DEEPX_TENSORFUNC_MATMUL_HPP
 #define DEEPX_TENSORFUNC_MATMUL_HPP
-
-#include <cblas.h> // 如果使用 OpenBLAS
+ 
 #include "deepx/tensor.hpp"
 
 namespace deepx::tensorfunc
