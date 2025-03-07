@@ -9,9 +9,6 @@
 namespace deepx::tensorfunc
 {
     using namespace deepx;
-    
-    template <typename T>
-    void arange(Tensor<T> &tensor, T start, T step);
 
    template <typename T>
     void uniform(Tensor<T> &tensor,const T low = 0,const T high = 1);
