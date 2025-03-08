@@ -138,11 +138,13 @@ def expand(t:Tensor,shape:list[int],out:Union[Tensor,str]='')->Tensor:
         ir=DeepxIR("expand",'',[t.node.name,*map(str, shape)], [outtensor.node.name])
         send(ir)
     return outtensor
-# 修复 broadcast 函数缩进
-def broadcast(a: Tensor, b: Tensor) -> Tuple[Tensor,Tensor]:
+
+def broadcast_to(a: Tensor, shape: tuple,out:Union[Tensor,str]='') -> Tensor:
     # 计算广播后的形状
     try:
-        target_shape = broadcast_shape(a.shape, b.shape)
+        target_shape = broadcast_shape(a.shape, shape)
+        if target_shape!=shape:
+            raise ValueError(f"广播失败：{a.shape} 无法广播为 {shape} ")
     except ValueError as e:
         raise ValueError(f"广播失败：{e}") from e
     
@@ -152,21 +154,11 @@ def broadcast(a: Tensor, b: Tensor) -> Tuple[Tensor,Tensor]:
         a_reshaped =  reshape(a,a_reshape)
     else:
         a_reshaped=a
-    if b.shape != target_shape:
-        b_reshape = [1] * (len(target_shape) - b.ndimension) + list(b.shape)
-        b_reshaped = reshape(b,b_reshape)
-    else:
-        b_reshaped=b
-    
+   
     # 执行实际广播
     if a_reshaped.shape != target_shape:
-        a_broadcasted =  expand(a_reshaped,target_shape)
+        a_broadcasted =  expand(a_reshaped,target_shape,out)
     else:
         a_broadcasted=a_reshaped
-        
-    if b_reshaped.shape != target_shape:
-        b_broadcasted =  expand(b_reshaped,target_shape)
-    else:
-        b_broadcasted=b_reshaped
     
-    return a_broadcasted, b_broadcasted
+    return a_broadcasted 
