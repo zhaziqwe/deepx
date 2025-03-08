@@ -1,11 +1,10 @@
 ########====DEEPX====########
-from deepx import Tensor,ones,broadcast_to
+from deepx import Tensor,ones
 
-a=ones( 4,2,3 ,name="a")
+a=ones( 4,2,3 ,name="a")    
 b=ones(  2,1 ,name='b')
-bb=b.broadcast_to( a.shape,out="b.broadcasted")
-print(bb)
-c=a+bb
+ 
+c=a+b
 
 print(c)
 import os
@@ -17,7 +16,6 @@ str.render(script_name+".dot", format='svg')
 import torch
 a=torch.ones(4,2,3)
 b=torch.ones(2,1)
-bb=b.expand(4,2,3)
-c=a+bb
+c=a+b
 print(c)
 

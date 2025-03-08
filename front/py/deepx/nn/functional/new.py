@@ -16,3 +16,7 @@ def copytensor(t:Tensor,out:Tensor):
     if t.graph.eager:
         ir2=DeepxIR("copytensor", t.dtype, [t.node.name], [out.node.name])
         send(ir2)
+def deltensor(t:Tensor):
+    if t.graph.eager:
+        ir2=DeepxIR("deltensor",'', [t.node.name], [])
+        send(ir2)

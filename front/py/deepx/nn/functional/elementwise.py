@@ -3,7 +3,7 @@ from deepx import Tensor
 from deepx.autograd import Graph,DataNode,OpNode
 from deepx.nn import DeepxIR
 from deepx.scheduler import send
-
+from .changeshape import broadcast_shape
 def _A_elementwiseop_C(
         a:Tensor,
         op:str=None,
@@ -33,22 +33,27 @@ def _A_B_elementwiseop_C(
     if g is None:
        g=b.graph
 
+    A,B=a,b
     if a.shape != b.shape:
-        #broadcast
-        a,b=broadcast(a,b)
-        
+        broadcastshape=broadcast_shape(a.shape,b.shape)
+        from .changeshape import broadcast_to
+        if a.shape != broadcastshape:
+            A=broadcast_to(a,broadcastshape)
+        if b.shape != broadcastshape:
+            B= broadcast_to(b,broadcastshape)
+
     opnode = g.add_op(op)
-    opnode.add_input(a.node)
-    opnode.add_input(b.node)
+    opnode.add_input(A.node)
+    opnode.add_input(B.node)
     outtensor=None
     if isinstance(out,str):
-        outtensor=Tensor(shape=a.shape, dtype=a.dtype, device=a.device)
+        outtensor=Tensor(shape=A.shape, dtype=A.dtype, device=A.device)
         outtensor.addtograph(out)
     else:
         outtensor=out   
     outtensor.node.add_input(opnode)
     if g.eager:
-        ir=DeepxIR(op, a.dtype, [a.node.name, b.node.name], [outtensor.node.name])
+        ir=DeepxIR(op, A.dtype, [A.node.name, B.node.name], [outtensor.node.name])
         send(ir)
     return outtensor
 def _A_b_elementwiseop_C(

@@ -1,5 +1,5 @@
 from .elementwise import *
-from .new import newtensor
+from .new import newtensor,deltensor
 from .print import printtensor
 from .matmul import matmul
 from .init import *

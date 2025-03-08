@@ -4,6 +4,8 @@ from .devicetype import Device
 from .dtype import infer_dtype,default_dtype
 
 class Tensor:
+
+    #生命周期 
     def __init__(
             self,
             data=None,
@@ -11,7 +13,6 @@ class Tensor:
             device=None,
             dtype:Optional[str]=None,
     ):
- 
         # data
         if data is not None:
             import numpy as np
@@ -47,11 +48,15 @@ class Tensor:
         self._graph = None
         self._node = None
 
-    def addtograph(self,name:str)->'Tensor':
-        # graph
-        from deepx.nn.functional import newtensor
-        newtensor(self,name)
-        return self
+    # todo，待实现eager模式下的tensor释放
+    def __del__(self):
+        try:
+            if self.graph.eager:
+                from deepx.nn.functional import deltensor
+                deltensor(self)
+        except:
+            pass
+
     # shape
     @property
     def shape(self):
@@ -96,7 +101,14 @@ class Tensor:
     def device(self):
         return self._device
 
-    # 计算图相关
+    
+    # 计算图
+    def addtograph(self,name:str)->'Tensor':
+        # graph
+        from deepx.nn.functional import newtensor
+        newtensor(self,name)
+        return self
+    
     @property
     def graph(self):
         return self._graph
@@ -105,7 +117,7 @@ class Tensor:
     def node(self):
         return self._node
     
-    # 重写运算符
+    #elementwise
     def __add__(self, other):
         return self.add(other)
     
@@ -121,10 +133,11 @@ class Tensor:
     def __rtruediv__(self, other):
         return self.rdiv(other)
 
+    #矩阵乘法
     def __matmul__(self, other):
         return self.matmul(other)
 
-    #自动转置最后两个维度，适用于二维矩阵
+    #shape操作
     @property
     def T(self) -> str:
         return self.transpose(1,0,out=self.node.name+".T")
@@ -133,6 +146,7 @@ class Tensor:
         from deepx.nn.functional import printtensor
         s=printtensor(self)
         return s
+
 
 def tensor_method(f):
     setattr(Tensor, f.__name__, f)
