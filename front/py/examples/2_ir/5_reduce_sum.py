@@ -11,10 +11,6 @@ print(torch_t1)
 torch_t2 = torch.sum(torch_t1, dim=[0, 1])
 print(torch_t2)
 
-torch_t3 = torch.arange(0, 120).reshape(4, 5, 6)
-print(torch_t3)
-torch_t3_mean = torch.mean(torch_t3, dim=[0, 1])
-print(torch_t3_mean)
 
 ############-------DEEPX-------################
 
@@ -33,11 +29,6 @@ print(t1)
 t2=sum(t1,dim=[0,1],out='t2')
 print(t2)
 
-t3=arange(0,120,1,name="t3").reshape_(4,5,6)
-print(t3)
-
-t3_mean=mean(t3,dim=[0,1],out='t3_mean')
-print(t3_mean)
 
 import os
 script_name = os.path.splitext(os.path.basename( os.path.abspath(__file__)))[0]

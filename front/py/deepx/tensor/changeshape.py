@@ -24,3 +24,9 @@ def reshape_(self,*shape)->Tensor:
     from deepx.nn.functional import reshape as reshape_func   
     result=reshape_func(self,shape,True)
     return result
+
+@tensor_method
+def expand(self,shape:tuple)->Tensor:
+    from deepx.nn.functional import expand as expand_func
+    result=expand_func(self,shape,False)
+    return result

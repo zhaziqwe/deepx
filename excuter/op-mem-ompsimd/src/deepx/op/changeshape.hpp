@@ -230,9 +230,9 @@ namespace deepx::op
             auto input_grad = mem.gettensor<T>(this->args_grad[0]).get();
             auto output_grad = mem.gettensor<T>(this->returns_grad[0]).get();
             vector<int> target_shape = this->getvector<int32_t>( 1);
-            vector<int> axis = sumaxis(target_shape);
+            vector<int> axis = this->sumaxis(input_grad->shape.shape,target_shape);
             // sum,按指定维度求和
-            tensorfunc::sum(*output_grad, *input_grad, axis);
+            tensorfunc::sum(*output_grad,  axis,*input_grad);
         }
         void setexample() override
         {
