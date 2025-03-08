@@ -1,14 +1,11 @@
 #ifndef DEEPX_OP_MATMUL_HPP
 #define DEEPX_OP_MATMUL_HPP
 
-#include <iostream>
-
 #include "deepx/shape_transpose.hpp"
 #include "deepx/op/op.hpp"
 #include "deepx/mem/mem.hpp"
-#include "deepx/tensorfunc/new.hpp"
 #include "deepx/tensorfunc/matmul.hpp"
-#include "deepx/tensorfunc/transpose.hpp"
+#include "deepx/tensorfunc/changeshape.hpp"
 namespace deepx::op
 {
     using namespace std;    

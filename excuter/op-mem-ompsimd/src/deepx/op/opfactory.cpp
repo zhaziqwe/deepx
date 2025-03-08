@@ -6,8 +6,7 @@
 #include "deepx/op/new.hpp"
 #include "deepx/op/arg.hpp"
 #include "deepx/op/print.hpp"
-#include "deepx/op/transpose.hpp"
-#include "deepx/op/reshape.hpp"
+#include "deepx/op/changeshape.hpp"
 namespace deepx::op
 {   
     //new

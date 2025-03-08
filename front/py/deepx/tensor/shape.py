@@ -36,6 +36,17 @@ class Shape:
         """
         return len(self._shape)
 
+    @property
+    def ndim(self):
+        """返回张量的维度数（dim的别名，与PyTorch命名习惯保持一致）
+        
+        设计考虑：
+        - 保持与PyTorch的ndimension()别名一致性
+        - 实际调用dim()方法避免代码重复
+        - 使用更符合Python风格的命名方式
+        """
+        return self.dim()
+    
     def ndimension(self):
         """返回张量的维度数（dim的别名，与PyTorch命名习惯保持一致）
         

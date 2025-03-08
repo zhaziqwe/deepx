@@ -33,6 +33,10 @@ def _A_B_elementwiseop_C(
     if g is None:
        g=b.graph
 
+    if a.shape != b.shape:
+        #broadcast
+        a,b=broadcast(a,b)
+        
     opnode = g.add_op(op)
     opnode.add_input(a.node)
     opnode.add_input(b.node)

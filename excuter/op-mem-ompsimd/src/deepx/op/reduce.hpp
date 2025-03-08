@@ -3,7 +3,7 @@
 
 #include "deepx/tensor.hpp" 
 #include "deepx/tensorfunc/reduce.hpp"
-#include "deepx/tensorfunc/broadcast.hpp"
+#include "deepx/tensorfunc/changeshape.hpp"
 #include "deepx/tensorfunc/compare.hpp"
 #include "stdutil/num.hpp"
 

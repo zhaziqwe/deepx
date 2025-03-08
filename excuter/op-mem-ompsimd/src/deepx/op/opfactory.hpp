@@ -9,7 +9,6 @@
 #include <algorithm>
 
 #include "deepx/op/op.hpp"
-#include "deepx/op/concat.hpp"
 namespace deepx::op
 {
     using Op_dtype = std::unordered_map<std::string, std::shared_ptr<Op>>;

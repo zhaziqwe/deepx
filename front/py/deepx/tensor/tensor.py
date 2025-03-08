@@ -78,6 +78,10 @@ class Tensor:
     @property
     def ndimension(self):
         return self._shape.ndimension() if self._shape else None
+    
+    @property
+    def ndim(self):
+        return self._shape.ndim  if self._shape else None
  
     def numel(self)->int:
         return self._shape.numel() if self._shape else None
