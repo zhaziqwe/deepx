@@ -32,7 +32,8 @@ namespace deepx::op
             {
                 auto output_grad = mem.gettensor<T>(this->returns_grad[0]);
                 auto A_grad = mem.gettensor<T>(this->args_grad[0]);
-                tensorfunc::broadcast(*output_grad, *A_grad);
+
+                tensorfunc::expand(*output_grad, *A_grad);
             }
             void setexample() override {
                 this->init("sum", "float32", {"T1", "1","2"}, {"T2"}, false, {}, {});

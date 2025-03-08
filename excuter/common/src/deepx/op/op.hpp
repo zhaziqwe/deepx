@@ -82,8 +82,11 @@ namespace deepx::op
         }
 
         template<typename T>
-        vector<T> getvector(int from,int to,mem::Mem &mem){
+        vector<T> getvector(const int from=0,int to=0){
             auto v = vector<T>();
+            if (to==0){
+                to = this->args.size();
+            }
             for (int i=from;i<to;i++){
                 v.push_back(T(std::stof(this->args[i].c_str())));
             }

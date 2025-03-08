@@ -46,7 +46,7 @@ make build && cd build && cmake .. && make
 cd deepx/excuter/op-mem-cuda
 
 需要提前安装好依赖
-+ cuda,
++ cuda
 + cublas
 + yaml-cpp
 
