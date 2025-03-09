@@ -1,7 +1,7 @@
 #include <chrono>
 
 #include "deepx/tensor.hpp"
-#include "deepx/tensorfunc/broadcast.hpp"
+#include "deepx/tensorfunc/changeshape.hpp"
 #include "deepx/tensorfunc/print.hpp"
 #include "deepx/tensorfunc/new.hpp"
 #include "deepx/tensorfunc/init.hpp"
@@ -18,7 +18,9 @@ void test_broadcast()
     tensor.data[3]=4;
     std::vector<int> resultShape = {2, 3, 4};
     Tensor result = New<float>(resultShape);
-    broadcast(tensor, result);
+    //
+    // reshape
+    // broadcast(tensor, result);
     print(result);
 }
 void bench_broadcast(int i)
@@ -28,7 +30,7 @@ void bench_broadcast(int i)
     auto start = std::chrono::high_resolution_clock::now();
     std::vector<int> resultShape = {4*i , i  , i};
     Tensor result = New<float>(resultShape);
-    broadcast(tensor, result);
+    // broadcast(tensor, result);
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
     std::cout << "time:" << duration.count() << " seconds" << std::endl;

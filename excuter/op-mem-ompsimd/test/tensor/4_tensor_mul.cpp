@@ -52,9 +52,9 @@ void test_muladd(){
     arange(b,101.0f);
     print(a);
     print(b);
-    muladd(a, 2.0f, b, -1.0f,c);
+    mulscalaradd(a, 2.0f, b, -1.0f,c);
     print(c);
-    muladd(a, 2.0f, b, -1.0f,a);
+    mulscalaradd(a, 2.0f, b, -1.0f,a);
     print(a);
 }
 void test_mul_scalar(){
@@ -62,7 +62,7 @@ void test_mul_scalar(){
     Tensor<float> a=New<float>(shape);
     std::iota(a.data,a.data+a.shape.size,1.0f);
     print(a);
-    mul(a, 100.0f,a);
+    mulscalar(a, 100.0f,a);
     print(a);
 }
 int main(int argc, char** argv){

@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-#include "deepx/tensorfunc/concat.hpp"
+#include "deepx/tensorfunc/changeshape.hpp"
 #include "deepx/tensor.hpp"
 #include "deepx/shape.hpp"
 #include "deepx/shape_concat.hpp"

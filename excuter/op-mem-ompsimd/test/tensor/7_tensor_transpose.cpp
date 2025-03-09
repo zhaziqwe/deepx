@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "deepx/tensor.hpp"
-#include "deepx/tensorfunc/transpose.hpp"
+#include "deepx/tensorfunc/changeshape.hpp"
 #include "deepx/tensorfunc/new.hpp"
 #include "deepx/tensorfunc/print.hpp"
 #include "stdutil/vector.hpp"

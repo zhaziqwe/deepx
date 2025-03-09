@@ -1,5 +1,6 @@
 #include "deepx/op/opfactory.hpp"
-#include "deepx/op/elementwise.hpp"
+#include "deepx/op/elementwise_miaobyte.hpp"
+#include "deepx/op/elementwise_cblas.hpp"
 #include "deepx/op/reduce.hpp"
 #include "deepx/op/matmul.hpp"
 #include "deepx/op/init.hpp"
@@ -9,6 +10,48 @@
 #include "deepx/op/changeshape.hpp"
 namespace deepx::op
 {
+    string OpFactory::print_markdown() const
+    {
+        std::stringstream ss;
+        ss << "## excuter/op-mem-ompsimd 支持算子列表 \n\n";
+        ss << "本页面由 `excuter/op-mem-ompsimd/src/deepx/op/opfactory.hpp` 生成，请勿手动修改 \n\n";
+        ss << "| Operation | Author | Data Types | Math Formula | IR Instruction |\n";
+        ss << "|-----------|--------|------------|--------------|----------------|\n";
+
+        // 输出每个操作及其信息
+        for (auto &[name, op_family] : op_families)
+        {
+
+            for (auto &[author, op_author] :  op_family->op_authors)
+            {
+                ss << "| " << name << " | ";
+                ss << author << " | ";
+                std::vector<std::string> dtypes;
+                for (const auto &dtype_op : op_author->ops)
+                {
+                    dtypes.push_back(dtype_op.first);
+                }
+                std::sort(dtypes.begin(), dtypes.end());
+                for (size_t i = 0; i < dtypes.size(); ++i)
+                {
+                    ss << dtypes[i];
+                    if (i < dtypes.size() - 1)
+                    {
+                        ss << ", ";
+                    }
+                }
+                ss << " | ";
+                // IR Instruction列
+                // 获取第一个数据类型的op实例来调用to_string()
+                auto first_op = op_author->ops.begin()->second;
+                first_op->setexample();
+                // Math Formula列
+                ss << first_op->math_formula() << " | ";
+                ss << first_op->to_string() << " |\n";
+            }
+        }
+        return ss.str();
+    }
     // tensor
     void register_lifecycle(OpFactory &opfactory)
     {
@@ -61,41 +104,52 @@ namespace deepx::op
     // elementwise
     void register_elementwise(OpFactory &opfactory)
     {
-        opfactory.add_op(Add<float>());
-        opfactory.add_op(Add<double>());
+        opfactory.add_op(Add_miaobyte<float>());
+        opfactory.add_op(Add_miaobyte<double>());
+        opfactory.add_op(Add_miaobyte<int8_t>());
+        opfactory.add_op(Add_miaobyte<int16_t>());
+        opfactory.add_op(Add_miaobyte<int32_t>());
+        opfactory.add_op(Add_miaobyte<int64_t>());
 
-        opfactory.add_op(Add_scalar<float>());
-        opfactory.add_op(Add_scalar<double>());
+        opfactory.add_op(Add_cblas<float>());
+        opfactory.add_op(Add_cblas<double>());
+   
 
-        opfactory.add_op(Sub<float>());
-        opfactory.add_op(Sub<double>());
+        opfactory.add_op(Addscalar_miaobyte<float>());
+        opfactory.add_op(Addscalar_miaobyte<double>());
+ 
+        opfactory.add_op(Sub_miaobyte<float>());
+        opfactory.add_op(Sub_miaobyte<double>());
+ 
+        opfactory.add_op(Sub_cblas<float>());
+        opfactory.add_op(Sub_cblas<double>());
 
-        opfactory.add_op(Mul<float>());
-        opfactory.add_op(Mul<double>());
+        opfactory.add_op(Mul_miaobyte<float>());
+        opfactory.add_op(Mul_miaobyte<double>());
+ 
+        opfactory.add_op(Mulscalar_miaobyte<float>());
+        opfactory.add_op(Mulscalar_miaobyte<double>());
 
-        opfactory.add_op(Mul_scalar<float>());
-        opfactory.add_op(Mul_scalar<double>());
+        opfactory.add_op(Div_miaobyte<float>());
+        opfactory.add_op(Div_miaobyte<double>());
+ 
+        opfactory.add_op(Divscalar_miaobyte<float>());
+        opfactory.add_op(Divscalar_miaobyte<double>());
 
-        opfactory.add_op(Div<float>());
-        opfactory.add_op(Div<double>());
+        opfactory.add_op(RDivscalar_miaobyte<float>());
+        opfactory.add_op(RDivscalar_miaobyte<double>());
 
-        opfactory.add_op(Div_scalar<float>());
-        opfactory.add_op(Div_scalar<double>());
+        opfactory.add_op(Sqrt_miaobyte<float>());
+        opfactory.add_op(Sqrt_miaobyte<double>());
 
-        opfactory.add_op(RDiv_scalar<float>());
-        opfactory.add_op(RDiv_scalar<double>());
+        opfactory.add_op(Exp_miaobyte<float>());
+        opfactory.add_op(Exp_miaobyte<double>());
 
-        opfactory.add_op(Sqrt<float>());
-        opfactory.add_op(Sqrt<double>());
+        opfactory.add_op(Pow_miaobyte<float>());
+        opfactory.add_op(Pow_miaobyte<double>());
 
-        opfactory.add_op(Exp<float>());
-        opfactory.add_op(Exp<double>());
-
-        opfactory.add_op(Pow<float>());
-        opfactory.add_op(Pow<double>());
-
-        opfactory.add_op(Pow_scalar<float>());
-        opfactory.add_op(Pow_scalar<double>());
+        opfactory.add_op(Powscalar_miaobyte<float>());
+        opfactory.add_op(Powscalar_miaobyte<double>());
     }
     // matmul
     void register_matmul(OpFactory &opfactory)
@@ -116,12 +170,12 @@ namespace deepx::op
     {
         opfactory.add_op(Max<float>());
         opfactory.add_op(Max<double>());
-        opfactory.add_op(Max_scalar<float>());
-        opfactory.add_op(Max_scalar<double>());
+        opfactory.add_op(Maxscalar<float>());
+        opfactory.add_op(Maxscalar<double>());
         opfactory.add_op(Min<float>());
         opfactory.add_op(Min<double>());
-        opfactory.add_op(Min_scalar<float>());
-        opfactory.add_op(Min_scalar<double>());
+        opfactory.add_op(Minscalar<float>());
+        opfactory.add_op(Minscalar<double>());
         opfactory.add_op(Sum<float>());
         opfactory.add_op(Sum<double>());
     }

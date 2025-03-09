@@ -9,21 +9,11 @@ namespace deepx::op{
     class ArgSet : public Op{
         public:
         ArgSet(){
-            this->init("argset",deepx::dtype<T>::name(), {}, {}, false, {}, {});
+            this->init("argset", deepx::dtype<T>::name(), {}, {}, false, {}, {});
         }
  
-        ArgSet(string name,T value){
-            this->init("argset",deepx::dtype<T>::name(), {name,value}, {}, false, {}, {});
-        }
- 
-        ArgSet(string name,vector<T> value){
-            this->init("argset",deepx::dtype<T>::name(), {name,value}, {}, false, {}, {});
-        }
-        ArgSet(initializer_list<string> args){
-            this->init("argset",deepx::dtype<T>::name(), args, {}, false, {}, {});
-        }
         void setexample() override {
-            this->init("argset", "int32", {"3", "4", "5"}, {"shape"}, false, {}, {});
+            this->init("argset",  "int32", {"3", "4", "5"}, {"shape"}, false, {}, {});
         }
         string math_formula() const override {
             return "shape = [3, 4, 5]";

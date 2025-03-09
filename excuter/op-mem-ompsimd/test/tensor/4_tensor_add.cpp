@@ -47,7 +47,7 @@ void test_add_inplace_scalar(){
     std::iota(a.data,a.data+a.shape.size,1.0f);
     cout<<"a"<<endl;
     print(a);
-    add(a, 100.0f,a);
+    addscalar(a, 100.0f,a);
     cout<<"a"<<endl;
     print(a);
 }

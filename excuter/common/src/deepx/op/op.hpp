@@ -8,10 +8,12 @@
 #include <iostream>
 #include <sstream>
 #include <chrono>
+
 #include "deepx/tensor.hpp"
 #include "deepx/mem/mem.hpp"
 #include "deepx/dtype.hpp"
 
+#include "stdutil/error.hpp"
 namespace deepx::op
 {
     using deepx::mem::Mem;
@@ -21,6 +23,7 @@ namespace deepx::op
     {
     public:
         string name;
+        string author;
         string dtype;
         vector<string> args;
         vector<string> args_grad;
@@ -46,14 +49,14 @@ namespace deepx::op
         // 改为普通虚函数，提供默认实现
         virtual void forward(mem::Mem &mem)
         {
-            throw std::runtime_error("forward not implemented");
+             throw NotImplementError(name);
         }
 
         virtual void backward(mem::Mem &mem)
         {
-            throw std::runtime_error("backward not implemented");
+            throw NotImplementError(name);
         }
-
+ 
         virtual string math_formula() const {
             return "";
         }

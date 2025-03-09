@@ -9,7 +9,8 @@ namespace deepx::op
 {
     // 与deepx/front/py/deepx/nn/deepxir.py对应
 
-    // 新格式示例：mul@float32 a(a_grad) b(b_grad) -> a(a_grad) //id=1 create_time=1714512000 send_time=1714512000
+    // 前向 示例：miaobyte@mul[float32] a  b -> a  //id=1 create_time=1714512000 send_time=1714512000
+    // 反向,混合精度计算 示例：miaobyte@matmul  a[float16](a_grad[float16]) b[float16](b_grad[float16]) <- c[float32](a_grad[float32]) //id=1 create_time=1714512000 send_time=1714512000
     void Op::load(const string &input)
     {
         // 分割元数据部分
@@ -144,6 +145,7 @@ namespace deepx::op
                   const vector<string> &returns_grad)
     {
         this->name = opname;
+        this->author = "";
         this->dtype = dtype;
         this->args = args;
         this->returns = returns;

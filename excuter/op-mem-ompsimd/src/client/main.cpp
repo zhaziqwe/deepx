@@ -59,18 +59,36 @@ int main()
             opresp.id = op.id;
             opresp.recv_at = op.recv_at;
             
-            if (opfactory.ops.find(op.name)==opfactory.ops.end()){
+ 
+            if ( opfactory.op_families.find(op.name)==opfactory.op_families.end()){
                 cerr<<"<op> "<<op.name<<" not found"<<endl;
                 opresp.error("op"+op.name+" not found");
                 continue;
+            } 
+            auto op_family = *(opfactory.op_families.find(op.name)->second);
+            string op_author_name= op.author;
+            if (op.author==""){
+                op_author_name= op_family._default;
+                if (op_author_name=="" && op_family.op_authors.size()>0){
+                    op_author_name=op_family.op_authors.begin()->first;
+                }else{
+                    cerr<<"<op> "<<op.name<<" no author implement"<<endl;
+                    opresp.error("op"+op.name+" no author implement");
+                    continue;
+                }
             }
-            auto &type_map = opfactory.ops.find(op.name)->second;
-            if (type_map.find(op.dtype)==type_map.end()){
+            if (op_family.op_authors.find(op_author_name)==op_family.op_authors.end()){
+                cerr<<"<op> "<<op.name<<" "<<op_author_name<<" not found"<<endl;
+                opresp.error("op"+op.name+" "+op_author_name+" not found");
+                continue;
+            }
+            auto &type_map =*(op_family.op_authors.find(op_author_name)->second);
+            if (type_map.ops.find(op.dtype)==type_map.ops.end()){
                 cerr<<"<op>"<<op.name<<" "<<op.dtype<<" not found"<<endl;
                  opresp.error("op"+op.dtype+" not found");
                  continue;
             }
-            auto src = type_map.find(op.dtype)->second;
+            auto src = type_map.ops.find(op.dtype)->second;
 
             (*src).init(op.name, op.dtype, op.args, op.returns, op.grad, op.args_grad, op.returns_grad);
             memmutex.lock();

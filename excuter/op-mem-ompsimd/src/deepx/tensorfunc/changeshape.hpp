@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "deepx/tensor.hpp"
+#include "deepx/tensorfunc/new.hpp"
 #include "deepx/shape_broadcast.hpp"
 
 namespace deepx::tensorfunc

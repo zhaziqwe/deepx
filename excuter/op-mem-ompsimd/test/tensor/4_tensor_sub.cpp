@@ -47,7 +47,7 @@ void test_sub_scalar(){
     Tensor<float> a=New<float>(shape);
     std::iota(a.data,a.data+a.shape.size,1.0f);
     print(a);
-    sub(a, 100.0f,a);
+    subscalar(a, 100.0f,a);
     print(a);
 }
 int main(int argc, char** argv){

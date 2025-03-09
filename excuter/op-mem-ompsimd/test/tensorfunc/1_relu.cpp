@@ -6,7 +6,7 @@
 #include "deepx/tensorfunc/init.hpp"
 #include "deepx/tensor.hpp"
 #include "deepx/op/op.hpp"
-#include "deepx/op/reduce.hpp"
+#include "deepx/op/elementwise.hpp"
  
 using namespace deepx::op;
 using namespace deepx;
@@ -40,7 +40,8 @@ void test_max()
     mem.addtensor("b.grad", b_grad);
 
 
-    op::Max<float> max({"a", "b"}, {"c"}, true, {"a.grad", "b.grad"}, {"c.grad"});
+    op::Max<float> max;
+    max.init("max", "float32", {"a", "b"}, {"c"}, true, {"a.grad", "b.grad"}, {"c.grad"});
     max.forward(mem);
     cout << "c: " << endl;
     print(*mem.gettensor<float>("c").get());

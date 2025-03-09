@@ -2,7 +2,6 @@
 #include "deepx/tensorfunc/elementwise.hpp"
 
 #include "deepx/tensor.hpp"
-#include "deepx/tensorfunc/compare.hpp"
 #include "deepx/tensorfunc/init.hpp"
 #include "deepx/tensorfunc/print.hpp"
 #include "deepx/tensorfunc/new.hpp"
