@@ -55,32 +55,35 @@ int main()
                 cout << "~" << op.to_string() << endl;
             }
 
-            std::string resp = to_string(op.id);
-            resp+="recv_at:";
-            resp+=to_string(op.recv_at.time_since_epoch().count());
+            deepx::op::OpResp opresp;
+            opresp.id = op.id;
+            opresp.recv_at = op.recv_at;
+            
             if (opfactory.ops.find(op.name)==opfactory.ops.end()){
                 cerr<<"<op> "<<op.name<<" not found"<<endl;
-                resp+="error op not found";
+                opresp.error("op"+op.name+" not found");
+                continue;
             }
             auto &type_map = opfactory.ops.find(op.name)->second;
             if (type_map.find(op.dtype)==type_map.end()){
                 cerr<<"<op>"<<op.name<<" "<<op.dtype<<" not found"<<endl;
-                resp+="error dtype not found";
+                 opresp.error("op"+op.dtype+" not found");
+                 continue;
             }
             auto src = type_map.find(op.dtype)->second;
 
             (*src).init(op.name, op.dtype, op.args, op.returns, op.grad, op.args_grad, op.returns_grad);
             memmutex.lock();
+            opresp.start_at= chrono::system_clock::now();
             if (op.grad) {
                 (*src).backward(mem);
             }else {
             (*src).forward(mem);
             }
+            opresp.finish("");
             memmutex.unlock();
-            resp+=" success";
-            server.resp(resp);
+            server.resp(opresp.to_string());
         }
     }
-
     return 0;
 }

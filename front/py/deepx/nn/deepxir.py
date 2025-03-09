@@ -1,5 +1,6 @@
 from typing import Tuple, List, Optional
 import time
+from datetime import datetime  # 添加datetime模块
 
 class DeepxIR:
     def __init__(self, 
@@ -72,3 +73,61 @@ class DeepxIR:
         parts.append(f"sent_at={self._sent_at}")
         return ' '.join(parts)
 
+class DeepxIRResp:
+    #'1 ok examplemsg // recv_at=1741494459006 start_at=1741494459006 finish_at=1741494459006'
+    def __init__(self,s:str):
+        self._id=None
+        self._result=""
+        self._message=''
+        #extra info
+        self._recv_at=None  
+        self._start_at=None
+        self._finish_at=None
+        
+        # 解析响应字符串
+        if s and isinstance(s, str):
+            # 首先按 "//" 分割为前后两部分
+            parts = s.split("//", 1)
+            
+            if len(parts) >= 1:
+                # 处理前半部分 ID、结果和消息
+                front_parts = parts[0].strip().split(" ", 2)
+                
+                if len(front_parts) >= 1:
+                    self._id = front_parts[0]
+                
+                if len(front_parts) >= 2:
+                    self._result = front_parts[1]
+                
+                if len(front_parts) >= 3:
+                    self._message = front_parts[2]
+            
+            # 处理后半部分的时间戳信息
+            if len(parts) >= 2:
+                extra_info = parts[1].strip()
+                extra_parts = extra_info.split()
+                
+                for part in extra_parts:
+                    if "=" in part:
+                        key, value = part.split("=", 1)
+                        if key == "recv_at":
+                            # 将毫秒时间戳转换为datetime对象
+                            self._recv_at = datetime.fromtimestamp( float(value) / 1000.0)
+                        elif key == "start_at":
+                            self._start_at =datetime.fromtimestamp( float(value) / 1000.0)
+                        elif key == "finish_at":
+                            self._finish_at = datetime.fromtimestamp( float(value) / 1000.0)
+ 
+    def __str__(self) -> str:
+        parts=[]
+        parts.append(self._id)
+        parts.append(self._result)
+        parts.append(self._message)
+        parts.append("//")
+        if self._recv_at is not None:
+            parts.append(f"recv_at={self._recv_at.strftime('%H:%M:%S.%f')[:-3]}")
+        if self._start_at is not None:
+            parts.append(f"start_at={self._start_at.strftime('%H:%M:%S.%f')[:-3]}")
+        if self._finish_at is not None:
+            parts.append(f"finish_at={self._finish_at.strftime('%H:%M:%S.%f')[:-3]}")
+        return ' '.join(parts)

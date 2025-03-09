@@ -4,11 +4,12 @@
 #include <ctime>
 
 #include "op.hpp"
+#include "stdutil/time.hpp"
 namespace deepx::op
 {
     // 与deepx/front/py/deepx/nn/deepxir.py对应
 
-    // 新格式示例：mul@float32 a(a_grad) b(b_grad) -> a(a_grad) //id=1 create_time=1714512000 send_time=1714512000 recv_time=1714512000
+    // 新格式示例：mul@float32 a(a_grad) b(b_grad) -> a(a_grad) //id=1 create_time=1714512000 send_time=1714512000
     void Op::load(const string &input)
     {
         // 分割元数据部分
@@ -180,22 +181,7 @@ namespace deepx::op
             }
         }
     }
-    static std::string format_time(const system_clock::time_point &tp)
-    {
-        using namespace std::chrono;
-        auto ms = duration_cast<microseconds>(tp.time_since_epoch());
-        auto sec = duration_cast<seconds>(ms);
-        ms -= sec;
-
-        std::time_t t = sec.count();
-        std::tm tm;
-        localtime_r(&t, &tm); // 线程安全版本
-
-        std::ostringstream oss;
-        oss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S")
-            << '.' << std::setfill('0') << std::setw(6) << ms.count();
-        return oss.str();
-    }
+    
     std::string Op::to_string(bool show_extra) const
     {
         std::stringstream ss;
@@ -226,9 +212,8 @@ namespace deepx::op
         if (show_extra)
         {
             ss << "//id=" << id
-               << " created_at=" << format_time(created_at)
-               << " sent_at=" << format_time(sent_at)
-               << " recv_at=" << format_time(recv_at);
+               << " created_at=" << stdutil::format_time(created_at)
+               << " sent_at=" << stdutil::format_time(sent_at);
         }
         return ss.str();
     }

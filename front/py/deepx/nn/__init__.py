@@ -1,5 +1,5 @@
-from .deepxir import DeepxIR
+from .deepxir import *
 
 __all__ = [
-    "DeepxIR"
+    "DeepxIR","DeepxIRResp"
     ]

@@ -10,13 +10,29 @@ namespace deepx::tensorfunc
 {
     using namespace hwy::HWY_NAMESPACE;
  
+    
+    template<typename T>
+    void add(const T a, const T b, T &c){
+        c = a + b;
+    }
 
-    template <typename T>
-    void add(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
+    template<typename T>
+    void addsimd(const T* a, const T* b, T* c, const size_t size){
+        const ScalableTag<T> tag;
+        auto vec1 = Load(tag, a);
+        auto vec2 = Load(tag, b);
+        auto vec_result = Add(vec1, vec2);
+        Store(vec_result, tag, c);
+    }
+    
+    // 通用元素级操作模板
+    template <typename T, typename ScalarOpFunc, typename SimdOpFunc>
+    void elementwise_A_B_C(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C,
+                          ScalarOpFunc scalar_op, SimdOpFunc simd_op)
     {
         if (A.shape == B.shape && A.shape == C.shape)
         {
-            C.shape.rangeParallel(C.shape.dim - 1, [&A, &B, &C](int i)
+            C.shape.rangeParallel(C.shape.dim - 1, [&A, &B, &C, &scalar_op, &simd_op](int i)
                                   {
                                       int shape_last = C.shape[-1];
                                       const ScalableTag<T> tag;
@@ -26,7 +42,9 @@ namespace deepx::tensorfunc
                                       // 1. 处理前置未对齐部分
                                       while (j < shape_last && !IsAligned(tag, A.data + i + j))
                                       {
-                                          C.data[i + j] = A.data[i + j] + B.data[i + j];
+                                          T c;
+                                          scalar_op(A.data[i + j], B.data[i + j], c);
+                                          C.data[i + j] = c;
                                           ++j;
                                       }
 
@@ -34,22 +52,38 @@ namespace deepx::tensorfunc
                                       size_t aligned_end = shape_last - (shape_last % lanes);
                                       for (; j + lanes <= aligned_end; j += lanes)
                                       {
-                                          auto vec1 = Load(tag, A.data + i + j);
-                                          auto vec2 = Load(tag, B.data + i + j);
-                                          auto vec_result = Add(vec1, vec2);
-                                          Store(vec_result, tag, C.data + i + j);
+                                          simd_op(A.data + i + j, B.data + i + j, C.data + i + j, lanes);
                                       }
 
                                       // 3. 处理尾部剩余元素
                                       for (; j < shape_last; j++)
                                       {
-                                          C.data[i + j] = A.data[i + j] + B.data[i + j];
+                                          T c;
+                                          scalar_op(A.data[i + j], B.data[i + j], c);
+                                          C.data[i + j] = c;
                                       } });
         }
         else
         {
             throw std::invalid_argument("shape mismatch");
         }
+    }
+
+    // 使用通用模板实现add函数
+    template <typename T>
+    void add(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
+    {
+        elementwise_A_B_C<T>(A, B, C, 
+            // 标量操作
+            [](const T& a, const T& b, T& c) { c = a + b; },
+            // SIMD操作
+            [](const T* a, const T* b, T* c, size_t size) {
+                const ScalableTag<T> tag;
+                auto vec1 = Load(tag, a);
+                auto vec2 = Load(tag, b);
+                auto vec_result = Add(vec1, vec2);
+                Store(vec_result, tag, c);
+            });
     }
 
     // float特化

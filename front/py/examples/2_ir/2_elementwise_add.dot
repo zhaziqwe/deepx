@@ -1,0 +1,31 @@
+// Computational Graph
+digraph {
+	rankdir=TB
+	node [shape=record]
+	126596790137952 [label="t1
+(2, 3, 4)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	126598789456288 [label=constant color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	126596790138480 [label="var_1
+10" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	126596789134640 [label="t2
+(2, 3, 4)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	126596789135936 [label=constant color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	126596789135792 [label="var_2
+10" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	126596789135312 [label=add color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	126596789136128 [label="t3
+(2, 3, 4)" color=skyblue fillcolor=aliceblue fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	126596789136320 [label=add_scalar color=darkslategray fillcolor=lightgray fontname="Courier Bold" labeljust=l shape=box style=filled]
+	126596789136272 [label="var_3
+0.5" color=orange fillcolor=moccasin fontname="Sans-Serif" labeljust=l shape=box style=filled]
+	126598789456288 -> 126596790137952 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	126596790138480 -> 126598789456288 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	126596789135936 -> 126596789134640 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	126596789135792 -> 126596789135936 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	126596790137952 -> 126596789135312 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	126596789134640 -> 126596789135312 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	126596789135312 -> 126596789136128 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	126596789136320 -> 126596789136128 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	126596789136128 -> 126596789136320 [arrowsize=0.8 color=gray40 penwidth=1.2]
+	126596789136272 -> 126596789136320 [arrowsize=0.8 color=gray40 penwidth=1.2]
+}

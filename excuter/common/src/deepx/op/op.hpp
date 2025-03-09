@@ -99,5 +99,50 @@ namespace deepx::op
             return deepx::dtype<T>::name();
         }
     };
+
+    class OpResp
+    {
+    public:
+        int id;
+        string result;
+        system_clock::time_point recv_at;
+        system_clock::time_point start_at;
+        system_clock::time_point finish_at;
+        string message;
+    public:
+        OpResp() = default;
+        OpResp(const OpResp &) = default;
+        OpResp &operator=(const OpResp &) = default;
+ 
+        std::string to_string() const{
+            std::stringstream stream;
+            stream << id << " " << result;
+            stream << "// recv_at=";
+            stream << duration_cast<milliseconds>(recv_at.time_since_epoch()).count();
+            stream << " start_at=";
+            stream << duration_cast<milliseconds>(start_at.time_since_epoch()).count();
+            stream << " finish_at=";    
+            stream << duration_cast<milliseconds>(finish_at.time_since_epoch()).count();
+            if (message.size()>0){
+                stream << " "<< message;
+            }
+            return stream.str();
+        }
+        void init(int id,system_clock::time_point recv_at){
+            this->id = id;
+            this->recv_at = recv_at;
+        }
+        void finish(const string &message){
+            this->result = "ok";
+            this->finish_at = system_clock::now();
+            this->message = message;
+        }
+        void error(const string &message){
+            this->result = "error";
+            this->finish_at = system_clock::now();
+            this->message = message;
+        }
+    };
+
 }
 #endif
