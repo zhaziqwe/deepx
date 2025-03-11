@@ -3,11 +3,12 @@
 
 #include "deepx/tensor.hpp"
 #include "deepx/tensorfunc/elementwise.hpp"
+#include "deepx/tensorfunc/elementwise_miaobyte.hpp"
 #include "deepx/tensorfunc/print.hpp"
 #include "deepx/tensorfunc/new.hpp"
 #include "deepx/tensorfunc/init.hpp"
-
 #include "tensorutil.hpp"
+#include "deepx/tensorfunc/authors.hpp"
 using namespace deepx;
 using namespace deepx::tensorfunc;
 using namespace std;
@@ -20,7 +21,7 @@ void test_add_inplace(){
     std::iota(b_int16.data,b_int16.data+b_int16.shape.size,2);
     print(a_int16,"%d");
     print(b_int16,"%d");
-    add(a_int16, b_int16,a_int16);  
+    add<tensorfunc::miaobyte,int16_t>(a_int16, b_int16,a_int16);  
     print(a_int16,"%d");
 
     Tensor<int8_t> a_int8=New<int8_t>(shape);   
@@ -29,7 +30,7 @@ void test_add_inplace(){
     std::iota(b_int8.data,b_int8.data+b_int8.shape.size,2);
     print(a_int8,"%d");
     print(b_int8,"%d");
-    add(a_int8, b_int8,a_int8);
+    add<tensorfunc::miaobyte,int8_t>(a_int8, b_int8,a_int8);
     print(a_int8,"%d");
 }
 void test_add_inplace_1(){
@@ -39,7 +40,7 @@ void test_add_inplace_1(){
     std::iota(b.data,b.data+b.shape.size,101.0f);
     print(a);
     print(b);
-    add(a, b,a);  
+    add<tensorfunc::miaobyte,float>(a, b,a);  
     print(a);
 }
 void test_add_inplace_scalar(){
@@ -47,7 +48,7 @@ void test_add_inplace_scalar(){
     std::iota(a.data,a.data+a.shape.size,1.0f);
     cout<<"a"<<endl;
     print(a);
-    addscalar(a, 100.0f,a);
+    addscalar<tensorfunc::miaobyte,float>(a, 100.0f,a);
     cout<<"a"<<endl;
     print(a);
 }

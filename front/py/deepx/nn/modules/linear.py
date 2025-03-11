@@ -2,6 +2,7 @@ from .module import Module
 from deepx  import Tensor
 from deepx.nn.functional import uniform,kaiming_uniform_,calculate_fan_in_and_fan_out
 import math
+
 class Linear(Module):
     r'''
     copy from torch.nn.Linear

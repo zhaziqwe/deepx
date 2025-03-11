@@ -71,7 +71,7 @@ void test_max_scalar()
     Tensor<float> a_grad = New<float>({1, 2, 3});
     mem.addtensor("a.grad", a_grad);
 
-    op::Max_scalar<float> max_scalar({"a", "b"}, {"c"}, true);
+    op::Maxscalar<tensorfunc::miaobyte,float> max_scalar({"a", "b"}, {"c"}, true);
     max_scalar.forward(mem);
     cout << "a: " << endl;
     print(*mem.gettensor<float>("a").get());

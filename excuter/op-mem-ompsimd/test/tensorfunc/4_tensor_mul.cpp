@@ -3,10 +3,12 @@
 
 #include "deepx/tensor.hpp"
 #include "deepx/tensorfunc/elementwise.hpp"
+#include "deepx/tensorfunc/elementwise_miaobyte.hpp"
 #include "deepx/tensorfunc/print.hpp"
 #include "deepx/tensorfunc/new.hpp"
 #include "deepx/tensorfunc/init.hpp"
 #include "tensorutil.hpp"
+#include "deepx/tensorfunc/authors.hpp"
 using namespace deepx;
 using namespace deepx::tensorfunc;
 
@@ -19,7 +21,7 @@ void test_mul(){
     std::iota(b_int16.data,b_int16.data+b_int16.shape.size,2);
     print(a_int16,"%d");
     print(b_int16,"%d");
-    mul(a_int16, b_int16,a_int16);  
+    mul<tensorfunc::miaobyte,int16_t>(a_int16, b_int16,a_int16);  
     print(a_int16,"%d");
 
     Tensor<float> a_float=New<float>(shape);
@@ -28,7 +30,7 @@ void test_mul(){
     std::iota(b_float.data,b_float.data+b_float.shape.size,2.0f);
     print(a_float);
     print(b_float);
-    mul(a_float, b_float,a_float);  
+    mul<tensorfunc::miaobyte,float>(a_float, b_float,a_float);  
     print(a_float);
 }
 void test_mul_1(){
@@ -39,7 +41,7 @@ void test_mul_1(){
     std::iota(b.data,b.data+b.shape.size,101.0f);
     print(a);
     print(b);
-    mul(a, b,a);  
+    mul<tensorfunc::miaobyte,float>(a, b,a);  
     print(a);
 }
 void test_muladd(){
@@ -52,9 +54,9 @@ void test_muladd(){
     arange(b,101.0f);
     print(a);
     print(b);
-    mulscalaradd(a, 2.0f, b, -1.0f,c);
+    mulscalaradd<tensorfunc::miaobyte,float>(a, 2.0f, b, -1.0f,c);
     print(c);
-    mulscalaradd(a, 2.0f, b, -1.0f,a);
+    mulscalaradd<tensorfunc::miaobyte,float>(a, 2.0f, b, -1.0f,a);
     print(a);
 }
 void test_mul_scalar(){
@@ -62,7 +64,7 @@ void test_mul_scalar(){
     Tensor<float> a=New<float>(shape);
     std::iota(a.data,a.data+a.shape.size,1.0f);
     print(a);
-    mulscalar(a, 100.0f,a);
+    mulscalar<tensorfunc::miaobyte,float>(a, 100.0f,a);
     print(a);
 }
 int main(int argc, char** argv){

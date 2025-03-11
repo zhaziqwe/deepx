@@ -6,6 +6,10 @@
 #include "deepx/tensorfunc/new.hpp"
 #include "deepx/tensorfunc/init.hpp"
 #include "deepx/tensorfunc/elementwise.hpp"
+#include "deepx/tensorfunc/elementwise_cblas.hpp"
+#include "deepx/tensorfunc/elementwise_miaobyte.hpp"
+#include "deepx/tensorfunc/authors.hpp"
+
 using namespace deepx;
 using namespace deepx::tensorfunc;
 
@@ -43,7 +47,7 @@ void bench_broadcast_add(int i){
     uniform(other,0.0f,1.0f);
     std::cout <<  "broadcast add "<<tensor.shape.shape<<std::endl;
     auto start = std::chrono::high_resolution_clock::now();
-    add(tensor, other,tensor);
+    add<tensorfunc::cblas,float>(tensor, other,tensor);
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
     std::cout << "time:" << duration.count() << " seconds" << std::endl;
@@ -55,7 +59,7 @@ void bench_broadcast_mul(int i){
     uniform(other,0.0f,1.0f);
     std::cout <<  "broadcast mul "<<tensor.shape.shape<<std::endl;
     auto start = std::chrono::high_resolution_clock::now();
-    mul(tensor, other,tensor);
+    mul<tensorfunc::miaobyte,float>(tensor, other,tensor);
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
     std::cout << "time:" << duration.count() << " seconds" << std::endl;
@@ -76,5 +80,4 @@ int main(int argc, char **argv)
     default:
         bench_broadcast(i);
     }
- 
 }

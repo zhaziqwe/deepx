@@ -73,7 +73,7 @@ def _A_v_reduceop_C(
 
 #max
 
-OpNode.register("reduce_max")
+OpNode.register("reducemax")
 def reduce_max(
         a:Tensor,
         dim:list[int] = None,
@@ -82,7 +82,7 @@ def reduce_max(
     return _A_v_reduceop_C(a,dim,keepdim,"max",out)
  
 #min    
-OpNode.register("reduce_min")
+OpNode.register("reducemin")
 def reduce_min(
         a:Tensor,
         dim:list[int] = None,

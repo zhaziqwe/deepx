@@ -1,138 +1,118 @@
 #ifndef DEEPX_TENSORFUNC_ELEMENTWISE_CBLAS_HPP
 #define DEEPX_TENSORFUNC_ELEMENTWISE_CBLAS_HPP
 
+#include "cblas.h"
+
 #include "deepx/tensor.hpp"
 #include "stdutil/error.hpp"
-
+#include "deepx/tensorfunc/elementwise.hpp"
+#include "deepx/tensorfunc/authors.hpp"
 namespace deepx::tensorfunc
 {
-    // 使用通用模板实现add函数
-    template <typename T>
-    void add_cblas(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
-    {
-        throw NotImplementError("add_cblas");
-    }
 
     // float特化
     template <>
-    void add_cblas<float>(const Tensor<float> &A, const Tensor<float> &B, Tensor<float> &C)
+    struct _add_func<cblas, float>
     {
-        if (A.shape == B.shape && A.shape == C.shape)
+        static void func(const Tensor<float> &A, const Tensor<float> &B, Tensor<float> &C)
         {
-
-            // 先复制A到C，再累加B (C = 1*A + 1*B)
-            if (std::addressof(A) != std::addressof(C))
+            if (A.shape == B.shape && A.shape == C.shape)
             {
-                cblas_scopy(A.shape.size, A.data, 1, C.data, 1);
+
+                // 先复制A到C，再累加B (C = 1*A + 1*B)
+                if (std::addressof(A) != std::addressof(C))
+                {
+                    cblas_scopy(A.shape.size, A.data, 1, C.data, 1);
+                }
+                cblas_saxpy(B.shape.size, 1.0f, B.data, 1, C.data, 1);
             }
-            cblas_saxpy(B.shape.size, 1.0f, B.data, 1, C.data, 1);
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
+    };
 
     // double特化
     template <>
-    void add_cblas<double>(const Tensor<double> &A, const Tensor<double> &B, Tensor<double> &C)
+    struct _add_func<cblas, double>
     {
-        if (A.shape == B.shape && A.shape == C.shape)
+        static void func(Tensor<double> &A, const Tensor<double> &B, Tensor<double> &C)
         {
-            if (std::addressof(A) != std::addressof(C))
+            if (A.shape == B.shape && A.shape == C.shape)
             {
-                cblas_dcopy(A.shape.size, A.data, 1, C.data, 1);
+                if (std::addressof(A) != std::addressof(C))
+                {
+                    cblas_dcopy(A.shape.size, A.data, 1, C.data, 1);
+                }
+                cblas_daxpy(B.shape.size, 1.0, B.data, 1, C.data, 1);
             }
-            cblas_daxpy(B.shape.size, 1.0, B.data, 1, C.data, 1);
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
-
-    template <typename T>
-    void sub_cblas(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
-    {
-        throw NotImplementError("sub_cblas");
-    }
-
- 
+    };
     template <>
-    void sub_cblas<float>(const Tensor<float> &A, const Tensor<float> &B, Tensor<float> &C)
+    struct _author_add<cblas>
     {
-        if (A.shape == B.shape && A.shape == C.shape)
+        template <typename T>
+        static void add(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
         {
-            if (std::addressof(A) != std::addressof(C))
-            {
-                cblas_scopy(A.shape.size, A.data, 1, C.data, 1);
-            }
-            cblas_saxpy(B.shape.size, 1.0, B.data, 1, C.data, 1);
+            _add_func<cblas, T>::func(A, B, C);
         }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
+    };
 
+    // float特化
     template <>
-    void sub_cblas<double>(const Tensor<double> &A, const Tensor<double> &B, Tensor<double> &C)
+    struct _sub_func<cblas, float>
     {
-        if (A.shape == B.shape && A.shape == C.shape)
+        static void func(const Tensor<float> &A, const Tensor<float> &B, Tensor<float> &C)
         {
-            if (std::addressof(A) != std::addressof(C))
+            // 先复制A到C，再累加B (C = 1*A - 1*B)
+            if (A.shape == B.shape && A.shape == C.shape)
             {
-                cblas_dcopy(A.shape.size, A.data, 1, C.data, 1);
+                if (std::addressof(A) != std::addressof(C))
+                {
+                    cblas_scopy(A.shape.size, A.data, 1, C.data, 1);
+                }
+                cblas_saxpy(B.shape.size, 1.0, B.data, 1, C.data, 1);
             }
-            cblas_daxpy(B.shape.size, 1.0, B.data, 1, C.data, 1);
-        }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
-
-    template <typename T>
-    void subscalar_cblas(const Tensor<T> &A, const T value, Tensor<T> &C)
-    {
-        throw NotImplementError("subscalar_cblas");
-    }
-
-   template <>
-    void subscalar_cblas<float>(const Tensor<float> &A, const float value, Tensor<float> &C)
-    {
-        if (A.shape == C.shape)
-        {
-            if (std::addressof(A) != std::addressof(C))
+            else
             {
-                cblas_scopy(A.shape.size, A.data, 1, C.data, 1);
+                throw std::invalid_argument("shape mismatch");
             }
-            cblas_saxpy(A.shape.size, 1.0, A.data, 1, C.data, 1);
         }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
+    };
 
+    // double特化
     template <>
-    void subscalar_cblas<double>(const Tensor<double> &A, const double value, Tensor<double> &C)
+    struct _sub_func<cblas, double>
     {
-        if (A.shape == C.shape)
+        static void func(const Tensor<double> &A, const Tensor<double> &B, Tensor<double> &C)
         {
-            if (std::addressof(A) != std::addressof(C))
+            if (A.shape == B.shape && A.shape == C.shape)
             {
-                cblas_dcopy(A.shape.size, A.data, 1, C.data, 1);
+                if (std::addressof(A) != std::addressof(C))
+                {
+                    cblas_dcopy(A.shape.size, A.data, 1, C.data, 1);
+                }
+                cblas_daxpy(B.shape.size, 1.0, B.data, 1, C.data, 1);
             }
-            cblas_daxpy(A.shape.size, 1.0, A.data, 1, C.data, 1);
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
+    };
+    template <>
+    struct _author_sub<cblas>
+    {
+        template <typename T>
+        static void sub(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
         {
-            throw std::invalid_argument("shape mismatch");
+            _sub_func<cblas, T>::func(A, B, C);
         }
-    }
-
-     
-    
+    };
 } // namespace deepx::tensorfunc
 #endif // DEEPX_TENSORFUNC_ELEMENTWISE_CBLAS_HPP

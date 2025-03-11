@@ -5,16 +5,17 @@
 #include <cmath>
 #include <hwy/highway.h>
 #include "deepx/tensor.hpp"
+#include "deepx/tensorfunc/authors.hpp"
 
 namespace deepx::tensorfunc
 {
     using namespace hwy::HWY_NAMESPACE;
- 
- 
+
+
     // 通用元素级操作模板
     template <typename T, typename ScalarOpFunc, typename SimdOpFunc>
     void elementwise_A_B_C(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C,
-                          ScalarOpFunc scalar_op, SimdOpFunc simd_op)
+                           ScalarOpFunc scalar_op, SimdOpFunc simd_op)
     {
         if (A.shape == B.shape && A.shape == C.shape)
         {
@@ -55,28 +56,10 @@ namespace deepx::tensorfunc
         }
     }
 
-    // 使用通用模板实现add函数
-    template <typename T>
-    void add_miaobyte(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
-    {
-        elementwise_A_B_C<T>(A, B, C, 
-            // 标量操作
-            [](const T& a, const T& b, T& c) { c = a + b; },
-            // SIMD操作
-            [](const T* a, const T* b, T* c, size_t size) {
-                const ScalableTag<T> tag;
-                auto vec1 = Load(tag, a);
-                auto vec2 = Load(tag, b);
-                auto vec_result = Add(vec1, vec2);
-                Store(vec_result, tag, c);
-            });
-    }
-
- 
-  // 通用元素级操作模板
+    // 通用元素级操作模板
     template <typename T, typename ScalarOpFunc, typename SimdOpFunc>
     void elementwise_A_b_C(const Tensor<T> &A, const T b, Tensor<T> &C,
-                          ScalarOpFunc scalar_op, SimdOpFunc simd_op)
+                           ScalarOpFunc scalar_op, SimdOpFunc simd_op)
     {
         if (A.shape == C.shape)
         {
@@ -117,155 +100,136 @@ namespace deepx::tensorfunc
         }
     }
 
-    //addscalar
-    //A+value=C
-    template <typename T>
-    void addscalar_miaobyte(const Tensor<T> &A, const T value, Tensor<T> &C)
+    // 通用实现
+    template <>
+    struct _author_add<miaobyte>
     {
-        elementwise_A_b_C<T>(A, value, C,
-            // 标量操作
-            [](const T& a, const T& b, T& c) { c = a + b; },
-            // SIMD操作
-            [](const T* a, const T b, T* c, size_t size) {
+        template <typename T>
+        static void add(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
+        {
+
+            elementwise_A_B_C<T>(A, B, C,
+                                 // 标量操作
+                                 [](const T &a, const T &b, T &c)
+                                 { c = a + b; },
+                                 // SIMD操作
+                                 [](const T *a, const T *b, T *c, size_t size)
+                                 {
+                const ScalableTag<T> tag;
+                auto vec1 = Load(tag, a);
+                auto vec2 = Load(tag, b);
+                auto vec_result = Add(vec1, vec2);
+                Store(vec_result, tag, c); });
+        }
+
+        template <typename T>
+        static void addscalar(const Tensor<T> &A, const T value, Tensor<T> &C)
+        {
+            elementwise_A_b_C<T>(A, value, C,
+                                 // 标量操作
+                                 [](const T &a, const T &b, T &c)
+                                 { c = a + b; },
+                                 // SIMD操作
+                                 [](const T *a, const T b, T *c, size_t size)
+                                 {
                 const ScalableTag<T> tag;
                 auto vec1 = Load(tag, a);
                 auto scalar = Set(tag, b);
                 auto vec_result = Add(vec1, scalar);
-                Store(vec_result, tag, c);
-            });
-    }
+                Store(vec_result, tag, c); });
+        }
+    };
 
-    template <typename T>
-    void sub_miaobyte(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
+    // 添加 sub 的模板特化实现
+    template <>
+    struct _author_sub<miaobyte>
     {
-        if (A.shape == B.shape && A.shape == C.shape)
+        template <typename T>
+        static void sub(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
         {
-            C.shape.rangeParallel(C.shape.dim - 1, [&A, &B, &C](int i)
-                                  {
-                int shape_last=C.shape[-1];
-                const ScalableTag<T> tag;
-                const size_t lanes = Lanes(tag);
-                size_t j=0;
-
-                // 1. 处理前置未对齐部分
-                while (j < shape_last && !IsAligned(tag,A.data + i + j)) {
-                    C.data[i+j] = A.data[i+j] - B.data[i+j];
-                    ++j;
-                }
-
-                // 2. 处理中间对齐部分
-                size_t aligned_end=shape_last-(shape_last%lanes);
-                for (; j+lanes<=aligned_end; j +=  lanes  )
-                {
-                    auto vec1 = Load(tag, A.data + i + j);
-                    auto vec2 = Load(tag, B.data + i + j);
-                    auto vec_result = Sub(vec1, vec2);
-                    Store(vec_result, tag, C.data + i + j);
-                }
-
-                // 3. 处理尾部剩余元素
-                for (;j<shape_last;j++)
-                {
-                    C.data[i+j] = A.data[i+j] - B.data[i+j];
-                } });
+            elementwise_A_B_C<T>(A, B, C,
+                                 // 标量操作
+                                 [](const T &a, const T &b, T &c)
+                                 { c = a - b; },
+                                 // SIMD操作
+                                 [](const T *a, const T *b, T *c, size_t size)
+                                 {
+                                    const ScalableTag<T> tag;
+                                    auto vec1 = Load(tag, a);
+                                    auto vec2 = Load(tag, b);
+                                    auto vec_result = Sub(vec1, vec2);
+                                    Store(vec_result, tag, c); });
         }
-        else
+
+        template <typename T>
+        static void subscalar(const Tensor<T> &A, const T value, Tensor<T> &C)
         {
-            throw std::invalid_argument("shape mismatch");
+            elementwise_A_b_C<T>(A, value, C,
+                                 // 标量操作
+                                 [](const T &a, const T &b, T &c)
+                                 { c = a - b; },
+                                 // SIMD操作
+                                 [](const T *a, const T b, T *c, size_t size)
+                                 {
+                                    const ScalableTag<T> tag;
+                                    auto vec1 = Load(tag, a);
+                                    auto scalar = Set(tag, b);
+                                    auto vec_result = Sub(vec1, scalar);
+                                    Store(vec_result, tag, c); });
         }
-    }
-   
+    };
 
-    template <typename T>
-    void subscalar_miaobyte(const Tensor<T> &input, const T value, Tensor<T> &output)
+    // 添加 mul 的模板特化实现
+    template <>
+    struct _author_mul<miaobyte>
     {
-        if (input.shape == output.shape)
+        template <typename T>
+        static void mul(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
         {
-            output.shape.rangeParallel(output.shape.dim - 1, [&input, &output, &value](int i)
-                                       {
-                int shape_last=output.shape[-1];
-                const ScalableTag<T> tag;
-                const size_t lanes = Lanes(tag);
-                size_t j=0;
-
-                // 1. 处理前置未对齐部分
-                while (j < shape_last && !IsAligned(tag,input.data + i + j)) {
-                    output.data[i+j] = input.data[i+j] - value;
-                    ++j;
-                }
-
-                // 2. 处理中间对齐部分
-                size_t aligned_end=shape_last-(shape_last%lanes);
-                for (; j+lanes<=aligned_end; j +=  lanes  )
-                {
-                    auto vec = Load(tag, input.data + i + j);
-                    auto scalar = Set(tag, value);
-                    auto vec_result = Sub(vec, scalar);
-                    Store(vec_result, tag, output.data + i + j);
-                }
-
-                // 3. 处理尾部剩余元素
-                for (;j<shape_last;j++)
-                {
-                    output.data[i+j] = input.data[i+j] - value;
-                } });
+            elementwise_A_B_C<T>(A, B, C,
+                                 // 标量操作
+                                 [](const T &a, const T &b, T &c)
+                                 { c = a * b; },
+                                 // SIMD操作
+                                 [](const T *a, const T *b, T *c, size_t size)
+                                 {
+                                    const ScalableTag<T> tag;
+                                    auto vec1 = Load(tag, a);
+                                    auto vec2 = Load(tag, b);
+                                    auto vec_result = Mul(vec1, vec2);
+                                    Store(vec_result, tag, c); });
         }
-        else
+
+        template <typename T>
+        static void mulscalar(const Tensor<T> &A, const T value, Tensor<T> &C)
         {
-            throw std::invalid_argument("shape mismatch");
+            elementwise_A_b_C<T>(A, value, C,
+                                 // 标量操作
+                                 [](const T &a, const T &b, T &c)
+                                 { c = a * b; },
+                                 // SIMD操作
+                                 [](const T *a, const T b, T *c, size_t size)
+                                 {
+                                    const ScalableTag<T> tag;
+                                    auto vec1 = Load(tag, a);
+                                    auto scalar = Set(tag, b);
+                                    auto vec_result = Mul(vec1, scalar);
+                                    Store(vec_result, tag, c); });
         }
-    }
+    };
 
-    
-
-    template <typename T>
-    void mul_miaobyte(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
+    template <>
+    struct _author_muladd<miaobyte>
     {
-        if (A.shape == B.shape && A.shape == C.shape)
+        // A*B+C=D
+        template <typename T>
+        static void muladd(const Tensor<T> &A, const Tensor<T> &B, const Tensor<T> &C,  Tensor<T> &D)
         {
-            C.shape.rangeParallel(C.shape.dim - 1, [&A, &B, &C](int i)
-                                  {
-                int shape_last=C.shape[-1];
-                const ScalableTag<T> tag;
-                const size_t lanes = Lanes(tag);
-                size_t j=0;
 
-                // 1. 处理前置未对齐部分
-                while (j < shape_last && !IsAligned(tag,A.data + i + j)) {
-                    C.data[i+j] = A.data[i+j] * B.data[i+j];
-                    ++j;
-                }
-
-                // 2. 处理中间对齐部分
-                size_t aligned_end=shape_last-(shape_last%lanes);
-                for (; j+lanes<=aligned_end; j +=  lanes  )
-                {
-                    auto vec1 = Load(tag, A.data + i + j);
-                    auto vec2 = Load(tag, B.data + i + j);
-                    auto vec_result = Mul(vec1, vec2);
-                    Store(vec_result, tag, C.data + i + j);
-                }
-
-                // 3. 处理尾部剩余元素
-                for (;j<shape_last;j++)
-                {
-                    C.data[i+j] = A.data[i+j] * B.data[i+j];
-                } });
-        }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
-
-    //A*B+C=D
-    template <typename T>
-    void muladd_miaobyte(const Tensor<T> &A, const Tensor<T> &B, const Tensor<T> &C,const Tensor<T> &D)
-    {
-        if (A.shape == B.shape && A.shape == C.shape && A.shape == D.shape)
-        {
-            D.shape.rangeParallel(D.shape.dim - 1, [&A, &B, &C, &D](int i)
-                                  {
+            if (A.shape == B.shape && A.shape == C.shape && A.shape == D.shape)
+            {
+                D.shape.rangeParallel(D.shape.dim - 1, [&A, &B, &C, &D](int i)
+                                      {
                 int shape_last=D.shape[-1];
                 const ScalableTag<T> tag;
                 const size_t lanes = Lanes(tag);
@@ -293,22 +257,21 @@ namespace deepx::tensorfunc
                 {
                     D.data[i+j] = A.data[i+j] * B.data[i+j] + C.data[i+j];
                 } });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
 
-    //muladd
-    // D = alpha*A*B + beta*C
-   template <typename T>
-    void muladd_miaobyte(const Tensor<T> &A, const Tensor<T> &B,const T alpha, const Tensor<T> &C,const T beta,const Tensor<T> &D)
-    {
-        if (A.shape == B.shape && A.shape == C.shape && A.shape == D.shape)
+        // A*B*alpha+C*beta=D
+        template <typename T>
+        static void muladd(const Tensor<T> &A, const Tensor<T> &B, const T alpha, const Tensor<T> &C, const T beta,  Tensor<T> &D)
         {
-            D.shape.rangeParallel(D.shape.dim - 1, [&A, &B, &alpha, &C, &beta, &D](int i)
-                                  {
+            if (A.shape == B.shape && A.shape == C.shape && A.shape == D.shape)
+            {
+                D.shape.rangeParallel(D.shape.dim - 1, [&A, &B, &alpha, &C, &beta, &D](int i)
+                                      {
                 int shape_last=D.shape[-1];
                 const ScalableTag<T> tag;
                 const size_t lanes = Lanes(tag);
@@ -350,62 +313,21 @@ namespace deepx::tensorfunc
                 {
                     D.data[i+j] = alpha * A.data[i+j] * B.data[i+j] + beta * C.data[i+j];
                 } });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
-    
-    template <typename T>
-    void mulscalar_miaobyte(const Tensor<T> &input, const T value, Tensor<T> &output)
-    {
-        if (input.shape == output.shape)
-        {
-            output.shape.rangeParallel(output.shape.dim - 1, [&input, &output, &value](int i)
-                                       {
-                int shape_last=output.shape[-1];
-                const ScalableTag<T> tag;
-                const size_t lanes = Lanes(tag);
-                size_t j=0;
 
-                // 1. 处理前置未对齐部分
-                while (j < shape_last && !IsAligned(tag,input.data + i + j)) {
-                    output.data[i+j] = input.data[i+j] * value;
-                    ++j;
-                }
-
-                // 2. 处理中间对齐部分
-                size_t aligned_end=shape_last-(shape_last%lanes);
-                for (; j+lanes<=aligned_end; j +=  lanes  )
-                {
-                    auto vec = Load(tag, input.data + i + j);
-                    auto scalar = Set(tag, value);
-                    auto vec_result = Mul(vec, scalar);
-                    Store(vec_result, tag, output.data + i + j);
-                }
-
-                // 3. 处理尾部剩余元素
-                for (;j<shape_last;j++)
-                {
-                    output.data[i+j] = input.data[i+j] * value;
-                } });
-        }
-        else
+        // A*alpha+B*beta=C
+        template <typename T>
+        static void mulscalaradd(const Tensor<T> &A, const T alpha, const Tensor<T> &B, const T beta,  Tensor<T> &C)
         {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
- 
-     //muladd
-    // C= alpha*A+ beta*B
-   template <typename T>
-    void mulscalaradd_miaobyte(const Tensor<T> &A, const T alpha, const Tensor<T> &B,const T beta,const Tensor<T> &C)
-    {
-        if (  A.shape == B.shape && A.shape ==C.shape)
-        {
-            C.shape.rangeParallel(C.shape.dim - 1, [&A,   &alpha, &B, &beta, &C](int i)
-                                  {
+            if (A.shape == B.shape && A.shape == C.shape)
+            {
+                C.shape.rangeParallel(C.shape.dim - 1, [&A, &alpha, &B, &beta, &C](int i)
+                                      {
                 int shape_last=C.shape[-1];
                 const ScalableTag<T> tag;
                 const size_t lanes = Lanes(tag);
@@ -437,285 +359,223 @@ namespace deepx::tensorfunc
                 {
                     C.data[i+j] = alpha * A.data[i+j] + beta * B.data[i+j];
                 } });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
+    };
 
-    //div
-    // C= A/B
-    template <typename T>
-    void div_miaobyte(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
+    // 添加 div 的模板特化实现
+    template <>
+    struct _author_div<miaobyte>
     {
-        if (A.shape == B.shape && A.shape == C.shape)
+        template <typename T>
+        static void div(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
         {
-            C.shape.rangeParallel(C.shape.dim - 1, [&A, &B, &C](int i)
-                                  {
-                int shape_last=C.shape[-1];
-                const ScalableTag<T> tag;
-                const size_t lanes = Lanes(tag);
-                size_t j=0;
-
-                // 1. 处理前置未对齐部分
-                while (j < shape_last && !IsAligned(tag,A.data + i + j)) {
-                    C.data[i+j] = A.data[i+j] / B.data[i+j];
-                    ++j;
-                }
-
-                // 2. 处理中间对齐部分
-                size_t aligned_end=shape_last-(shape_last%lanes);
-                for (; j+lanes<=aligned_end; j +=  lanes  )
-                {
-                    auto vec1 = Load(tag, A.data + i + j);
-                    auto vec2 = Load(tag, B.data + i + j);
-                    auto vec_result = Div(vec1, vec2);
-                    Store(vec_result, tag, C.data + i + j);
-                }
-
-                // 3. 处理尾部剩余元素
-                for (;j<shape_last;j++)
-                {
-                    C.data[i+j] = A.data[i+j] / B.data[i+j];
-                } });
+            elementwise_A_B_C<T>(A, B, C,
+                                 // 标量操作
+                                 [](const T &a, const T &b, T &c)
+                                 { c = a / b; },
+                                 // SIMD操作
+                                 [](const T *a, const T *b, T *c, size_t size)
+                                 {
+                                    const ScalableTag<T> tag;
+                                    auto vec1 = Load(tag, a);
+                                    auto vec2 = Load(tag, b);
+                                    auto vec_result = Div(vec1, vec2);
+                                    Store(vec_result, tag, c); });
         }
-        else
+
+        template <typename T>
+        static void divscalar(const Tensor<T> &A, const T value, Tensor<T> &C)
         {
-            throw std::invalid_argument("shape mismatch");
+            elementwise_A_b_C<T>(A, value, C,
+                                 // 标量操作
+                                 [](const T &a, const T &b, T &c)
+                                 { c = a / b; },
+                                 // SIMD操作
+                                 [](const T *a, const T b, T *c, size_t size)
+                                 {
+                                    const ScalableTag<T> tag;
+                                    auto vec1 = Load(tag, a);
+                                    auto scalar = Set(tag, b);
+                                    auto vec_result = Div(vec1, scalar);
+                                    Store(vec_result, tag, c); });
         }
-    }
-    
-    //divadd
-    // D= A/B+ C
-    template <typename T>
-    void divadd_miaobyte(const Tensor<T> &A, const Tensor<T> &B, const Tensor<T> &C,const Tensor<T> &D)
+
+        template <typename T>
+        static void rdivscalar(const T value, const Tensor<T> &In, Tensor<T> &Out)
+        {
+            elementwise_A_b_C<T>(In, value, Out,
+                                 // 标量操作
+                                 [](const T &a, const T &b, T &c)
+                                 { c = b / a; },
+                                 // SIMD操作
+                                 [](const T *a, const T b, T *c, size_t size)
+                                 {
+                                    const ScalableTag<T> tag;
+                                    auto vec1 = Load(tag, a);
+                                    auto scalar = Set(tag, b);
+                                    auto vec_result = Div(scalar, vec1);
+                                    Store(vec_result, tag, c); });
+        }
+    };
+
+    template <>
+    struct _author_divadd<miaobyte>
     {
-        if (A.shape == B.shape && A.shape == C.shape && A.shape == D.shape)
+
+        // D= A/B+ C
+        template <typename T>
+        static void divadd(const Tensor<T> &A, const Tensor<T> &B, const Tensor<T> &C,   Tensor<T> &D)
         {
-            D.shape.rangeParallel(D.shape.dim - 1, [&A, &B, &C, &D](int i)
-                                  {
-                int shape_last=D.shape[-1];
-                const ScalableTag<T> tag;
-                const size_t lanes = Lanes(tag);
-                size_t j=0;
+            if (A.shape == B.shape && A.shape == C.shape && A.shape == D.shape)
+            {
+                D.shape.rangeParallel(D.shape.dim - 1, [&A, &B, &C, &D](int i)
+                                      {
+                    int shape_last=D.shape[-1];
+                    const ScalableTag<T> tag;
+                    const size_t lanes = Lanes(tag);
+                    size_t j=0;
 
-                // 1. 处理前置未对齐部分
-                while (j < shape_last && !IsAligned(tag,A.data + i + j)) {
-                    D.data[i+j] = A.data[i+j] / B.data[i+j] + C.data[i+j];
-                    ++j;
-                }
+                    // 1. 处理前置未对齐部分
+                    while (j < shape_last && !IsAligned(tag,A.data + i + j)) {
+                        D.data[i+j] = A.data[i+j] / B.data[i+j] + C.data[i+j];
+                        ++j;
+                    }
 
-                // 2. 处理中间对齐部分
-                size_t aligned_end=shape_last-(shape_last%lanes);
-                for (; j+lanes<=aligned_end; j +=  lanes  )
-                {
-                    auto vec1 = Load(tag, A.data + i + j);
-                    auto vec2 = Load(tag, B.data + i + j);
-                    auto vec3 = Load(tag, C.data + i + j);
-                    auto vec_result = Add(Div(vec1, vec2), vec3);
-                    Store(vec_result, tag, D.data + i + j);
-                }
+                    // 2. 处理中间对齐部分
+                    size_t aligned_end=shape_last-(shape_last%lanes);
+                    for (; j+lanes<=aligned_end; j +=  lanes  )
+                    {
+                        auto vec1 = Load(tag, A.data + i + j);
+                        auto vec2 = Load(tag, B.data + i + j);
+                        auto vec3 = Load(tag, C.data + i + j);
+                        auto vec_result = Add(Div(vec1, vec2), vec3);
+                        Store(vec_result, tag, D.data + i + j);
+                    }
 
-                // 3. 处理尾部剩余元素
-                for (;j<shape_last;j++)
-                {
-                    D.data[i+j] = A.data[i+j] / B.data[i+j] + C.data[i+j];
-                } });
+                    // 3. 处理尾部剩余元素
+                    for (;j<shape_last;j++)
+                    {
+                        D.data[i+j] = A.data[i+j] / B.data[i+j] + C.data[i+j];
+                    } });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
+
+        //  C= A/alpha+ B/beta
+        template <typename T>
+        static void divscalaradd(const Tensor<T> &A, const T alpha, const Tensor<T> &B, const T beta,   Tensor<T> &C)
         {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
+            if (A.shape == B.shape && A.shape == C.shape)
+            {
+                C.shape.rangeParallel(C.shape.dim - 1, [&A, &alpha, &B, &beta, &C](int i)
+                                      {
+                    int shape_last=C.shape[-1];
+                    const ScalableTag<T> tag;
+                    const size_t lanes = Lanes(tag);
+                    size_t j=0;
 
-  //divadd
-    // C= A/alpha+ B/beta
-   template <typename T>
-    void divscalaradd_miaobyte(const Tensor<T> &A, const T alpha, const Tensor<T> &B,const T beta,const Tensor<T> &C)
+                    // 1. 处理前置未对齐部分
+                    while (j < shape_last && !IsAligned(tag,A.data + i + j)) {
+                        C.data[i+j] = A.data[i+j] / alpha + B.data[i+j] / beta;
+                        ++j;
+                    }
+
+                    // 2. 处理中间对齐部分
+                    size_t aligned_end=shape_last-(shape_last%lanes);
+                    for (; j+lanes<=aligned_end; j +=  lanes  )
+                    {
+                        auto vec_a = Load(tag, A.data + i + j);
+                        auto alpha_vec = Set(tag, alpha);
+                        vec_a=Div(vec_a,alpha_vec);
+                        auto vec_b = Load(tag, B.data + i + j);
+                        auto beta_vec = Set(tag, beta);
+                        vec_b=Div(vec_b,beta_vec);
+                        auto vec_c = Load(tag, C.data + i + j);
+                        auto vec_result = Add(vec_a, vec_b);
+                        Store(vec_result, tag, C.data + i + j); 
+                    }
+
+                    // 3. 处理尾部剩余元素
+                    for (;j<shape_last;j++)
+                    {
+                        C.data[i+j] = A.data[i+j] / alpha + B.data[i+j] / beta;
+                    } });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
+        }
+
+        // divadd
+        // D= A/B*alpha+ C*beta
+        template <typename T>
+        static void divaddbeta(const Tensor<T> &A, const Tensor<T> &B, const T alpha, const Tensor<T> &C, const T beta,   Tensor<T> &D)
+        {
+            if (A.shape == B.shape && A.shape == C.shape && A.shape == D.shape)
+            {
+                D.shape.rangeParallel(D.shape.dim - 1, [&A, &alpha, &B, &beta, &C, &D](int i)
+                                      {
+                    int shape_last=D.shape[-1];
+                    const ScalableTag<T> tag;
+                    const size_t lanes = Lanes(tag);
+                    size_t j=0;
+
+                    // 1. 处理前置未对齐部分
+                    while (j < shape_last && !IsAligned(tag,A.data + i + j)) {
+                        D.data[i+j] = A.data[i+j] / B.data[i+j] * alpha + C.data[i+j] * beta;
+                        ++j;
+                    }
+
+                    // 2. 处理中间对齐部分
+                    size_t aligned_end=shape_last-(shape_last%lanes);
+                    for (; j+lanes<=aligned_end; j +=  lanes  )
+                    {
+                        auto vec_a = Load(tag, A.data + i + j);
+                        auto vec_b = Load(tag, B.data + i + j);
+                        auto vec_c = Load(tag, C.data + i + j);
+                        auto vec_d = Load(tag, D.data + i + j);
+                        auto alpha_vec = Set(tag, alpha);
+                        vec_a=Div(vec_a,vec_b);
+                        vec_a=Mul(vec_a,alpha_vec);
+                        auto beta_vec = Set(tag, beta);
+                        vec_c=Mul(vec_c,beta_vec);
+                        auto vec_result = Add(vec_a, vec_c);
+                        Store(vec_result, tag, D.data + i + j); 
+                    }
+
+                    // 3. 处理尾部剩余元素
+                    for (;j<shape_last;j++)
+                    {
+                        D.data[i+j] = A.data[i+j] / B.data[i+j] * alpha + C.data[i+j] * beta;
+                    } });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
+        }
+    };
+
+    template <>
+    struct _author_sqrt<miaobyte>
     {
-        if (  A.shape == B.shape && A.shape ==C.shape)
+        template <typename T>
+        static void sqrt(const Tensor<T> &input, Tensor<T> &output)
         {
-            C.shape.rangeParallel(C.shape.dim - 1, [&A,   &alpha, &B, &beta, &C](int i)
-                                  {
-                int shape_last=C.shape[-1];
-                const ScalableTag<T> tag;
-                const size_t lanes = Lanes(tag);
-                size_t j=0;
 
-                // 1. 处理前置未对齐部分
-                while (j < shape_last && !IsAligned(tag,A.data + i + j)) {
-                    C.data[i+j] = A.data[i+j] / alpha + B.data[i+j] / beta;
-                    ++j;
-                }
-
-                // 2. 处理中间对齐部分
-                size_t aligned_end=shape_last-(shape_last%lanes);
-                for (; j+lanes<=aligned_end; j +=  lanes  )
-                {
-                    auto vec_a = Load(tag, A.data + i + j);
-                    auto alpha_vec = Set(tag, alpha);
-                    vec_a=Div(vec_a,alpha_vec);
-                    auto vec_b = Load(tag, B.data + i + j);
-                    auto beta_vec = Set(tag, beta);
-                    vec_b=Div(vec_b,beta_vec);
-                    auto vec_c = Load(tag, C.data + i + j);
-                    auto vec_result = Add(vec_a, vec_b);
-                    Store(vec_result, tag, C.data + i + j); 
-                }
-
-                // 3. 处理尾部剩余元素
-                for (;j<shape_last;j++)
-                {
-                    C.data[i+j] = A.data[i+j] / alpha + B.data[i+j] / beta;
-                } });
-        }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
-
-     //divadd
-    // D= A/B*alpha+ C*beta
-   template <typename T>
-    void divadd_miaobyte(const Tensor<T> &A, const Tensor<T> &B, const T alpha, const Tensor<T> &C,const T beta,const Tensor<T> &D)
-    {
-        if (  A.shape == B.shape && A.shape ==C.shape && A.shape == D.shape)
-        {
-            D.shape.rangeParallel(D.shape.dim - 1, [&A,&alpha, &B, &beta, &C,&D](int i)
-                                  {
-                int shape_last=D.shape[-1];
-                const ScalableTag<T> tag;
-                const size_t lanes = Lanes(tag);
-                size_t j=0;
-
-                // 1. 处理前置未对齐部分
-                while (j < shape_last && !IsAligned(tag,A.data + i + j)) {
-                    D.data[i+j] = A.data[i+j] / B.data[i+j] * alpha + C.data[i+j] * beta;
-                    ++j;
-                }
-
-                // 2. 处理中间对齐部分
-                size_t aligned_end=shape_last-(shape_last%lanes);
-                for (; j+lanes<=aligned_end; j +=  lanes  )
-                {
-                    auto vec_a = Load(tag, A.data + i + j);
-                    auto vec_b = Load(tag, B.data + i + j);
-                    auto vec_c = Load(tag, C.data + i + j);
-                    auto vec_d = Load(tag, D.data + i + j);
-                    auto alpha_vec = Set(tag, alpha);
-                    vec_a=Div(vec_a,vec_b);
-                    vec_a=Mul(vec_a,alpha_vec);
-                    auto beta_vec = Set(tag, beta);
-                    vec_c=Mul(vec_c,beta_vec);
-                    auto vec_result = Add(vec_a, vec_c);
-                    Store(vec_result, tag, D.data + i + j); 
-                }
-
-                // 3. 处理尾部剩余元素
-                for (;j<shape_last;j++)
-                {
-                    D.data[i+j] = A.data[i+j] / B.data[i+j] * alpha + C.data[i+j] * beta;
-                } });
-        }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
-
-    //div_scalar
-    // C= A/value
-    template <typename T>
-    void divscalar_miaobyte(const Tensor<T> &input, const T value, Tensor<T> &output)
-    {
-        if (input.shape == output.shape)
-        {
-            output.shape.rangeParallel(output.shape.dim - 1, [&input, &output, &value](int i)
-                                       {
-                int shape_last=output.shape[-1];
-                const ScalableTag<T> tag;
-                const size_t lanes = Lanes(tag);
-                size_t j=0;
-
-                // 1. 处理前置未对齐部分
-                while (j < shape_last && !IsAligned(tag,input.data + i + j)) {
-                    output.data[i+j] = input.data[i+j] / value;
-                    ++j;
-                }
-
-                // 2. 处理中间对齐部分
-                size_t aligned_end=shape_last-(shape_last%lanes);
-                for (; j+lanes<=aligned_end; j +=  lanes  )
-                {
-                    auto vec = Load(tag, input.data + i + j);
-                    auto scalar = Set(tag, value);
-                    auto vec_result = Div(vec, scalar);
-                    Store(vec_result, tag, output.data + i + j);
-                }
-
-                // 3. 处理尾部剩余元素
-                for (;j<shape_last;j++)
-                {
-                    output.data[i+j] = input.data[i+j] / value;
-                } });
-        }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
-
-     //rdivscalar
-    // C=value/A
-    template <typename T>
-    void rdivscalar_miaobyte(const T value,const Tensor<T> &t, Tensor<T> &output)
-    {
-        if (t.shape == output.shape)
-        {
-            output.shape.rangeParallel(output.shape.dim - 1, [&t, &output, &value](int i)
-                                       {
-                int shape_last=output.shape[-1];
-                const ScalableTag<T> tag;
-                const size_t lanes = Lanes(tag);
-                size_t j=0;
-
-                // 1. 处理前置未对齐部分
-                while (j < shape_last && !IsAligned(tag,t.data + i + j)) {
-                    output.data[i+j] = value / t.data[i+j] ;
-                    ++j;
-                }
-
-                // 2. 处理中间对齐部分
-                size_t aligned_end=shape_last-(shape_last%lanes);
-                for (; j+lanes<=aligned_end; j +=  lanes  )
-                {
-                    auto vec = Load(tag, t.data + i + j);
-                    auto scalar = Set(tag, value);
-                    auto vec_result = Div(scalar, vec);
-                    Store(vec_result, tag, output.data + i + j);
-                }
-
-                // 3. 处理尾部剩余元素
-                for (;j<shape_last;j++)
-                {
-                    output.data[i+j] = value / t.data[i+j] ;
-                } });
-        }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
-
-   template <typename T>
-    void sqrt_miaobyte(const Tensor<T> &input, Tensor<T> &output)
-    {
-        if (input.shape == output.shape)
-        {
-            output.shape.rangeParallel(output.shape.dim - 1, [&input, &output](int i)
-                                       {
+            if (input.shape == output.shape)
+            {
+                output.shape.rangeParallel(output.shape.dim - 1, [&input, &output](int i)
+                                           {
                 int shape_last=output.shape[-1];
                 const ScalableTag<T> tag;
                 const size_t lanes = Lanes(tag);
@@ -741,92 +601,97 @@ namespace deepx::tensorfunc
                 {
                     output.data[i+j] = std::sqrt(input.data[i+j]);
                 } });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
+    };
 
-    //C=A^B
-    template <typename T>
-    void pow_miaobyte(const Tensor<T> &A, Tensor<T> &B,Tensor<T> &C)
+    template <>
+    struct _author_pow<miaobyte>
     {
-        if (A.shape == B.shape && A.shape == C.shape)
+        // C=A^B
+        template <typename T>
+        static void pow(const Tensor<T> &A, Tensor<T> &B, Tensor<T> &C)
         {
-            C.shape.rangeParallel(C.shape.dim , [&A, &B, &C](int i){
-                    C.data[i] = std::pow(A.data[i], B.data[i]);
-            });
+            if (A.shape == B.shape && A.shape == C.shape)
+            {
+                C.shape.rangeParallel(C.shape.dim, [&A, &B, &C](int i)
+                                      { C.data[i] = std::pow(A.data[i], B.data[i]); });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
+        // C=A^value
+        //  highway 不支持POW
+        template <typename T>
+        static void powscalar(const Tensor<T> &input, const T value, Tensor<T> &output)
         {
-            throw std::invalid_argument("shape mismatch");
+            if (input.shape == output.shape)
+            {
+                output.shape.rangeParallel(output.shape.dim, [&input, &output, &value](int i)
+                                           { output.data[i] = std::pow(input.data[i], value); });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-    }
-    //C=A^value
-    // highway 不支持POW 
-    template <typename T>
-    void powscalar_miaobyte(const Tensor<T> &input, const T value, Tensor<T> &output)
-    {
-        if (input.shape == output.shape)
-        {
-            output.shape.rangeParallel(output.shape.dim , [&input, &output, &value](int i)
-                                       {
-                output.data[i] = std::pow(input.data[i], value);
-            });
-        }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
+    };
 
+    template <>
+    struct _author_log<miaobyte>
+    {   
+        // hwy库没有log函数，所以只能用std::log
 
-
-    //hwy库没有log函数，所以只能用std::log
-
-    template <typename T>
-    void log_miaobyte(const Tensor<T> &input, Tensor<T> &output)
-    {
-        if (input.shape == output.shape)
+        template <typename T>
+        static void log(const Tensor<T> &input, Tensor<T> &output)
         {
-            output.shape.rangeParallel(output.shape.dim , [&input, &output](int i){
-                 
-                    output.data[i] = std::log(input.data[i]);
-                   
-            });
+            if (input.shape == output.shape)
+            {
+                output.shape.rangeParallel(output.shape.dim, [&input, &output](int i)
+                                           { output.data[i] = std::log(input.data[i]); });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
+    };
 
-    //发现hwy库没有exp函数，所以只能用std::exp
-    template <typename T>
-    void exp_miaobyte(const Tensor<T> &input, Tensor<T> &output)
-    {
-        if (input.shape == output.shape)
+    template <>
+    struct _author_exp<miaobyte>
+    {   
+        // 发现hwy库没有exp函数，所以只能用std::exp
+        template <typename T>
+        static void exp(const Tensor<T> &input, Tensor<T> &output)
         {
-            output.shape.rangeParallel(output.shape.dim  , [&input, &output](int i)   
-                                       {
-                    output.data[i] = std::exp(input.data[i]);
-                
-            });
+            if (input.shape == output.shape)
+            {
+                output.shape.rangeParallel(output.shape.dim, [&input, &output](int i)
+                                           { output.data[i] = std::exp(input.data[i]); });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");  
-        }
-    } 
+    };
 
-    template <typename T>
-    void sin_miaobyte(const Tensor<T> &input, Tensor<T> &output)
-    {
-        if (input.shape == output.shape)
+    template <>
+    struct _author_sin<miaobyte>
+    {   
+        template <typename T>
+        static void sin(const Tensor<T> &input, Tensor<T> &output)
         {
-            output.shape.rangeParallel(output.shape.dim - 1, [&input, &output](int i)
-                                       {
+            if (input.shape == output.shape)
+            {
+                output.shape.rangeParallel(output.shape.dim - 1, [&input, &output](int i)
+                                           {
                 int shape_last=output.shape[-1];
                 const ScalableTag<T> tag;
                 const size_t lanes = Lanes(tag);
@@ -851,21 +716,25 @@ namespace deepx::tensorfunc
                 for (;j<shape_last;j++)
                 {
                     output.data[i+j] = std::sin(input.data[i+j]);
-                } 
-            });
+                } });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
+    };
+
+    template <>
+    struct _author_cos<miaobyte>
+    {   
+        template <typename T>
+        static void cos(const Tensor<T> &input, Tensor<T> &output)
         {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
-    template <typename T>
-    void cos_miaobyte(const Tensor<T> &input, Tensor<T> &output)
-    {
-        if (input.shape == output.shape)
-        {
-            output.shape.rangeParallel(output.shape.dim - 1, [&input, &output](int i)
-                                       {
+            if (input.shape == output.shape)
+            {
+                output.shape.rangeParallel(output.shape.dim - 1, [&input, &output](int i)
+                                           {
                 int shape_last=output.shape[-1];
                 const ScalableTag<T> tag;
                 const size_t lanes = Lanes(tag);
@@ -890,22 +759,25 @@ namespace deepx::tensorfunc
                 for (;j<shape_last;j++)
                 {
                     output.data[i+j] = std::cos(input.data[i+j]);
-                } 
-            });
+                } });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
+    };
+
+    template <>
+    struct _author_tan<miaobyte>
+    {   
+        template <typename T>
+        static void tan(const Tensor<T> &input, Tensor<T> &output)
         {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
-    
-    template <typename T>
-    void tan_miaobyte(const Tensor<T> &input, Tensor<T> &output)
-    {
-        if (input.shape == output.shape)
-        {
-            output.shape.rangeParallel(output.shape.dim - 1, [&input, &output](int i)
-                                       {
+            if (input.shape == output.shape)
+            {
+                output.shape.rangeParallel(output.shape.dim - 1, [&input, &output](int i)
+                                           {
                 int shape_last=output.shape[-1];
                 const ScalableTag<T> tag;
                 const size_t lanes = Lanes(tag);
@@ -930,24 +802,25 @@ namespace deepx::tensorfunc
                 for (;j<shape_last;j++)
                 {
                     output.data[i+j] = std::tan(input.data[i+j]);
-                } 
-            });
+                } });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }   
-  
+    };
 
-
-    template <typename T>
-    void max_miaobyte(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
-    {
-        if (A.shape == B.shape && A.shape == C.shape)
+    template <>
+    struct _author_max<miaobyte>
+    {       
+        template <typename T>
+        static void max(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
         {
-            C.shape.rangeParallel(C.shape.dim - 1, [&A, &B, &C](int idx)
-                                  {
+            if (A.shape == B.shape && A.shape == C.shape)
+            {
+                C.shape.rangeParallel(C.shape.dim - 1, [&A, &B, &C](int idx)
+                                      {
                 int shape_last=C.shape[-1];
                 const ScalableTag<T> tag;
                 const size_t lanes = Lanes(tag);
@@ -974,20 +847,20 @@ namespace deepx::tensorfunc
                 {
                     C.data[idx+j]=std::max(A.data[idx+j],B.data[idx+j]);
                 } });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
 
-    template <typename T>
-    void maxgrad_miaobyte(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &A_grad, Tensor<T> &B_grad, Tensor<T> &output_grad)
-    {
-        if (A.shape == B.shape && A.shape == output_grad.shape && A.shape == A_grad.shape && A.shape == B_grad.shape)
+        template <typename T>
+        static void maxgrad(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &A_grad, Tensor<T> &B_grad, const Tensor<T> &output_grad)
         {
-            A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &B, &output_grad, &A_grad, &B_grad](int idx)
-                                       {
+            if (A.shape == B.shape && A.shape == output_grad.shape && A.shape == A_grad.shape && A.shape == B_grad.shape)
+            {
+                A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &B, &output_grad, &A_grad, &B_grad](int idx)
+                                           {
                 if (A.data[idx]>B.data[idx]){
                     A_grad.data[idx]=output_grad.data[idx];
                     B_grad.data[idx]=0;
@@ -998,20 +871,20 @@ namespace deepx::tensorfunc
                     A_grad.data[idx]=output_grad.data[idx]/2;   
                     B_grad.data[idx]=output_grad.data[idx]/2;
                 } });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
 
-    template <typename T>
-    void maxscalar_miaobyte(const Tensor<T> &A, T b, Tensor<T> &C)
-    {
-        if (A.shape == C.shape)
+        template <typename T>
+        static void maxscalar(const Tensor<T> &A,const T b, Tensor<T> &C)
         {
-            C.shape.rangeParallel(C.shape.dim - 1, [&A, b, &C](int idx)
-                                  {
+            if (A.shape == C.shape)
+            {
+                C.shape.rangeParallel(C.shape.dim - 1, [&A, b, &C](int idx)
+                                      {
                 int shape_last=C.shape[-1];
                 const ScalableTag<T> tag;
                 const size_t lanes = Lanes(tag);
@@ -1038,20 +911,20 @@ namespace deepx::tensorfunc
                 {
                     C.data[idx+j]=std::max(A.data[idx+j],b);
                 } });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
 
-    template <typename T>
-    void maxscalargrad_miaobyte(const Tensor<T> &A, const T b, Tensor<T> &A_grad, Tensor<T> &output_grad)
-    {
-        if (A.shape == A_grad.shape && A.shape == output_grad.shape)
+        template <typename T>
+        static void maxscalargrad(const Tensor<T> &A, const T b, Tensor<T> &A_grad, const Tensor<T> &output_grad)
         {
-            A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &b, &A_grad, &output_grad](int idx)
-                                       {
+            if (A.shape == A_grad.shape && A.shape == output_grad.shape)
+            {
+                A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &b, &A_grad, &output_grad](int idx)
+                                           {
                 if (A.data[idx]>b){
                     A_grad.data[idx]=output_grad.data[idx];
                 }else if (A.data[idx]<b){
@@ -1059,20 +932,24 @@ namespace deepx::tensorfunc
                 }else{
                     A_grad.data[idx]=output_grad.data[idx]/2;   
                 } });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
+    };
 
-    template <typename T>
-    void min_miaobyte(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
+    template <>
+    struct _author_min<miaobyte>
     {
-        if (A.shape == B.shape && A.shape == C.shape)
+        template <typename T>
+        static void min(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
         {
-            C.shape.rangeParallel(C.shape.dim - 1, [&A, &B, &C](int idx)
-                                  {
+            if (A.shape == B.shape && A.shape == C.shape)
+            {
+                C.shape.rangeParallel(C.shape.dim - 1, [&A, &B, &C](int idx)
+                                      {
                 int shape_last=C.shape[-1];
                 const ScalableTag<T> tag;
                 const size_t lanes = Lanes(tag);
@@ -1099,22 +976,20 @@ namespace deepx::tensorfunc
                 {
                     C.data[idx+j]=std::min(A.data[idx+j],B.data[idx+j]);
                 } });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
 
-
-    
-    template <typename T>
-    void mingrad_miaobyte(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &A_grad, Tensor<T> &B_grad, Tensor<T> &output_grad)
-    {
-        if (A.shape == B.shape && A.shape == output_grad.shape && A.shape == A_grad.shape && A.shape == B_grad.shape)
+        template <typename T>
+        static void mingrad(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &A_grad, Tensor<T> &B_grad, const Tensor<T> &output_grad)
         {
-            A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &B, &output_grad, &A_grad, &B_grad](int idx)
-                                       {
+            if (A.shape == B.shape && A.shape == output_grad.shape && A.shape == A_grad.shape && A.shape == B_grad.shape)
+            {
+                A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &B, &output_grad, &A_grad, &B_grad](int idx)
+                                           {
                 if (A.data[idx]<B.data[idx]){
                     A_grad.data[idx]=output_grad.data[idx];
                     B_grad.data[idx]=0;
@@ -1125,22 +1000,20 @@ namespace deepx::tensorfunc
                     A_grad.data[idx]=output_grad.data[idx]/2;   
                     B_grad.data[idx]=output_grad.data[idx]/2;
                 } });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
+
+        template <typename T>
+        static void minscalar(const Tensor<T> &A,const T b, Tensor<T> &C)
         {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
-
-
-
-    template <typename T>
-    void minscalar_miaobyte(const Tensor<T> &A, T b, Tensor<T> &C)
-    {
-        if (A.shape == C.shape)
-        {
-            C.shape.rangeParallel(C.shape.dim - 1, [&A, b, &C](int idx)
-                                  {   
+            if (A.shape == C.shape)
+            {
+                C.shape.rangeParallel(C.shape.dim - 1, [&A, b, &C](int idx)
+                                      {   
                 int shape_last=C.shape[-1];
                 const ScalableTag<T> tag;
                 const size_t lanes = Lanes(tag);
@@ -1166,20 +1039,20 @@ namespace deepx::tensorfunc
                 for (;j<shape_last;j++){
                     C.data[idx+j]=std::min(A.data[idx+j],b);
                 } });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
 
-    template <typename T>
-    void minscalargrad_miaobyte(const Tensor<T> &A, const T b, Tensor<T> &A_grad, Tensor<T> &output_grad)
-    {
-        if (A.shape == A_grad.shape && A.shape == output_grad.shape)
+        template <typename T>
+        static void minscalargrad(const Tensor<T> &A, const T b, Tensor<T> &A_grad, const Tensor<T> &output_grad)
         {
-            A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &b, &A_grad, &output_grad](int idx)
-                                       {
+            if (A.shape == A_grad.shape && A.shape == output_grad.shape)
+            {
+                A_grad.shape.rangeParallel(A_grad.shape.dim, [&A, &b, &A_grad, &output_grad](int idx)
+                                           {
                 if (A.data[idx]<b){
                     A_grad.data[idx]=output_grad.data[idx];
                 }else if (A.data[idx]>b){
@@ -1187,11 +1060,12 @@ namespace deepx::tensorfunc
                 }else{
                     A_grad.data[idx]=output_grad.data[idx]/2;   
                 } });
+            }
+            else
+            {
+                throw std::invalid_argument("shape mismatch");
+            }
         }
-        else
-        {
-            throw std::invalid_argument("shape mismatch");
-        }
-    }
+    };
 }
 #endif // DEEPX_OP_CPU_ELEMENTWISE_HPP

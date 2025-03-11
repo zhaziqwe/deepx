@@ -101,7 +101,7 @@ def _a_B_elementwiseop_C(
 
 #add
 OpNode.register("add")
-OpNode.register("add_scalar")
+OpNode.register("addscalar")
 
 def add(
         a:Tensor,
@@ -110,12 +110,12 @@ def add(
     if isinstance(b,Tensor):
         return _A_B_elementwiseop_C(a,b,"add",out)
     else:
-        return _A_b_elementwiseop_C(a,b,"add_scalar",out)
+        return _A_b_elementwiseop_C(a,b,"addscalar",out)
 
 
 #sub
 OpNode.register("sub")
-OpNode.register("sub_scalar")
+OpNode.register("subscalar")
 
 def sub(
         a:Tensor,
@@ -124,11 +124,11 @@ def sub(
     if isinstance(b,Tensor):
         return _A_B_elementwiseop_C(a,b,"sub",out)
     else:
-        return _A_b_elementwiseop_C(a,b*-1,"add_scalar",out)
+        return _A_b_elementwiseop_C(a,b*-1,"addscalar",out)
 
 #mul
 OpNode.register("mul")
-OpNode.register("mul_scalar")
+OpNode.register("mulscalar")
 
 def mul(
         a:Tensor,
@@ -137,13 +137,13 @@ def mul(
     if isinstance(b,Tensor):
         return _A_B_elementwiseop_C(a,b,"mul",out)
     else:
-        return _A_b_elementwiseop_C(a,b,"mul_scalar",out)
+        return _A_b_elementwiseop_C(a,b,"mulscalar",out)
  
 
 #div
 OpNode.register("div")
-OpNode.register("div_scalar")
-OpNode.register("rdiv_scalar")
+OpNode.register("divscalar")
+OpNode.register("rdivscalar")
 def div(
         a: Optional[Union[Tensor, float, int]] = None,
         b: Optional[Union[Tensor, float, int]] = None, 
@@ -153,32 +153,32 @@ def div(
     else:
         if isinstance(a,Tensor):
             #C=A/b
-            return _A_b_elementwiseop_C(a,b,"div_scalar",out)
+            return _A_b_elementwiseop_C(a,b,"divscalar",out)
         else:
             #C=a/B
-            return _a_B_elementwiseop_C(a,b,"rdiv_scalar",out)
+            return _a_B_elementwiseop_C(a,b,"rdivscalar",out)
 
 
 OpNode.register("max")
-OpNode.register("max_scalar")
+OpNode.register("maxscalar")
 def max(
         a:Tensor,
         b:Union[int,float,Tensor,]=0,
         out:Union[Tensor,str]='')->Tensor:
     if  isinstance(b,int) or isinstance(b,float):
-        return _A_b_elementwiseop_C(a,b,"max_scalar",out)
+        return _A_b_elementwiseop_C(a,b,"maxscalar",out)
     else:
         return _A_B_elementwiseop_C(a,b,"max",out)
 
 
 OpNode.register("min")
-OpNode.register("min_scalar")
+OpNode.register("minscalar")
 def min(
         a:Tensor,
         b:Union[int,float,Tensor,]=0,
         out:Union[Tensor,str]='')->Tensor:
     if  isinstance(b,int) or isinstance(b,float):
-        return _A_b_elementwiseop_C(a,b,"min_scalar",out)
+        return _A_b_elementwiseop_C(a,b,"minscalar",out)
     else:
         return _A_B_elementwiseop_C(a,b,"min",out)
 
@@ -217,13 +217,13 @@ def exp(
 #pow
 # todo
 OpNode.register("pow")
-OpNode.register("pow_scalar")
+OpNode.register("powscalar")
 def pow(
         a:Tensor,
         b:Union[int,float,Tensor,]=0,
         out:Union[Tensor,str]='')->Tensor:
     if  isinstance(b,int) or isinstance(b,float):
-        return _A_b_elementwiseop_C(a,b,"pow_scalar",out)
+        return _A_b_elementwiseop_C(a,b,"powscalar",out)
     else:
         return _A_B_elementwiseop_C(a,b,"pow",out)
 #sqrt

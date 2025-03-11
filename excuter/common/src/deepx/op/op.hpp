@@ -16,7 +16,7 @@
 #include "stdutil/error.hpp"
 namespace deepx::op
 {
-    using deepx::mem::Mem;
+    using mem::Mem;
     using namespace std;
     using namespace std::chrono;
     class Op
@@ -30,6 +30,7 @@ namespace deepx::op
         bool grad=false;
         vector<string> returns;
         vector<string> returns_grad;
+        //
         int id;
         system_clock::time_point created_at;
         system_clock::time_point sent_at;
@@ -47,7 +48,7 @@ namespace deepx::op
             return dtype;
         }
         // 改为普通虚函数，提供默认实现
-        virtual void forward(mem::Mem &mem)
+        virtual void forward(Mem &mem)
         {
              throw NotImplementError(name);
         }

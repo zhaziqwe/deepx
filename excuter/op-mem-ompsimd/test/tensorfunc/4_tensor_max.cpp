@@ -1,11 +1,13 @@
 #include <numeric>
 #include "deepx/tensorfunc/elementwise.hpp"
-
+#include "deepx/tensorfunc/elementwise_miaobyte.hpp"
 #include "deepx/tensor.hpp"
 #include "deepx/tensorfunc/init.hpp"
 #include "deepx/tensorfunc/print.hpp"
 #include "deepx/tensorfunc/new.hpp"
+#include "deepx/tensorfunc/authors.hpp"
 #include "tensorutil.hpp"
+    
 using namespace deepx;
 using namespace deepx::tensorfunc;
 
@@ -19,9 +21,9 @@ void test_max(){
     print(B);
     Tensor<float> C=New<float>(shape);
     Tensor<float> D=New<float>(shape);
-    max(A,B,C);
+    max<tensorfunc::miaobyte,float>(A,B,C);
     print(C);
-    min(A,B,D);
+    min<tensorfunc::miaobyte,float>(A,B,D);
     print(D);
 }
 int main(){

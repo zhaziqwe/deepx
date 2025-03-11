@@ -16,7 +16,12 @@ add_subdirectory(../common common)
 
 # 源文件
 
-file(GLOB_RECURSE DEEPX_SOURCES "src/deepx/*.cpp")
+file(GLOB_RECURSE DEEPX_SOURCES 
+    "src/*.cpp"
+)
+list(FILTER DEEPX_SOURCES EXCLUDE REGEX ".*/op/.*")  # 排除所有包含/op/路径的文件
+message(STATUS "DEEPX_SOURCES: ${DEEPX_SOURCES}")  # 查看实际获取的文件列表
+# file(GLOB_RECURSE DEEPX_SOURCES "src/deepx/*.cpp")
 file(GLOB_RECURSE CLIENT_SOURCES "src/client/*.cpp")
 
 # cpu 线性代数库
@@ -61,13 +66,13 @@ target_link_libraries( deepx_ompsimd
     OpenMP::OpenMP_CXX
     hwy
 )
-add_executable(${PROJECT_NAME} ${CLIENT_SOURCES})
-target_link_libraries(${PROJECT_NAME}
-    PRIVATE
-    deepx_ompsimd
-)
+# add_executable(${PROJECT_NAME} ${CLIENT_SOURCES})
+# target_link_libraries(${PROJECT_NAME}
+#     PRIVATE
+#     deepx_ompsimd
+# )
 # 测试
-add_subdirectory(test/tensor)
 add_subdirectory(test/tensorfunc)
+# add_subdirectory(test/op)
 # # 数据集测试
 # add_subdirectory(test/dataset)
