@@ -1,6 +1,5 @@
 
 #include <iostream>
-#include <omp.h>
 #include <vector>
 
 #include <yaml-cpp/yaml.h>

@@ -8,36 +8,40 @@
 
 namespace deepx::tensorfunc
 {
-    template <typename T>
-    void print(const Tensor<T> &t,const std::string &f="")
+    // 辅助函数：根据dtype打印单个元素
+    inline void print_element(const void* data, int offset, const std::string& dtype, const std::string& format) {
+        if (dtype == "int8")
+            printf(format.c_str(), ((int8_t*)data)[offset]);
+        else if (dtype == "int16")
+            printf(format.c_str(), ((int16_t*)data)[offset]);
+        else if (dtype == "int32")
+            printf(format.c_str(), ((int32_t*)data)[offset]);
+        else if (dtype == "int64")
+            printf(format.c_str(), ((int64_t*)data)[offset]);
+        else if (dtype == "float32")
+            printf(format.c_str(), ((float*)data)[offset]);
+        else if (dtype == "float64")
+            printf(format.c_str(), ((double*)data)[offset]);
+    }
+
+    void print(const Tensor<void> &t, const std::string &f="")
     {
-        std::string format=f;
-        if (f.empty()){
-            if constexpr (std::is_same_v<T, int8_t>)
+        std::string format = f;
+        if (f.empty()) {
+            if (t.shape.dtype == "int8" || t.shape.dtype == "int16" || t.shape.dtype == "int32") 
             {
                 format = "%d";
             }
-            else if constexpr (std::is_same_v<T, int16_t>)
+            else if (t.shape.dtype == "int64")
             {
-                format = "%d";
+                format = "%lld"; 
             }
-            else if constexpr (std::is_same_v<T, int32_t>)
-            {
-                format = "%d";
-            }
-            else if constexpr (std::is_same_v<T, int64_t>)
-            {
-                format = "%lld";
-            }
-            else if constexpr (std::is_same_v<T, float>)
+            else if (t.shape.dtype == "float32" || t.shape.dtype == "float64")
             {
                 format = "%.4f";
             }
-            else if constexpr (std::is_same_v<T, double>)
-            {
-                format = "%.4f";    
-            }
         }
+
         t.shape.print();
         if (t.shape.dim == 1)
         {
@@ -46,15 +50,15 @@ namespace deepx::tensorfunc
             {
                 if (i > 0)
                     std::cout << " ";
-                printf(format.c_str(), t.data[i]);
+                print_element(t.data, i, t.shape.dtype, format);
             }
             std::cout << "]" << std::endl;
         }
-        else
+        else 
         {
             t.shape.range(-2, [&format, &t](const int idx_linear,const std::vector<int> &indices)
                           {
-                        std::cout <<   indices  << "=";
+                        std::cout << indices << "=";
                         std::cout<<"["<<std::endl;
                         for (int i = 0; i < t.shape[-2]; ++i)
                         {
@@ -63,7 +67,8 @@ namespace deepx::tensorfunc
                             {
                                 if (j > 0)
                                     std::cout << " ";
-                                printf(format.c_str(), t.data[idx_linear+i * t.shape[-1] + j]);
+                                int offset = idx_linear + i * t.shape[-1] + j;
+                                print_element(t.data, offset, t.shape.dtype, format);
                             }
                             
                             std::cout<<"]";
@@ -74,6 +79,19 @@ namespace deepx::tensorfunc
                         }
                         std::cout<<"]"<<std::endl; });
         }
+    }
+
+    // 修改模板函数重载
+    template <typename T>
+    void print(const Tensor<T> &t, const std::string &f="") {
+        // 创建一个不会删除数据的 Tensor<void>
+        Tensor<void> vt;
+        vt.data = t.data;
+        vt.shape = t.shape;
+        vt.deleter = nullptr;  // 确保析构时不会删除数据
+
+        // 调用 void 版本的 print
+        print(vt, f);
     }
 }
 

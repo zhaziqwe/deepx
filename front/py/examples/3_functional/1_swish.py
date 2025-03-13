@@ -12,7 +12,7 @@ print("\nPyTorch swish result:")
 print(out_torch)
 
 ############-------DEEPX-------################
-from deepx import  arange,swish,swiglu
+from deepx import  arange,swish
 
 # 使用相同的初始化方式
 x = arange(0,60,1,name="x").reshape_(3,4,5)

@@ -11,6 +11,9 @@ Always respond in 中文
 关于概念
 deepx.Tensor仅仅就是一个tensor，不像pytorch的tensor，一个tensor其实包含了自身和梯度2个tensor的数据
 
+关于任何编程语言
+注重设计函数时，通过多级的子函数，实现层级模块化分解
+
 关于c++
 我的环境为ubuntu22,项目是c++17,使用cmake编译,
 返回c++代码区分header和source文件

@@ -7,7 +7,7 @@
 #include <sys/un.h>
 #include <unistd.h>
 #include <functional>
-#include "deepx/op/op.hpp"
+#include "deepx/tf/tf.hpp"
 #include <queue>
 
 namespace client{
@@ -24,7 +24,7 @@ namespace client{
     public:
         udpserver(int port);
         ~udpserver();
-        void start(queue<deepx::op::Op> &tasks);
+        void start(queue<deepx::tf::TF> &tasks);
         using handlefunc = std::function<void(const char *buffer)>;
         handlefunc func;
         void resp(string str);

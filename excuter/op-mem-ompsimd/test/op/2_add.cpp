@@ -8,7 +8,7 @@
 #include "deepx/tensorfunc/new.hpp"
 #include "deepx/tensorfunc/init.hpp"
 
-using namespace deepx::op;
+using namespace deepx::tf;
 using namespace deepx;
 using namespace deepx::tensorfunc;  
 using namespace std;
@@ -38,7 +38,7 @@ void test_add()
     std::vector<int> shape = { 2, 3};
     Mem mem = setmem(shape);
 
-    op::Add<float> add({"a", "b"}, {"c"}, true, {"a.grad", "b.grad"}, {"c.grad"});
+    tf::Add<float> add({"a", "b"}, {"c"}, true, {"a.grad", "b.grad"}, {"c.grad"});
     add.forward(mem);
  
     print(*mem.gettensor<float>("c").get(),"%.2f");
@@ -50,7 +50,7 @@ void test_add_inplace()
 {
     std::vector<int> shape = { 2, 3};
     Mem mem = setmem(shape);
-    op::Add<float> add_inplace({"a", "b"}, {"a"}, true, {"a.grad", "b.grad"}, {"a.grad"});
+    tf::Add<float> add_inplace({"a", "b"}, {"a"}, true, {"a.grad", "b.grad"}, {"a.grad"});
     add_inplace.forward(mem);
     print(*mem.gettensor<float>("a").get(),"%.2f");
     add_inplace.backward(mem);
@@ -72,7 +72,7 @@ void test_add_scalar()
     mem.addtensor("c.grad",New<float>(shape));
     constant(*mem.gettensor<float>("c.grad").get(), 3.33f);
 
-    op::Add_scalar<float> add_scalar({"a", "b"}, {"c"}, true, {"a.grad"}, {"c.grad"});
+    tf::Add_scalar<float> add_scalar({"a", "b"}, {"c"}, true, {"a.grad"}, {"c.grad"});
     add_scalar.forward(mem);
     cout<<"c"<<endl;
     print(*mem.gettensor<float>("c").get(),"%.2f");
@@ -87,7 +87,7 @@ void test_div()
     std::vector<int> shape = { 2, 3};
     Mem mem = setmem(shape);
 
-    op::Div<float> div({"a", "b"}, {"c"}, true, {"a.grad", "b.grad"}, {"c.grad"});
+    tf::Div<float> div({"a", "b"}, {"c"}, true, {"a.grad", "b.grad"}, {"c.grad"});
     div.forward(mem);
     cout<<"a"<<endl;
     print(*mem.gettensor<float>("a").get());

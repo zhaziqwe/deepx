@@ -7,7 +7,7 @@
 #include "deepx/mem/mem.hpp"
 #include "deepx/op/op.hpp"
 
-using namespace deepx::op;
+using namespace deepx::tf;
 using namespace deepx;
 using namespace deepx::tensorfunc;  
 using namespace std;

@@ -8,7 +8,7 @@
 #include "deepx/op/op.hpp"
 #include "deepx/op/elementwise.hpp"
  
-using namespace deepx::op;
+using namespace deepx::tf;
 using namespace deepx;
 using namespace deepx::tensorfunc;
 using namespace std;
@@ -40,7 +40,7 @@ void test_max()
     mem.addtensor("b.grad", b_grad);
 
 
-    op::Max<float> max;
+    tf::Max<float> max;
     max.init("max", "float32", {"a", "b"}, {"c"}, true, {"a.grad", "b.grad"}, {"c.grad"});
     max.forward(mem);
     cout << "c: " << endl;
@@ -71,7 +71,7 @@ void test_max_scalar()
     Tensor<float> a_grad = New<float>({1, 2, 3});
     mem.addtensor("a.grad", a_grad);
 
-    op::Maxscalar<tensorfunc::miaobyte,float> max_scalar({"a", "b"}, {"c"}, true);
+    tf::Maxscalar<tensorfunc::miaobyte,float> max_scalar({"a", "b"}, {"c"}, true);
     max_scalar.forward(mem);
     cout << "a: " << endl;
     print(*mem.gettensor<float>("a").get());

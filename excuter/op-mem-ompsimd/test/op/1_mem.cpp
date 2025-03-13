@@ -6,7 +6,7 @@
 #include "deepx/tensorfunc/init.hpp"
 #include "deepx/tensorfunc/print.hpp"
 
-using namespace deepx::op;
+using namespace deepx::tf;
 using namespace deepx;
 using namespace deepx::mem;
 using namespace deepx::tensorfunc;

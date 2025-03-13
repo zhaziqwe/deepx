@@ -7,7 +7,6 @@
 #include <atomic>
 #include <memory>
 #include "deepx/tensor.hpp"
-#include "deepx/tensorfunc/new.hpp"
 
 namespace deepx::mem
 {
@@ -114,16 +113,16 @@ namespace deepx::mem
             mem[name] = ptr;
         }
 
-        template <typename T>
-        shared_ptr<Tensor<T>> temptensor(vector<int> shape)
-        {
-            // 直接构造到shared_ptr避免移动
-            auto temp = tensorfunc::New<T>(shape); // 临时对象
-            auto cloned = make_shared<Tensor<T>>(std::move(temp));
-            mem["temp" + to_string(tempidx)] = cloned;
-            tempidx++;
-            return cloned;
-        }
+        // template <typename T>
+        // shared_ptr<Tensor<T>> temptensor(vector<int> shape)
+        // {
+        //     // 直接构造到shared_ptr避免移动
+        //     auto temp = tensorfunc::New<T>(shape); // 临时对象
+        //     auto cloned = make_shared<Tensor<T>>(std::move(temp));
+        //     mem["temp" + to_string(tempidx)] = cloned;
+        //     tempidx++;
+        //     return cloned;
+        // }
 
         bool existstensor(const string &name) const
         {
@@ -143,6 +142,48 @@ namespace deepx::mem
             }
             auto ptr = mem.at(name);
             return std::static_pointer_cast<Tensor<T>>(ptr);
+        }
+
+        //TODO 
+        shared_ptr<Tensor<void>> gettensor(const string &name) const
+        {
+            if (mem.find(name) == mem.end())
+            {
+                throw std::runtime_error("tensor not found: " + name);
+            }
+            auto ptr = mem.at(name);
+            auto result = make_shared<Tensor<void>>();
+            result->shape = ptr->shape;
+            result->device = ptr->device;
+            result->deleter = nullptr;
+            result->copyer = nullptr;
+            result->newer = nullptr;
+
+            switch (precision(ptr->shape.dtype))
+            {
+                case Precision::Float64:
+                {
+                    auto ptr_tensor = std::static_pointer_cast<Tensor<double>>(ptr);
+                    result->data = ptr_tensor->data;
+                    break;
+                }
+                case Precision::Float32:
+                {
+                    auto ptr_tensor = std::static_pointer_cast<Tensor<float>>(ptr);
+                    result->data = ptr_tensor->data;
+                    break;
+                }
+                case Precision::Int32:
+                {
+                    auto ptr_tensor = std::static_pointer_cast<Tensor<int32_t>>(ptr);
+                    result->data = ptr_tensor->data;
+                    break;
+                }
+                default:
+                    throw std::runtime_error("Unsupported dtype: " + ptr->shape.dtype);
+            }
+
+            return result;
         }
 
         // 获取多个张量
@@ -165,7 +206,7 @@ namespace deepx::mem
             return tensors;
         }
 
-        template <typename T>
+
         void delete_tensor(const string &name)
         {
             mem.erase(name);

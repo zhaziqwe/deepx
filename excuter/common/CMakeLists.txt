@@ -15,13 +15,23 @@ include_directories(src)
 # 源文件
 
 file(GLOB_RECURSE DEEPX_COMMON_SOURCES "src/*.cpp")
- 
- 
+
 add_library(deepx_common SHARED 
     ${DEEPX_COMMON_SOURCES}
+)
+
+ 
+find_package(yaml-cpp REQUIRED)
+
+target_link_libraries(deepx_common
+    PUBLIC
+    yaml-cpp
 )
 
 target_include_directories(deepx_common PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<INSTALL_INTERFACE:include>
 )
+ 
+ 
+add_subdirectory(test)

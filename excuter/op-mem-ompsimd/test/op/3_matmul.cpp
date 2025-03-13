@@ -9,7 +9,7 @@
 #include "deepx/tensorfunc/init.hpp"
 #include "deepx/op/matmul.hpp"
 
-using namespace deepx::op;
+using namespace deepx::tf;
 using namespace deepx;
 using namespace deepx::tensorfunc;  
 using namespace std;
@@ -43,7 +43,7 @@ void test_matmul()
 {
     vector<int> shape={2,3,4};
     Mem mem=setmem(shape,7);
-    op::MatMul<float> matmul({"a", "b"}, {"c"}, true, {"a.grad", "b.grad"}, {"c.grad"});
+    tf::MatMul<float> matmul({"a", "b"}, {"c"}, true, {"a.grad", "b.grad"}, {"c.grad"});
     matmul.forward(mem);
 
     cout<<"a"<<endl;

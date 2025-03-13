@@ -31,12 +31,12 @@ namespace deepx
         Tensor(const vector<int> &s)  
         {
             shape = Shape(s);
-            shape.dtype = dtype<T>::name();
+            shape.dtype = precision_str(precision<T>());
         }
         Tensor(const Shape &s)  
         {
             shape = s;
-            shape.dtype = dtype<T>::name();
+            shape.dtype = precision_str(precision<T>());
         }
 
         ~Tensor()
@@ -55,7 +55,7 @@ namespace deepx
         Tensor(const Tensor<T> &tensor)
         {
             shape = tensor.shape;
-            shape.dtype = dtype<T>::name();
+            shape.dtype = precision_str(precision<T>());
             device = tensor.device;
             newer = tensor.newer;
             deleter = tensor.deleter;
@@ -103,7 +103,7 @@ namespace deepx
                 return *this;
 
             shape = tensor.shape;
-            shape.dtype = dtype<T>::name();
+            shape.dtype = precision_str(precision<T>());
             device = tensor.device;
             deleter = tensor.deleter;
             copyer = tensor.copyer;
@@ -129,7 +129,7 @@ namespace deepx
             if (this == &tensor)
                 return *this;
             shape = tensor.shape;
-            shape.dtype = dtype<T>::name();
+            shape.dtype = precision_str(precision<T>());
             device = tensor.device;
             newer = tensor.newer;
             deleter = tensor.deleter;
@@ -153,5 +153,20 @@ namespace deepx
     //     Tensor<T> tensor;
     // };
 
+    // 添加一个新的类用于类型擦除
+    struct TensorVoid : public TensorBase {
+        void* data;
+        void (*deleter)(void*);
+        void (*copyer)(void*, void*, int);
+        void* (*newer)(int);
+        
+        TensorVoid() = default;
+        ~TensorVoid() {
+            if (data && deleter) {
+                deleter(data);
+                data = nullptr;
+            }
+        }
+    };
 }
 #endif

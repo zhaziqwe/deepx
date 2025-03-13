@@ -16,7 +16,7 @@ namespace client
             close(sockfd);
         }
     }
-    void udpserver::start(queue<deepx::op::Op> &queue)
+    void udpserver::start(queue<deepx::tf::TF> &queue)
     {
         // 创建UDP套接字
         if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -49,10 +49,10 @@ namespace client
             string line;
             while (getline(ss, line)) {
                 if (!line.empty()) {
-                    deepx::op::Op op;
-                    op.recv_at = chrono::system_clock::now();
-                    op.load(line);
-                    queue.push(op);
+                    deepx::tf::TF tf;
+                    tf.recv_at = chrono::system_clock::now();
+                    tf.parse(line,true);
+                    queue.push(tf);
                 }
             }
         }

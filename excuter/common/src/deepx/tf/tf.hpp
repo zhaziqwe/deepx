@@ -1,5 +1,5 @@
-#ifndef DEEPX_OP_OP_HPP
-#define DEEPX_OP_OP_HPP
+#ifndef DEEPX_TF_TF_HPP
+#define DEEPX_TF_TF_HPP
 
 #include <unordered_map>
 #include <vector>
@@ -14,94 +14,89 @@
 #include "deepx/dtype.hpp"
 
 #include "stdutil/error.hpp"
-namespace deepx::op
+#include "stdutil/num.hpp"
+namespace deepx::tf
 {
     using mem::Mem;
     using namespace std;
     using namespace std::chrono;
-    class Op
+    
+    struct Param {
+        string name;
+        string dtype;
+        
+        Param(const string& n = "", const string& dt = "any") 
+            : name(n), dtype(dt) {}
+    };
+
+    class TF
     {
     public:
         string name;
         string author;
-        string dtype;
-        vector<string> args;
-        vector<string> args_grad;
-        bool grad=false;
-        vector<string> returns;
-        vector<string> returns_grad;
+        vector<Param> args;
+        vector<Param> returns;
         //
         int id;
         system_clock::time_point created_at;
         system_clock::time_point sent_at;
         system_clock::time_point recv_at;
     public:
-        Op() = default;
-        Op(const Op &) = default;
-        Op &operator=(const Op &) = default;
-        string op_name()
-        {
-            return name;
-        }
-        string dtype_name()
-        {
-            return dtype;
-        }
-        // 改为普通虚函数，提供默认实现
-        virtual void forward(Mem &mem)
-        {
-             throw NotImplementError(name);
-        }
-
-        virtual void backward(mem::Mem &mem)
-        {
+        TF() = default;
+        TF(const TF &) = default;
+        TF(string text, bool call = false);
+        TF &operator=(const TF &) = default;
+        
+        string op_name();
+        virtual int run(Mem &mem,string &error){
             throw NotImplementError(name);
         }
- 
-        virtual string math_formula() const {
-            return "";
-        }
-        virtual void setexample(){
-            
-        }
-        void load(const string &str) ;
-        std::string to_string(bool show_extra=false) const;
+        virtual string math_formula() const;
+        virtual void setexample();
+        
+        void parse(const string &str, bool call = false);
+        std::string to_string(bool show_extra=false, bool show_name=true) const;
         void init(const string &opname,
-                  const string &dtype,
-                  const vector<string> &args,
-                  const vector<string> &returns,
-                  bool  grad,
-                  const vector<string> &args_grad,
-                  const vector<string> &returns_grad);
+                  const vector<Param> &args,
+                  const vector<Param> &returns);
 
         template<typename T>
-        T getarg(int idx,mem::Mem &mem){
-            auto x = T(0);
-            if (mem.existarg(this->args[idx])){
-                x = mem.getarg<T>(this->args[idx]);
-            }else{
-                x = T(std::stof(this->args[idx].c_str()));
+        T getvar(int idx, mem::Mem &mem,bool arg=true){
+            vector<Param> &vars=arg?args:returns;
+            if(idx<0){
+                idx = vars.size()+idx;
             }
-            return x;
+            if(idx<0 || idx>=vars.size()){
+                throw std::invalid_argument("Invalid argument index");
+            }
+            if (is_float(vars[idx].name)){
+                T value=T(std::stof(vars[idx].name));
+                return value;
+            }
+            return mem.getarg<T>(vars[idx].name);
         }
 
         template<typename T>
-        vector<T> getvector(const int from=0,int to=0){
-            auto v = vector<T>();
-            if (to==0){
-                to = this->args.size();
+        vector<T> argvector(const int from=0, int to=0,bool arg=true){
+            vector<Param> &vars=arg?args:returns;
+            if(from<0){
+                from = vars.size()+from;
+            }   
+            if(to<0){
+                to = vars.size()+to;
             }
-            for (int i=from;i<to;i++){
-                v.push_back(T(std::stof(this->args[i].c_str())));
+            if(from>to){
+                throw std::invalid_argument("Invalid argument index");
             }
-            return v;
+            vector<T> result;
+            for(int i=from;i<=to;i++){
+                result.push_back(T(std::stof(vars[i].name)));
+            }
+            return result;
         }
 
-        template<typename T>
-        string getdtype()
-        {
-            return deepx::dtype<T>::name();
-        }
+        std::string dtypes() const;
+        bool check_dtype(const TF &other) const;
     };
 
     class OpResp
