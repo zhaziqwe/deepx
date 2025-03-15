@@ -10,6 +10,7 @@ namespace deepx::tf{
         public:
         Print(){
             this->name="print";
+            this->funcdef();
         }
         Print(string text){
             this->parse(text);
@@ -33,8 +34,8 @@ namespace deepx::tf{
             }
             return 0;
         }   
-        void setexample() override {
-            this->parse("print(T1)");
+        void funcdef(int polymorphism=0) override {
+            this->args.push_back(Param("tensor1", DataCategory::Tensor, Precision::Any));
         }
         string math_formula() const override {
             return "print(T1)";

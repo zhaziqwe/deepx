@@ -1,67 +1,115 @@
-# deepx IR设计说明
+# DeepX IR (Intermediate Representation) 格式规范
 
-+ 1.除了newtensor以外，其他IR均不创建新的张量，而是引用已有的张量
-+ 2.IR的输入输出均使用张量名，而不是张量指针（后期IR可能支持直接用值）
-+ 3.命名，t开头为张量名，a开头为参数名，v开头为vector名
-+ 4.backward需要指令触发，箭头方向为<-，同时需要指定所有grad张量名
-+ 5.这份IR均为基本IR，也就是最基础的IR。如relu这类组合IR（可以用max_scalar实现的），则不会出现在这里
+DeepX IR 采用简洁的文本格式来表示张量运算。主要分为函数定义(funcdef)和函数调用(funccall)两种模式。
 
-## IR列表
+## 基本语法规则
 
-## 单向IR（不支持backward）
+1. 使用 `->` 分隔输入参数和返回值
+2. 参数之间使用逗号(,)分隔
+3. 向量类型的值使用空格分隔元素
+4. 参数和返回值可选择性地用括号()包裹
+5. 可在指令后添加元数据，使用 `//` 分隔
 
-| IR | 说明 | 例子 |例子作用|
-| --- | --- | --- | --- |
-| argset | 设置参数 | argset@int32 1->a1 |设置a1为int32类型，值为1|
-| argset | 设置参数 | argset@int32 1->a1 |设置a2为int32类型，值为2|
-| argset | 设置vector参数 | argset@int32 1 2 3->vec1 |设置vec1为int32类型，值为1 2 3|
-| argset | 设置vector参数 | argset@int32 0 1 2->vec2 |设置vec2为int32类型，值为0 1 2|
-| argdel | 删除参数 | argdel a |删除a参数|
-| newtensor | 创建张量 | newtensor@int32 vec1->t1 |创建一个int32类型的张量t1，并从vec1中复制数据|
-| deltensor | 删除张量 | deltensor t1 |删除t1张量|
-| constant | tensor初始化-填充固定值 | constant@int32 a1->t1 |给t1填充固定值，值引用a1|
-| arange | tensor初始化-生成序列 | arange@int32 a1 a2>t1 |给t1生成序列，从a1开始，步长为a2|
-| uniform | tensor初始化-均匀分布 | uniform@int32 a1 a2>t1 |给t1生成均匀分布，low为a1，high为a2|
+## 函数调用(funccall)模式
 
-## 双向IR（支持backward）
-| IR | 说明 | 例子 |例子作用|
-| --- | --- | --- | --- |
-| add | 矩阵加法 | add@float32 t1 t2->t3 |t3=t1+t2|
-| add_scalar | 矩阵加法 | add_scalar@float32 t1 a1->t3 |t3=t1+a1,a1为常数|
-| sub | 矩阵减法 | sub@float32 t1 t2->t3 |t3=t1-t2|
-| mul | 矩阵乘法 | mul@float32 t1 t2->t3 |t3=t1*t2|
-| mul_scalar | 矩阵乘法 | mul_scalar@float32 t1 a1->t3 |t3=t1*a1,a1为常数|
-| div | 除法 | div@float32 t1 t2->t3 |t3=t1/t2|
-| div_scalar | 除法 | div_scalar@float32 t1 a1->t3 |t3=t1/a1,a1为常数|
-| mod (还没实现)| 取模 | mod@float32 t1 t2->t3 |t3=t1%t2|
-| mod_scalar (还没实现) | 取模 | mod_scalar@float32 t1 a1->t3 |t3=t1%a1,a1为常数|
-| exp | 指数 | exp@float32 t1->t3 |t3=exp(t1)|
-| sqrt | 平方根 | sqrt@float32 t1->t3 |t3=sqrt(t1)|
-| log | 对数 | log@float32 t1->t3 |t3=log(t1)|
-| sum | 规约计算-按dims求和 | sum@float32 t1 vec2->t3 |t3=sum(t1,dims=vec2),按vec2的维度求和|
-| max | 规约计算-按dims求最大值 | max@float32 t1 t2->t3 |t3=max(t1,t2) |
-| max_scalar | 规约计算-按dims求最大值 | max_scalar@float32 t1 a1->t3 |t3=max(t1,a1),a1为常数|
-| min | 规约计算-按dims求最小值 | min@float32 t1 t2->t3 |t3=min(t1,t2) |
-| min_scalar | 规约计算-按dims求最小值 | min_scalar@float32 t1 a1->t3 |t3=min(t1,a1),a1为常数|
+函数调用模式用于实际执行操作，语法更简洁。
 
-backward时，改变箭头方向为<-
+示例:
+matmul A,B -> C
+sum(A,[1 2 3]) -> B
+newtensor 3 4 5 -> T1
 
-| IR | 说明 | 例子 |例子作用|
-| --- | --- | --- | --- |
-| add | 矩阵加法 | add@float32 t1(t1_grad) t2(t2_grad)<-t3(t3_grad) |t3=t1+t2,t3_grad=t1_grad+t2_grad|
-| add_scalar | 矩阵加法 | add_scalar@float32 t1(t1_grad) a1<-t3(t3_grad) |t3=t1+a1,t3_grad=t1_grad|
-| sub | 矩阵减法 | sub@float32 t1(t1_grad) t2(t2_grad)<-t3(t3_grad) |t3=t1-t2,t3_grad=t1_grad-t2_grad|
-| mul | 矩阵乘法 | mul@float32 t1(t1_grad) t2(t2_grad)<-t3(t3_grad) |t3=t1*t2,t3_grad=t1_grad*t2+t1*t2_grad|
-| mul_scalar | 矩阵乘法 | mul_scalar@float32 t1(t1_grad) a1<-t3(t3_grad) |t3=t1*a1,t3_grad=t1_grad*a1|
-| div | 除法 | div@float32 t1(t1_grad) t2(t2_grad)<-t3(t3_grad) |t3=t1/t2,t3_grad=t1_grad/t2-t1*t2_grad/t2^2|
-| div_scalar | 除法 | div_scalar@float32 t1(t1_grad) a1<-t3(t3_grad) |t3=t1/a1,t3_grad=t1_grad/a1|
-| mod (还没实现)| 取模 | mod@float32 t1(t1_grad) t2(t2_grad)<-t3(t3_grad) |t3=t1%t2,t3_grad=t1_grad%t2|
-| mod_scalar (还没实现) | 取模 | mod_scalar@float32 t1(t1_grad) a1<-t3(t3_grad) |t3=t1%a1,t3_grad=t1_grad%a1,a1为常数|
-| exp | 指数 | exp@float32 t1(t1_grad)<-t3(t3_grad) |t3=exp(t1),t3_grad=t1_grad*exp(t1)|
-| sqrt | 平方根 | sqrt@float32 t1(t1_grad)<-t3(t3_grad) |t3=sqrt(t1),t3_grad=t1_grad/(2*sqrt(t1))|
-| log | 对数 | log@float32 t1(t1_grad)<-t3(t3_grad) |t3=log(t1),t3_grad=t1_grad/t1  |
-| sum | 规约计算-按dims求和 | sum@float32 t1 vec2<-t3 |t3=sum(t1,dims=vec2),按vec2的维度求和|
-| max | 规约计算-按dims求最大值 | max@float32 t1 t2<-t3 |t3=max(t1,t2) |
-| max_scalar | 规约计算-按dims求最大值 | max_scalar@float32 t1 a1<-t3 |t3=max(t1,a1),a1为常数|
-| min | 规约计算-按dims求最小值 | min@float32 t1 t2<-t3 |t3=min(t1,t2) |
-| min_scalar | 规约计算-按dims求最小值 | min_scalar@float32 t1 a1<-t3 |t3=min(t1,a1),a1为常数|
+## 函数定义(funcdef)
+
+函数定义由excuter层负责注册实现,用于声明操作的参数和返回值类型。excuter通过注册funcdef来声明其支持的tensorfunc。
+
+因此需要设置参数、返回值的详细类型约束
+
+语法示例:
+```
+matmul(Tensor<float32|float64> A, Tensor<float32|float64> B) -> Tensor<float32|float64> C
+sum(Tensor<any> A, vector<int32> dim) -> Tensor<any> B
+newtensor(vector<int32> shape) -> Tensor<float32> T1
+```
+
+## 元数据格式
+
+可在指令后添加元数据信息:
+
+```
+matmul(A,B)->C //id=1 created_at=123456789 sent_at=123456790
+```
+
+支持的元数据字段:
+- id: 操作ID
+- author: 作者，部分tensorfunc的实现，如matmul，会有多实现，需要指定作者以根据环境指定最优实现
+- created_at: 创建时间戳
+- sent_at: 发送时间戳
+
+## 类型系统
+
+对于tensorfunc的类型系统，我们只关心与tensor相关的类型系统
+
+参考 excuter/common/src/deepx/dtype.hpp
+
+```
+{
+    类型: 
+         var
+         vector
+         tensor
+         listtensor
+    精度:
+         float64
+         float32
+         float16
+         bfloat16
+         fp8
+         fp4
+         int64
+         int32
+         int16
+         int8
+         int4
+         string//可以用来引用其他var或tensor的name
+}
+```
+多精度支持可以用|分隔,如float32|float64
+
+
+## funcdef
+
+excuter 负责定义其支持的tensorfunc
+
+1. 矩阵乘法:
+```
+# funcdef
+matmul(Tensor<float32|float64> A, Tensor<float32|float64> B) -> Tensor<float32|float64> C
+
+# funccall  
+matmul A,B -> C
+// rtf(remote tensor func)解析器会自动解析参数和返回值的列表
+// excuter会从mem获取A，B，C这3个tensor，并执行matmul操作
+```
+
+2. 张量求和:
+```
+# funcdef
+sum(Tensor<any> input, vector<int32> dims,var<bool> keepdim) -> Tensor<any> output
+
+# funccall
+sum(T1,[0 1],true) -> T2
+// rtf(remote tensor func)解析器会自动解析参数和返回值的列表
+// 其中[0 1]会被解析为vector<int32>，便于excuter执行时使用
+// true会被解析为var<bool> keepdim，便于excuter执行时使用
+// excuter会从mem获取T1，T2这2个tensor，并执行sum操作
+```
+
+3. 创建新张量:
+```
+# funcdef
+newtensor(vector<int32> shape) -> Tensor<float32> output
+
+# funccall
+newtensor 3 4 5 -> T1
+```

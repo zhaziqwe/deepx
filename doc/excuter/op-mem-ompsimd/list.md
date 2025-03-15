@@ -4,12 +4,8 @@
 
 | Operation | Author | Func Def | Math Formula | IR Instruction |
 |-----------|--------|------------|--------------|----------------|
-| argset |  none  | (arg)->(double) | shape = [3  4  5] | argset(arg )->(double d1) |
-| argset |  none  | (arg)->(float) | shape = [3  4  5] | argset(arg )->(float f1) |
-| argset |  none  | (args)->(int32) | shape = [3  4  5] | argset(args )->(int32 shape) |
-| newtensor |  none  | (shape)->(double) | T1 = zeros(shape) | newtensor(shape )->(double tensor) |
-| newtensor |  none  | (shape)->(float) | T1 = zeros(shape) | newtensor(shape )->(float tensor) |
-| newtensor |  none  | (shape)->(int64) | T1 = zeros(shape) | newtensor(shape )->(int64 tensor) |
-| newtensor |  none  | (shape)->(int32) | T1 = zeros(shape) | newtensor(shape )->(int32 tensor) |
-| newtensor |  none  | (shape)->(int16) | T1 = zeros(shape) | newtensor(shape )->(int16 tensor) |
-| newtensor |  none  | (shape)->(int8) | T1 = zeros(shape) | newtensor(shape )->(int8 tensor) |
+| concat |  none  | (unknown<any>, var<int32>)->(tensor<any>) | Tresult = concat([T1, T2...], axis=3) | concat(unknown<any> tensors, var<int32> axis)->(tensor<any> Tresult) |
+| newtensor |  none  | (var<unknown>)->(tensor<any>) | T1 = zeros(shape) | newtensor(var<unknown> shape)->(tensor<any> tensor1) |
+| newtensor |  none  | (vector<int32>)->(tensor<any>) | T1 = zeros(shape) | newtensor(vector<int32> shape)->(tensor<any> tensor1) |
+| vecset |  none  | (vector<any>)->() | shape = [3  4  5] | vecset(vector<any> shape)->() |
+| argset |  none  | (var<any>)->() | var argname = argvalue | argset(var<any> argname)->() |

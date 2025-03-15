@@ -15,6 +15,7 @@ namespace deepx::tf
         Concat()
         {
             this->name=_name;
+            this->funcdef();
         }
         Concat(string text)
         {
@@ -23,13 +24,15 @@ namespace deepx::tf
                 throw std::runtime_error("Invalid name: "+this->name);
             }
         }
-        void setexample() override
+        void funcdef(int polymorphism=0) override
         {
-            this->parse("concat(float32 T1,T2,int32 3)->(float32 T3)");
+            this->args.push_back(Param("tensors", DataCategory::ListTensor, Precision::Any));
+            this->args.push_back(Param("axis", DataCategory::Var, Precision::Int32));
+            this->returns.push_back(Param("Tresult", DataCategory::Tensor, Precision::Any));
         }
         string math_formula() const override
         {
-            return "T3 = concat([T1, T2], axis=3)";
+            return "Tresult = concat([T1, T2...], axis=3)";
         }
         int run(mem::Mem &mem, string &error) override
         {
@@ -61,7 +64,7 @@ namespace deepx::tf
     //             throw std::runtime_error("Invalid name: "+this->name);
     //         }
     //     }
-    //     void setexample() override
+    //     void funcdef() override
     //     {
     //         this->parse("split(float32 T1,int32 3)->(float32 T2,T3)");
     //     }   
@@ -115,7 +118,7 @@ namespace deepx::tf
     //         vector<int> shape = input->shape.shape;
     //         tensorfunc::reshape(*return_grad, *input_grad, shape);
     //     }
-    //     void setexample() override
+    //     void funcdef() override
     //     {
     //         this->init("reshape", "float32", {"T1", "2", "3", "4"}, {"T2"}, false, {}, {});
     //     }
@@ -177,7 +180,7 @@ namespace deepx::tf
     //         auto output_grad = mem.gettensor<T>(this->returns_grad[0]).get();
     //         tensorfunc::transpose(*output_grad, *input_grad, dimOrder);
     //     }
-    //     void setexample() override
+    //     void funcdef() override
     //     {
     //         this->init("transpose", "float32", {"T1", "1", "0"}, {"T2"}, false, {}, {});
     //     }
@@ -259,7 +262,7 @@ namespace deepx::tf
     //         // sum,按指定维度求和
     //         tensorfunc::sum(*output_grad,  axis,*input_grad);
     //     }
-    //     void setexample() override
+    //     void funcdef() override
     //     {
     //         this->init("expand", "float32", {"T1", "4", "6", "12"}, {"T2"}, false, {}, {});
     //     }

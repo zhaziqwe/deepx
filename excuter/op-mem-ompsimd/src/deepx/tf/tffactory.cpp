@@ -42,18 +42,10 @@ namespace deepx::tf
     // tensor
     void register_lifecycle(TfFactory &tffactory)
     {
-        
-        tffactory.add_tf(std::make_shared<NewTensor<int8_t>>("newtensor(shape)->(int8 tensor)"));
-        tffactory.add_tf(std::make_shared<NewTensor<int16_t>>("newtensor(shape)->(int16 tensor)"));
-        tffactory.add_tf(std::make_shared<NewTensor<int32_t>>("newtensor(shape)->(int32 tensor)"));
-        tffactory.add_tf(std::make_shared<NewTensor<int64_t>>("newtensor(shape)->(int64 tensor)"));
-        tffactory.add_tf(std::make_shared<NewTensor<float>>("newtensor(shape)->(float tensor)"));
-        tffactory.add_tf(std::make_shared<NewTensor<double>>("newtensor(shape)->(double tensor)"));
-
-        tffactory.add_tf(std::make_shared<ArgSet>("argset(args)->(int32 shape)"));
-        tffactory.add_tf(std::make_shared<ArgSet>("argset(arg)->(float f1)"));
-        tffactory.add_tf(std::make_shared<ArgSet>("argset(arg)->(double d1)"));
-
+        tffactory.add_tf(std::make_shared<ArgSet>());
+        tffactory.add_tf(std::make_shared<VecSet>());
+        tffactory.add_tf(std::make_shared<NewTensor>(0));
+        tffactory.add_tf(std::make_shared<NewTensor>(1));
         //opfactory.add_op(DelTensor<float>());
     }
 
@@ -72,7 +64,7 @@ namespace deepx::tf
     //io
     void register_util(TfFactory &opfactory)
     {
-        opfactory.add_tf(std::make_shared<Print>("print(float tensor)->()"));
+        opfactory.add_tf(std::make_shared<Print>());
     }
 
     // // elementwise
@@ -137,7 +129,8 @@ namespace deepx::tf
     //     opfactory.add_op(Transpose<float>());
     //     opfactory.add_op(Reshape<float>());
     //     opfactory.add_op(Expand<float>());
-        tffactory.add_tf(std::make_shared<Concat>("concat(tensor)->(tensor)"));
+        tffactory.add_tf(std::make_shared<Concat>());
+        
     }
     // // reduce
     // void register_reduce(OpFactory &opfactory)

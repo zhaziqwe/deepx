@@ -1,3 +1,7 @@
+
+add_executable(test_dtypes 0_dtypes.cpp)
+target_link_libraries(test_dtypes deepx_common)
+
 add_executable(test_tf  1_tf.cpp)
 target_link_libraries(test_tf deepx_common)
 

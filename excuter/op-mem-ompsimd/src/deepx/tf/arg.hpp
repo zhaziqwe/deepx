@@ -3,6 +3,7 @@
 
 #include "deepx/tf/tf.hpp"
 #include "deepx/dtype.hpp"
+#include <any>
 
 namespace deepx::tf
 {
@@ -25,34 +26,35 @@ namespace deepx::tf
     public:
         ArgSet()
         {
-            this->name = "argset";
+           this->name = "argset";
+            this->funcdef(0);
         }
-        ArgSet(string text)
+        ArgSet(string text, bool call = false)
         {
-            this->parse(text);
+            this->parse(text, call);
             if (this->name != "argset")
             {
                 throw std::runtime_error("Invalid name: " + this->name);
             }
         }
-        void setexample() override
+        void funcdef(int polymorphism=0) override
         {
-            this->parse("argset(3)->(int32 int1)");
+            this->args.push_back(Param("argname", DataCategory::Var, Precision::Any));
         }
         string math_formula() const override
         {
-            return "int1 = 3";
+            return "var argname = argvalue";
         }
         int run(mem::Mem &mem, string &error) override
         {
-            string name = this->returns[0].name;
+            string name = this->args[0].name;
             if (this->args.size() != 1)
             {
                 error = "argset(int32) must have 1 argument";
                 return 1;
             }
-            DataType datatype = dtype(this->returns[0].dtype);
-            if (datatype.parts.category!= DataCategory::Var)
+            TypeDef datatype = this->args[0].dtype;
+            if (datatype.parts.category != DataCategory::Var)
             {
                 error = "datatype must be var";
                 return 1;
@@ -60,25 +62,25 @@ namespace deepx::tf
             switch (datatype.parts.precision)
             {
             case Precision::Int32:
-                {
-                    int value = atoi(this->args[0].name.c_str());
-                    mem.addarg(name, value);
-                    break;
-                }
+            {
+                int value = atoi(this->args[0].name.c_str());
+                mem.addarg(name, value);
+                break;
+            }
             case Precision::Float32:
-                {
-                    float value = stof(this->args[0].name.c_str());
-                    mem.addarg(name, value);
-                    break;
-                }
+            {
+                float value = stof(this->args[0].name.c_str());
+                mem.addarg(name, value);
+                break;
+            }
             case Precision::Float64:
-                {
-                    double value = stod(this->args[0].name.c_str());
-                    mem.addarg(name, value);
-                    break;
-                }
+            {
+                double value = stod(this->args[0].name.c_str());
+                mem.addarg(name, value);
+                break;
+            }
             default:
-                error = "Unsupported dtype: " + this->args[0].dtype;
+                error = "Unsupported dtype: " + dtype_str(this->args[0].dtype);
                 return 1;
             }
             return 0;
@@ -91,6 +93,7 @@ namespace deepx::tf
         VecSet()
         {
             this->name = "vecset";
+            this->funcdef(0);
         }
         VecSet(string text)
         {
@@ -100,9 +103,9 @@ namespace deepx::tf
                 throw std::runtime_error("Invalid name: " + this->name);
             }
         }
-        void setexample() override
+        void funcdef(int polymorphism=0) override
         {
-            this->parse("vecset(3 4 5)->(int32 shape)");
+            this->args.push_back(Param("shape", DataCategory::Vector, Precision::Any));
         }
         string math_formula() const override
         {
@@ -110,66 +113,35 @@ namespace deepx::tf
         }
         int run(mem::Mem &mem, string &error) override
         {
-            string name = this->returns[0].name;
-            DataType datatype = dtype(this->returns[0].dtype);
-            if (datatype.parts.category!= DataCategory::Vector)
+            string name = this->args[0].name;
+            TypeDef datatype = this->args[0].dtype;
+            if (datatype.category() != DataCategory::Vector)
             {
                 error = "datatype must be vector";
                 return 1;
             }
-            switch (datatype.parts.precision)
+            switch (datatype.precision())
             {
             case Precision::Int32:
-                if (this->args.size() == 1)
                 {
-                    int value = atoi(this->args[0].name.c_str());
-                    mem.addarg(name, value);
-                }
-                else if (this->args.size() > 1)
-                {
-                    vector<int> value;
-                    for (int i = 0; i < this->args.size(); i++)
-                    {
-                        value.push_back(atoi(this->args[i].name.c_str()));
-                    }
+                    vector<int> value = std::any_cast<vector<int>>(this->args[0].value);
                     mem.addvector(name, value);
+                    break;
                 }
-                break;
             case Precision::Float32:
-
-                if (this->args.size() == 1)
                 {
-                    float value = stof(this->args[0].name.c_str());
-                    mem.addarg(name, value);
-                }
-                else if (this->args.size() > 1)
-                {
-                    vector<float> value;
-                    for (int i = 0; i < this->args.size(); i++)
-                    {
-                        value.push_back(stof(this->args[i].name.c_str()));
-                    }
+                    vector<float> value = std::any_cast<vector<float>>(this->args[0].value);
                     mem.addvector(name, value);
+                    break;
                 }
-                break;
             case Precision::Float64:
-                if (this->args.size() == 1)
                 {
-                    double value = stod(this->args[0].name.c_str());
-                    mem.addarg(name, value);
-                }
-                else if (this->args.size() > 1)
-                {
-                    vector<double> value;
-                    for (int i = 0; i < this->args.size(); i++)
-                    {
-                        value.push_back(stod(this->args[i].name.c_str()));
-                    }
+                    vector<double> value = std::any_cast<vector<double>>(this->args[0].value);
                     mem.addvector(name, value);
+                    break;
                 }
-                break;
             default:
-                error = "Unsupported dtype: " + this->args[0].dtype;
+                error = "Unsupported dtype: " + dtype_str(datatype);
                 return 1;
             }
             return 0;

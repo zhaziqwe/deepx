@@ -10,6 +10,12 @@
 namespace deepx::tensorfunc
 {
     template <typename T>
+    void constant(Tensor<T> &tensor, const T value)
+    {
+        std::fill(tensor.data, tensor.data + tensor.shape.size, value);
+    }
+
+    template <typename T>
     void uniform(Tensor<T> &tensor, const T low = 0, const T high = 1, const unsigned int seed = 0)
     {
         std::uniform_real_distribution<double> distribution(low, high);
@@ -39,12 +45,6 @@ namespace deepx::tensorfunc
             int thread_id = omp_get_thread_num();
             tensor.data[i] = static_cast<T>(distribution(generators[thread_id]));
         }
-    }
-
-    template <typename T>
-    void constant(Tensor<T> &tensor, const T value)
-    {
-        std::fill(tensor.data, tensor.data + tensor.shape.size, value);
     }
 
     template <typename T>

@@ -22,13 +22,15 @@ namespace deepx::tf
     using namespace std::chrono;
     
     struct Param {
+        TypeDef dtype;
         string name;
-        string dtype;
+        any value;
         
-        Param(const string& n = "", const string& dt = "any") 
-            : name(n), dtype(dt) {}
+        Param(const string& name = "", const DataCategory& dt = DataCategory::Unknown, const Precision& prec = Precision::Unknown) 
+            : name(name), dtype(make_dtype(dt, prec)) {}
     };
 
+    //TF:Tensor Function的缩写
     class TF
     {
     public:
@@ -52,7 +54,7 @@ namespace deepx::tf
             throw NotImplementError(name);
         }
         virtual string math_formula() const;
-        virtual void setexample();
+        virtual void funcdef(int polymorphism=0);
         
         void parse(const string &str, bool call = false);
         std::string to_string(bool show_extra=false, bool show_name=true) const;

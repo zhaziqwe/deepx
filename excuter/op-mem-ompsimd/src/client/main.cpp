@@ -86,8 +86,8 @@ int main()
             }
             if (op_family.tf_authors.find(author) == op_family.tf_authors.end())
             {
-                cerr << "<op> " << op.name << " " << author << " not found" << endl;
-                opresp.error("op" + op.name + " " + author + " not found");
+                cerr << "<op>" << op.name << "author:" << author << " not found" << endl;
+                opresp.error("op" + op.name + " author:" + author + " not found");
                 continue;
             }
             string dtypes = op.dtypes();
@@ -95,6 +95,11 @@ int main()
             {
                 cerr << "<op> " << op.name << " " << author << " " << dtypes << " not found" << endl;
                 opresp.error("op" + op.name + " " + author + " " + dtypes + " not found");
+                cerr << "supported dtypes: " << endl;
+                for (auto &[funcdef, tf] : op_family.tf_authors.find(author)->second->tfs)
+                {
+                    cerr << "" << funcdef << endl;
+                }
                 continue;
             }
             auto src = op_family.tf_authors.find(author)->second->tfs.find(dtypes)->second;
