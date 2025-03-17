@@ -2,6 +2,7 @@
 #define DEEPX_TENSORFUNC_NEW_HPP
 
 #include "deepx/tensor.hpp"
+#include "deepx/dtype.hpp"
 #include "deepx/tensorfunc/new_mempool.hpp"
 
 // 具体的张量类
@@ -51,7 +52,7 @@ namespace deepx::tensorfunc
     {
         
         Shape shape(shapedata);
-        shape.dtype=typeid(T).name();
+        shape.dtype=precision<T>();
         // 分配内存
         // 创建tensor并返回
         Tensor<T> tensor(shape);

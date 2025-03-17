@@ -23,7 +23,7 @@ include_directories(${cutlass_SOURCE_DIR}/include)
 include_directories(${cutlass_SOURCE_DIR}/tools/util/include)
 
 
-add_subdirectory(../common common)  # 包含公共模块
+add_subdirectory(../cpp-common common)  # 包含公共模块
 
 # 源文件
 file(GLOB_RECURSE DEEPX_SOURCES "src/deepx/*.cpp" "src/deepx/*.cu")
