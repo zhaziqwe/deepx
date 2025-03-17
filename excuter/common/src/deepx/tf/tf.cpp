@@ -66,169 +66,192 @@ namespace deepx::tf
         return {func_name, input_part, output_part};
     }
 
-    // 检查是否是数组格式并提取内容
-    std::pair<bool, string> extract_array_content(const string &token) {
-        if (token.front() != '[') {
-            return {false, ""};
-        }
-        
-        if (token.back() == ']') {
-            // 单个token的数组
-            return {true, token.substr(1, token.length() - 2)};
-        }
-        return {true, token.substr(1)}; // 返回去掉开头'['的内容
-    }
-
-    // 处理多token数组的情况
-    string parse_multi_token_array(stringstream &ss, const string &first_content) {
-        string array_content = first_content;
-        string temp;
-        
-        while (ss >> temp) {
-            array_content += " " + temp;
-            if (temp.back() == ']') {
-                return array_content.substr(0, array_content.length() - 1);
-            }
-        }
-        throw runtime_error("Invalid array format: missing closing bracket");
-    }
-
     // 解析单个值为具体C++类型
-    any parse_single_value(const string &value_str, const TypeDef &dtype) {
+    any parse_single_value(const string &value_str, const TypeDef &dtype)
+    {
         // 如果是字符串类型，直接返回
-        if (dtype.precision() == Precision::String) {
+        if (dtype.precision() == Precision::String)
+        {
             return value_str;
         }
 
         // 处理布尔类型
-        if (dtype.precision() == Precision::Bool) {
-            if (value_str == "true" || value_str == "1") return true;
-            if (value_str == "false" || value_str == "0") return false;
+        if (dtype.precision() == Precision::Bool)
+        {
+            if (value_str == "true" || value_str == "1")
+                return true;
+            if (value_str == "false" || value_str == "0")
+                return false;
             throw runtime_error("Invalid boolean value: " + value_str);
         }
 
-        try {
+        try
+        {
             // 处理整数类型
-            if (uint16_t(dtype.precision() & Precision::Int)) {
-                if (dtype.precision() == Precision::Int64) return stoll(value_str);
-                if (dtype.precision() == Precision::Int32) return stoi(value_str);
-                if (dtype.precision() == Precision::Int16) return (int16_t)stoi(value_str);
-                if (dtype.precision() == Precision::Int8) return (int8_t)stoi(value_str);
-                if (dtype.precision() == Precision::Int4) return (int8_t)(stoi(value_str) & 0x0F);
+            if (uint16_t(dtype.precision() & Precision::Int))
+            {
+                if (dtype.precision() == Precision::Int64)
+                    return stoll(value_str);
+                if (dtype.precision() == Precision::Int32)
+                    return stoi(value_str);
+                if (dtype.precision() == Precision::Int16)
+                    return (int16_t)stoi(value_str);
+                if (dtype.precision() == Precision::Int8)
+                    return (int8_t)stoi(value_str);
+                if (dtype.precision() == Precision::Int4)
+                    return (int8_t)(stoi(value_str) & 0x0F);
             }
-            
+
             // 处理浮点类型
-            if (uint16_t(dtype.precision() & Precision::Float) ) {
-                if (dtype.precision() == Precision::Float64) return stod(value_str);
-                if (dtype.precision() == Precision::Float32) return stof(value_str);
+            if (uint16_t(dtype.precision() & Precision::Float))
+            {
+                if (dtype.precision() == Precision::Float64)
+                    return stod(value_str);
+                if (dtype.precision() == Precision::Float32)
+                    return stof(value_str);
                 // Float16等其他浮点类型先转为float32
                 return stof(value_str);
             }
 
             // Any类型，尝试按照以下顺序解析：int64 -> float64 -> bool -> string
-            try {
+            try
+            {
                 return stoll(value_str);
-            } catch (...) {
-                try {
+            }
+            catch (...)
+            {
+                try
+                {
                     return stod(value_str);
-                } catch (...) {
-                    if (value_str == "true") return true;
-                    if (value_str == "false") return false;
+                }
+                catch (...)
+                {
+                    if (value_str == "true")
+                        return true;
+                    if (value_str == "false")
+                        return false;
                     return value_str;
                 }
             }
-        } catch (const std::exception &e) {
-            throw runtime_error("Failed to parse value '" + value_str + "' as " + 
-                              base_category_str(dtype.category()) + "<" + 
-                              precision_str(dtype.precision()) + ">");
         }
-        
+        catch (const std::exception &e)
+        {
+            throw runtime_error("Failed to parse value '" + value_str + "' as " +
+                                base_category_str(dtype.category()) + "<" +
+                                precision_str(dtype.precision()) + ">");
+        }
+
         return value_str; // 默认作为字符串处理
     }
 
-    // 解析数组值
-    vector<any> parse_array_values(const string &array_str, const TypeDef &elem_dtype) {
-        vector<any> values;
-        stringstream ss(array_str);
-        string elem_str;
-        
-        while (ss >> elem_str) {
-            values.push_back(parse_single_value(elem_str, elem_dtype));
+    // 主参数解析函数,param已经去除两侧空格
+    Param parse_param(const string &param)
+    {
+        Param result;
+        if (param.empty())
+        {
+            return result;
+        }
+
+        // 初始化变量
+        string type;
+        string textvalue;
+        vector<string> vectorvalues;
+        bool vectorvalue = false;
+
+        // 检查是否是向量值（以]结尾）
+        if (param.back() == ']')
+        {
+            size_t bracket_start = param.find_last_of('[');
+            if (bracket_start != string::npos)
+            {
+                vectorvalue = true;
+                // 提取方括号内的内容作为textvalue
+                textvalue = param.substr(bracket_start + 1, param.length() - bracket_start - 2);
+                // 提取方括号前的内容作为type
+                type = param.substr(0, bracket_start);
+                // 去除type两端的空格
+                type.erase(0, type.find_first_not_of(" "));
+                type.erase(type.find_last_not_of(" ") + 1);
+            }
+        }
+
+        if (!vectorvalue)
+        {
+            // 没有方括号，按空格分割
+            stringstream ss(param);
+            string first, second;
+            ss >> first;
+            if (ss >> second)
+            {
+                // 如果能读取到两个部分
+                type = first;
+                textvalue = second;
+            }
+            else
+            {
+                textvalue = first;
+            }
+        }
+
+        // 处理向量值
+        if (vectorvalue)
+        {
+            // 分割字符串为向量
+            stringstream ss(textvalue);
+            string item;
+            while (getline(ss, item, ' '))
+            {
+                item.erase(0, item.find_first_not_of(" "));
+                item.erase(item.find_last_not_of(" ") + 1);
+                if (!item.empty())
+                {
+                    vectorvalues.push_back(item);
+                }
+            }
+        }
+
+        // 设置结果
+        if (!type.empty())
+        {
+            result.dtype =  dtype(type);
+        }
+        else
+        {
+            // 没有显式类型声明,根据值推断
+            if (vectorvalue)
+            {
+                if (!vectorvalues.empty())
+                {   
+                    if (is_integer(vectorvalues[0])){
+                        result.dtype = make_dtype(DataCategory::Vector, Precision::Int32);
+                    }
+                    else if (is_float(vectorvalues[0]))
+                    {
+                        result.dtype = make_dtype(DataCategory::Vector, Precision::Float64);
+                    }
+                    else
+                    {
+                        result.dtype = make_dtype(DataCategory::ListTensor, Precision::Any);
+                    }
+                }
+                else
+                {
+                    result.dtype = make_dtype(DataCategory::Vector, Precision::Any);
+                }
+            }
+            else
+            {
+                result.dtype = make_dtype(DataCategory::Var|DataCategory::Tensor, Precision::Any);
+            }
         }
         
-        return values;
-    }
-
-    // // 修改parse_array_param函数
-    // Param parse_array_param(stringstream &ss, const string &array_content, bool call) {
-    //     if (call) {
-    //         // callfunc模式：解析数组值
-    //         Param param("[" + array_content + "]", "vector<any>");
-    //         param.value = parse_array_values(array_content, 
-    //             make_dtype(DataCategory::Unknown, Precision::Any));
-    //         return param;
-    //     } else {
-    //         // deffunc模式：第二个token是参数名
-    //         string param_name;
-    //         ss >> param_name;
-    //         TypeDef type = dtype(array_content);
-    //         return Param(param_name, type);
-    //     }
-    // }
-
-    // // 修改parse_non_array_param函数
-    // Param parse_non_array_param(stringstream &ss, const string &first_token, bool call) {
-    //     string second_token;
-    //     if (ss >> second_token) {
-    //         if (call) {
-    //             // callfunc模式：first_token是类型，second_token是值
-    //             Param param(second_token, first_token);
-    //             param.value = parse_single_value(second_token, param.dtype);
-    //             return param;
-    //         } else {
-    //             // deffunc模式：first_token是类型，second_token是参数名
-    //             return Param(second_token, first_token);
-    //         }
-    //     } else {
-    //         // 只有一个token
-    //         if (call) {
-    //             // callfunc模式：token作为值
-    //             Param param(first_token, "any");
-    //             param.value = parse_single_value(first_token, param.dtype);
-    //             return param;
-    //         } else {
-    //             // deffunc模式：token作为类型
-    //             return Param("", first_token);
-    //         }
-    //     }
-    // }
-
-    // 主参数解析函数
-    Param parse_param(const string &param_str, bool call) {
-        stringstream param_ss(param_str);
-        string first_token;
-        
-        if (!(param_ss >> first_token)) {
-            return Param();
-        }
-        
-        // 检查是否是数组格式
-        // auto [is_array, array_content] = extract_array_content(first_token);
-        // if (is_array) {
-        //     if (array_content.empty() || array_content.back() != ']') {
-        //         // 处理多token数组
-        //         array_content = parse_multi_token_array(param_ss, array_content);
-        //     }
-        //     return parse_array_param(param_ss, array_content, call);
-        // }
-        
-        // // 处理非数组格式
-        // return parse_non_array_param(param_ss, first_token, call);
-        return Param{};
+        result.textvalue = textvalue;
+        return result;
     }
 
     // 解析参数列表
-    vector<Param> parse_params(const string &params_str, bool call)
+    vector<Param> parse_params(const string &params_str)
     {
         vector<Param> params;
         stringstream params_ss(params_str);
@@ -244,7 +267,7 @@ namespace deepx::tf
                 continue;
 
             // 解析单个参数
-            Param parsed_param = parse_param(param, call);
+            Param parsed_param = parse_param(param);
             params.push_back(parsed_param);
         }
 
@@ -298,7 +321,7 @@ namespace deepx::tf
     }
 
     // 主解析函数
-    void TF::parse(const string &input, bool call)
+    void TF::parse(const string &input)
     {
         // 1. 按//分割主体和元数据
         auto [body, meta] = split_body_metadata(input);
@@ -308,10 +331,10 @@ namespace deepx::tf
         name = func_name;
 
         // 3. 解析输入为参数列表
-        args = parse_params(input_part, call);
+        args = parse_params(input_part);
 
         // 4. 解析返回值
-        returns = parse_params(output_part, call);
+        returns = parse_params(output_part);
 
         // 5. 解析元数据
         parse_metadata(meta, id, author, created_at, sent_at);
@@ -344,7 +367,7 @@ namespace deepx::tf
             ss << dtype_str(args[i].dtype);
             if (show_name)
             {
-                ss << " " << args[i].name;
+                ss << " " << args[i].textvalue;
             }
         }
 
@@ -362,7 +385,7 @@ namespace deepx::tf
             ss << dtype_str(returns[i].dtype);
             if (show_name)
             {
-                ss << " " << returns[i].name;
+                ss << " " << returns[i].textvalue;
             }
         }
 
@@ -378,9 +401,9 @@ namespace deepx::tf
         return ss.str();
     }
 
-    TF::TF(string text, bool call)
+    TF::TF(const string text)
     {
-        parse(text, call);
+        parse(text);
     }
     string TF::op_name()
     {
@@ -417,14 +440,16 @@ namespace deepx::tf
             // 当前TF的类型可能包含多个选项
             TypeDef dtype = args[i].dtype;
             TypeDef other_dtype = other.args[i].dtype;
-            //TODO
+            // TODO
         }
 
         return true;
     }
 
-    void TF::funcdef(int polymorphism) {
+    void TF::funcdef(int polymorphism)
+    {
         // 基类的默认实现为空
         // 派生类需要重写这个函数来定义具体的函数签名
     }
+ 
 }

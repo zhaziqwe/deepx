@@ -62,48 +62,13 @@ int main()
             opresp.id = op.id;
             opresp.recv_at = op.recv_at;
 
-            if (tf_factory.tf_families.find(op.name) == tf_factory.tf_families.end())
+            auto src = tf_factory.get_tf(op);
+            if (src == nullptr)
             {
-                cerr << "<op> " << op.name << " not found" << endl;
                 opresp.error("op" + op.name + " not found");
+                server.resp(opresp.to_string());
                 continue;
             }
-            auto op_family = *(tf_factory.tf_families.find(op.name)->second);
-            string author = op.author;
-            if (op.author == "")
-            {
-                author = op_family._default;
-                if (author == "" && op_family.tf_authors.size() > 0)
-                {
-                    author = op_family.tf_authors.begin()->first;
-                }
-                else
-                {
-                    cerr << "<op> " << op.name << " no author implement" << endl;
-                    opresp.error("op" + op.name + " no author implement");
-                    continue;
-                }
-            }
-            if (op_family.tf_authors.find(author) == op_family.tf_authors.end())
-            {
-                cerr << "<op>" << op.name << "author:" << author << " not found" << endl;
-                opresp.error("op" + op.name + " author:" + author + " not found");
-                continue;
-            }
-            string dtypes = op.dtypes();
-            if (op_family.tf_authors.find(author)->second->tfs.find(dtypes) == op_family.tf_authors.find(author)->second->tfs.end())
-            {
-                cerr << "<op> " << op.name << " " << author << " " << dtypes << " not found" << endl;
-                opresp.error("op" + op.name + " " + author + " " + dtypes + " not found");
-                cerr << "supported dtypes: " << endl;
-                for (auto &[funcdef, tf] : op_family.tf_authors.find(author)->second->tfs)
-                {
-                    cerr << "" << funcdef << endl;
-                }
-                continue;
-            }
-            auto src = op_family.tf_authors.find(author)->second->tfs.find(dtypes)->second;
-
             (*src).init(op.name, op.args, op.returns);
             memmutex.lock();
             opresp.start_at = chrono::system_clock::now();

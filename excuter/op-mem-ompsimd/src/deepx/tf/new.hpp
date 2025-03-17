@@ -25,7 +25,7 @@ namespace deepx::tf
         }
         NewTensor(string text, bool call = false)
         {
-            this->parse(text, call);
+            this->parse(text);
             if (this->name != "newtensor")
             {
                 throw std::runtime_error("Invalid name: " + this->name);
@@ -33,24 +33,31 @@ namespace deepx::tf
         }
         int run(mem::Mem &mem, string &error) override
         {
-            string name = this->returns[0].name;
+            string name = this->returns[0].textvalue;
             TypeDef type = this->returns[0].dtype;
-            if (type.category() != DataCategory::Tensor)
+            if (uint8_t(type.category() & DataCategory::Tensor) == 0)
             {
-                error = "newtensor: shape must be a tensor";
+                error = "newtensor: return type must include tensor category";
                 return 1;
             }
             vector<int> shape;
-            if (this->args.size() == 1 && !is_positive_integer(this->args[0].name))
+            if (this->args.size() == 1 && !is_positive_integer(this->args[0].textvalue))
             {
-                shape = mem.getvector<int32_t>(this->args[0].name);
+                shape = mem.getvector<int32_t>(this->args[0].textvalue);
             }
             else
             {
-                for (int i = 0; i < this->args.size(); i++)
-                {
-                    shape.push_back(atoi(this->args[i].name.c_str()));
+                vector<string> value_strs;
+                stringstream ss(this->args[0].textvalue);
+                string item;
+                while (ss >> item) {
+                    value_strs.push_back(item);
                 }
+                vector<int32_t> values;
+                for (const auto &str : value_strs) {
+                    values.push_back(stoi(str));
+                }
+                shape=values;
             }
             switch (type.precision())
             {
@@ -239,7 +246,7 @@ namespace deepx::tf
         }
         int run(mem::Mem &mem, string &error) override
         {
-            string name = this->args[0].name;
+            string name = this->args[0].textvalue;
             mem.delete_tensor(name);
             return 0;
         }

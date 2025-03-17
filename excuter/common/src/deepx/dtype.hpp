@@ -15,27 +15,67 @@ enum class DataCategory : uint8_t {
     // 4-15预留
 };
 
-// DataCategory
-inline std::string base_category_str(DataCategory category) {
-    switch(category) {
-        case DataCategory::Tensor: return "tensor";
-        case DataCategory::Vector: return "vector";
-        case DataCategory::Var: return "var";
-        default: return "unknown";
-    }
+// 在DataCategory枚举定义后添加位运算操作符
+inline DataCategory operator|(DataCategory a, DataCategory b) {
+    return static_cast<DataCategory>(
+        static_cast<uint8_t>(a) | static_cast<uint8_t>(b)
+    );
 }
 
+inline DataCategory operator&(DataCategory a, DataCategory b) {
+    return static_cast<DataCategory>(
+        static_cast<uint8_t>(a) & static_cast<uint8_t>(b)
+    );
+}
+
+// 修改base_category_str函数以支持组合类型
+inline std::string base_category_str(DataCategory category) {
+    std::vector<std::string> types;
+    uint8_t value = static_cast<uint8_t>(category);
+    
+    if (value & static_cast<uint8_t>(DataCategory::Tensor)) types.push_back("tensor");
+    if (value & static_cast<uint8_t>(DataCategory::Vector)) types.push_back("vector");
+    if (value & static_cast<uint8_t>(DataCategory::Var)) types.push_back("var");
+    if (value & static_cast<uint8_t>(DataCategory::ListTensor)) types.push_back("listtensor");
+    
+    if (types.empty()) return "unknown";
+    
+    std::string result = types[0];
+    for (size_t i = 1; i < types.size(); i++) {
+        result += "|" + types[i];
+    }
+    return result;
+}
+
+// 修改base_category函数以支持组合类型
 inline DataCategory base_category(const std::string& str) {
-    if (str == "tensor") return DataCategory::Tensor;
-    else if (str == "vector") return DataCategory::Vector;
-    else if (str == "var") return DataCategory::Var;
-    return DataCategory::Unknown;
+    if (str.find('|') == std::string::npos) {
+        // 处理单一类型
+        if (str == "tensor") return DataCategory::Tensor;
+        else if (str == "vector") return DataCategory::Vector;
+        else if (str == "var") return DataCategory::Var;
+        else if (str == "listtensor") return DataCategory::ListTensor;
+        return DataCategory::Unknown;
+    }
+    
+    // 处理组合类型
+    DataCategory result = DataCategory::Unknown;
+    size_t start = 0;
+    size_t pos;
+    
+    while ((pos = str.find('|', start)) != std::string::npos) {
+        std::string type = str.substr(start, pos - start);
+        result = result | base_category(type);
+        start = pos + 1;
+    }
+    
+    // 处理最后一个类型
+    result = result | base_category(str.substr(start));
+    return result;
 }
 
 // 将Precision改为位图形式
 enum class Precision : uint16_t {
-    Unknown = 0,
-    
     // 浮点类型 (0-7位)
     Float64    = 1 << 0,   // 0000 0000 0000 0001
     Float32    = 1 << 1,   // 0000 0000 0000 0010  
@@ -139,12 +179,12 @@ constexpr Precision precision() {
     else if constexpr (std::is_same_v<T, int8_t>) return Precision::Int8;
     // else if constexpr (std::is_same_v<T, int4_t>) return Precision::Int4;
     else if constexpr (std::is_same_v<T, bool>) return Precision::Bool;
-    else return Precision::Unknown;
+    else if constexpr (std::is_same_v<T, std::string>) return Precision::String;
+    else return Precision::Any;
 }
 
 // 修改precision_str函数以使用标准命名格式
 inline std::string precision_str(Precision p) {
-    if (p == Precision::Unknown) return "unknown";
     if (p == Precision::Any) return "any";
     
     std::vector<std::string> types;
@@ -163,8 +203,8 @@ inline std::string precision_str(Precision p) {
     if (value & static_cast<uint16_t>(Precision::Int8)) types.push_back("int8");
     if (value & static_cast<uint16_t>(Precision::Int4)) types.push_back("int4");
     if (value & static_cast<uint16_t>(Precision::Bool)) types.push_back("bool");
-    
-    if (types.empty()) return "unknown";
+    if (value & static_cast<uint16_t>(Precision::String)) types.push_back("string");
+    if (types.empty()) return "any";
     
     std::string result = types[0];
     for (size_t i = 1; i < types.size(); i++) {
@@ -202,8 +242,8 @@ inline Precision precision(const std::string& str) {
     else if (str == "int4") return Precision::Int4;
     
     else if (str == "bool") return Precision::Bool;
-    
-    return Precision::Unknown;
+    else if (str=="string") return Precision::String;
+    return Precision::Any;
 }
 
 // 修改dtype函数，处理无精度标记的情况

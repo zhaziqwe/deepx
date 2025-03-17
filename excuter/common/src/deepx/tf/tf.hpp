@@ -23,11 +23,10 @@ namespace deepx::tf
     
     struct Param {
         TypeDef dtype;
-        string name;
+        string textvalue;
         any value;
-        
-        Param(const string& name = "", const DataCategory& dt = DataCategory::Unknown, const Precision& prec = Precision::Unknown) 
-            : name(name), dtype(make_dtype(dt, prec)) {}
+        Param(const string& textvalue = "", const DataCategory& dt = DataCategory::Unknown, const Precision& prec = Precision::Any)
+            : textvalue(textvalue), dtype(make_dtype(dt, prec)) {}
     };
 
     //TF:Tensor Function的缩写
@@ -46,7 +45,7 @@ namespace deepx::tf
     public:
         TF() = default;
         TF(const TF &) = default;
-        TF(string text, bool call = false);
+        TF(const string text);
         TF &operator=(const TF &) = default;
         
         string op_name();
@@ -56,7 +55,7 @@ namespace deepx::tf
         virtual string math_formula() const;
         virtual void funcdef(int polymorphism=0);
         
-        void parse(const string &str, bool call = false);
+        void parse(const string &str);
         std::string to_string(bool show_extra=false, bool show_name=true) const;
         void init(const string &opname,
                   const vector<Param> &args,
@@ -71,15 +70,15 @@ namespace deepx::tf
             if(idx<0 || idx>=vars.size()){
                 throw std::invalid_argument("Invalid argument index");
             }
-            if (is_float(vars[idx].name)){
-                T value=T(std::stof(vars[idx].name));
+            if (is_float(vars[idx].textvalue)){
+                T value=T(std::stof(vars[idx].textvalue));
                 return value;
             }
-            return mem.getarg<T>(vars[idx].name);
+            return mem.getarg<T>(vars[idx].textvalue);
         }
 
         template<typename T>
-        vector<T> argvector(const int from=0, int to=0,bool arg=true){
+        vector<T> argvector(  int from=0, int to=0,bool arg=true){
             vector<Param> &vars=arg?args:returns;
             if(from<0){
                 from = vars.size()+from;
@@ -92,7 +91,7 @@ namespace deepx::tf
             }
             vector<T> result;
             for(int i=from;i<=to;i++){
-                result.push_back(T(std::stof(vars[i].name)));
+                result.push_back(T(std::stof(vars[i].textvalue)));
             }
             return result;
         }

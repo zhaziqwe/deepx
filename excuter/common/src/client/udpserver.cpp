@@ -51,7 +51,7 @@ namespace client
                 if (!line.empty()) {
                     deepx::tf::TF tf;
                     tf.recv_at = chrono::system_clock::now();
-                    tf.parse(line,true);
+                    tf.parse(line);
                     queue.push(tf);
                 }
             }
