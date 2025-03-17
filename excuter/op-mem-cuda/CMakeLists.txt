@@ -9,18 +9,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE Debug)
 
 
-# include(FetchContent)
-# FetchContent_Declare(
-#     cutlass
-#     GIT_REPOSITORY https://github.com/NVIDIA/cutlass.git
-#     GIT_TAG v3.4.1
-# )
-# FetchContent_MakeAvailable(cutlass)
+include(FetchContent)
+FetchContent_Declare(
+    cutlass
+    GIT_REPOSITORY git@github.com:NVIDIA/cutlass.git
+    GIT_TAG v3.8
+)
+FetchContent_MakeAvailable(cutlass)
 
 # 包含头文件目录
 include_directories(src)
-# include_directories(${cutlass_SOURCE_DIR}/include)
-# include_directories(${cutlass_SOURCE_DIR}/tools/util/include)
+include_directories(${cutlass_SOURCE_DIR}/include)
+include_directories(${cutlass_SOURCE_DIR}/tools/util/include)
 
 
 add_subdirectory(../common common)  # 包含公共模块
@@ -29,7 +29,7 @@ add_subdirectory(../common common)  # 包含公共模块
 file(GLOB_RECURSE DEEPX_SOURCES "src/deepx/*.cpp" "src/deepx/*.cu")
 file(GLOB_RECURSE CLIENT_SOURCES "src/client/*.cpp")
 
-# include(FetchContent)
+include(FetchContent)
 
 find_package(CUDAToolkit REQUIRED COMPONENTS cublas)
 include_directories(${CUDAToolkit_INCLUDE_DIRS})
@@ -50,7 +50,7 @@ target_link_libraries( deepx
     deepx_common
     yaml-cpp
     CUDA::cublas
-    # cutlass
+    cutlass
 )
 add_executable(${PROJECT_NAME} ${CLIENT_SOURCES})
 target_link_libraries(${PROJECT_NAME}
