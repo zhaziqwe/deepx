@@ -159,7 +159,7 @@ namespace deepx::mem
             result->copyer = nullptr;
             result->newer = nullptr;
 
-            switch (precision(ptr->shape.dtype))
+            switch (ptr->shape.dtype)
             {
                 case Precision::Float64:
                 {
@@ -180,7 +180,7 @@ namespace deepx::mem
                     break;
                 }
                 default:
-                    throw std::runtime_error("Unsupported dtype: " + ptr->shape.dtype);
+                    throw std::runtime_error("Unsupported dtype: " + precision_str(ptr->shape.dtype));
             }
 
             return result;

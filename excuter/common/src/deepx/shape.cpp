@@ -5,6 +5,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include "tensor.hpp"
+#include "deepx/dtype.hpp"
 namespace deepx
 {
 
@@ -79,7 +80,7 @@ namespace deepx
 
     std::string Shape::toYaml() const{
         YAML::Node node;
-        node["dtype"] = dtype;
+        node["dtype"] = precision_str(dtype);
         node["dim"] = dim;
         node["shape"] = shape;
         node["strides"] = strides;
@@ -88,7 +89,7 @@ namespace deepx
     }
     void Shape::fromYaml(const std::string &yaml){
         YAML::Node node = YAML::Load(yaml);
-        dtype = node["dtype"].as<std::string>();
+        dtype = precision(node["dtype"].as<std::string>());
         dim = node["dim"].as<int>();
         shape = node["shape"].as<std::vector<int>>();
         strides=node["strides"].as<std::vector<int>>();

@@ -25,9 +25,9 @@ int main(int argc, char **argv)
         {"var<float32>", make_dtype(DataCategory::Var, Precision::Float32)},
         {"var<bool>", make_dtype(DataCategory::Var, Precision::Bool)},
 
-         {"tensor", make_dtype(DataCategory::Tensor, Precision::Unknown)},
-        {"vector", make_dtype(DataCategory::Vector, Precision::Unknown)},
-        {"var", make_dtype(DataCategory::Var, Precision::Unknown)},
+         {"tensor", make_dtype(DataCategory::Tensor, Precision::Any)},
+        {"vector", make_dtype(DataCategory::Vector, Precision::Any)},
+        {"var", make_dtype(DataCategory::Var, Precision::Any)},
     };
 
     // 打印表头

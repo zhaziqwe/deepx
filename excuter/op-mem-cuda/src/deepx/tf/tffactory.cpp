@@ -2,7 +2,6 @@
 #include "deepx/tf/tf.hpp"
 #include "deepx/tf/new.hpp"
 #include "deepx/tf/print.hpp"
-#include "deepx/tf/changeshape.hpp"
 #include "deepx/dtype.hpp"
 #include "deepx/tf/tffactory.hpp"
 
@@ -63,8 +62,8 @@ namespace deepx::tf
     string TfFactory::print_markdown() const
     {
         std::stringstream ss;
-        ss << "## excuter/op-mem-ompsimd 支持算子列表 \n\n";
-        ss << "本页面由 `excuter/op-mem-ompsimd/src/deepx/tf/tffactory.hpp` 生成，请勿手动修改 \n\n";
+        ss << "## excuter/op-mem-cuda 支持算子列表 \n\n";
+        ss << "本页面由 `excuter/op-mem-cuda/src/deepx/tf/tffactory.hpp` 生成，请勿手动修改 \n\n";
         ss << "| Operation | Author | Func Def | Math Formula | IR Instruction |\n";
         ss << "|-----------|--------|------------|--------------|----------------|\n";
 
@@ -108,7 +107,6 @@ namespace deepx::tf
     void register_util(TfFactory &opfactory)
     {
         opfactory.add_tf(std::make_shared<Print>());
-        opfactory.add_tf(std::make_shared<Print>(1));
     }
 
     // // elementwise
@@ -172,7 +170,7 @@ namespace deepx::tf
         //     opfactory.add_op(Transpose<float>());
         //     opfactory.add_op(Reshape<float>());
         //     opfactory.add_op(Expand<float>());
-        tffactory.add_tf(std::make_shared<Concat>());
+        //tffactory.add_tf(std::make_shared<Concat>());
     }
     // // reduce
     // void register_reduce(OpFactory &opfactory)

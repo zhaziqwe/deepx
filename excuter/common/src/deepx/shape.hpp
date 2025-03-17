@@ -4,12 +4,14 @@
 #include <vector>
 #include <string>
 #include <functional>
+
+#include "deepx/dtype.hpp"
 namespace deepx
 {
    
     struct Shape
     {
-        std::string dtype;
+        Precision dtype;
         std::vector<int> shape;
         std::vector<int> strides;
         int dim;

@@ -31,12 +31,12 @@ namespace deepx
         Tensor(const vector<int> &s)  
         {
             shape = Shape(s);
-            shape.dtype = precision_str(precision<T>());
+            shape.dtype = precision<T>();
         }
         Tensor(const Shape &s)  
         {
             shape = s;
-            shape.dtype = precision_str(precision<T>());
+            shape.dtype = precision<T>();
         }
 
         ~Tensor()
@@ -55,7 +55,7 @@ namespace deepx
         Tensor(const Tensor<T> &tensor)
         {
             shape = tensor.shape;
-            shape.dtype = precision_str(precision<T>());
+            shape.dtype = precision<T>();
             device = tensor.device;
             newer = tensor.newer;
             deleter = tensor.deleter;
@@ -103,7 +103,7 @@ namespace deepx
                 return *this;
 
             shape = tensor.shape;
-            shape.dtype = precision_str(precision<T>());
+            shape.dtype = precision<T>();
             device = tensor.device;
             deleter = tensor.deleter;
             copyer = tensor.copyer;

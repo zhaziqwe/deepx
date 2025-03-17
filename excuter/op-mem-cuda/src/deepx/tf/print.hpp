@@ -8,9 +8,9 @@ namespace deepx::tf{
  
     class Print : public TF{
         public:
-        Print(int polymorphism=0){
+        Print(){
             this->name="print";
-            this->funcdef(polymorphism);
+            this->funcdef();
         }
         Print(string text){
             this->parse(text);
@@ -36,9 +36,7 @@ namespace deepx::tf{
         }   
         void funcdef(int polymorphism=0) override {
             this->args.push_back(Param("tensor1", DataCategory::Tensor, Precision::Any));
-            if (polymorphism==0) {
-                this->args.push_back(Param("format", DataCategory::Var, Precision::String));
-            }
+            this->args.push_back(Param("format", DataCategory::Var, Precision::String));
         }
         string math_formula() const override {
             return "print(T1)";
