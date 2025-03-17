@@ -12,7 +12,7 @@ set(CMAKE_BUILD_TYPE Debug)
 # 包含头文件目录
 include_directories(src)
  
-add_subdirectory(../common common)
+add_subdirectory(../cpp-common common)
 
 # 源文件
 
