@@ -1,6 +1,8 @@
 #include <cuda_fp16.h>
+#include <curand_kernel.h>
 
 #include "init_miaobyte.hpp"
+#include "init_miaobyte.cuh"
 #include "deepx/tensor.hpp"
 #include "authors.hpp"
 #include <cuda_fp16.h>
@@ -16,8 +18,6 @@ namespace deepx::tensorfunc
             data[idx] = value;
         }
     }
-
-
 
     // 实现特化版本的成员函数
     void _constant_func<miaobyte, float>::func(Tensor<float> &tensor, const float value)
@@ -62,7 +62,7 @@ namespace deepx::tensorfunc
         }
     }
 
-        // 添加kernel函数
+    // 添加kernel函数
     template <typename T>
     __global__ void kernel_arange(T *data, int size, T start, T step)
     {
@@ -112,6 +112,66 @@ namespace deepx::tensorfunc
         cudaError_t err = cudaGetLastError();
         if (err != cudaSuccess) {
             throw std::runtime_error("Failed to launch arange kernel");
+        }
+    }
+
+    template <typename T>
+    __global__ void kernel_uniform(T *data, int size, T low, T high, unsigned int seed) 
+    {
+        int idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx < size) {
+            // 为每个线程创建独立的随机数生成器状态
+            curandState state;
+            curand_init(seed, idx, 0, &state);
+            
+            // 生成[0,1)范围的随机数
+            float rand = curand_uniform(&state);
+            
+            // 先用float类型进行计算，然后转换为目标类型
+            float result = static_cast<float>(low) + (static_cast<float>(high) - static_cast<float>(low)) * rand;
+            data[idx] = static_cast<T>(result);
+        }
+    }
+
+    void _uniform_func<miaobyte, float>::func(Tensor<float> &tensor, const float low, const float high, const unsigned int seed)
+    {
+        int size = tensor.shape.size;
+        int blockSize = 256;
+        int numBlocks = (size + blockSize - 1) / blockSize;
+        
+        kernel_uniform<<<numBlocks, blockSize>>>(tensor.data, size, low, high, seed);
+        
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess) {
+            throw std::runtime_error("Failed to launch uniform kernel");
+        }
+    }
+
+    void _uniform_func<miaobyte, double>::func(Tensor<double> &tensor, const double low, const double high, const unsigned int seed)
+    {
+        int size = tensor.shape.size;
+        int blockSize = 256;
+        int numBlocks = (size + blockSize - 1) / blockSize;
+        
+        kernel_uniform<<<numBlocks, blockSize>>>(tensor.data, size, low, high, seed);
+        
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess) {
+            throw std::runtime_error("Failed to launch uniform kernel");
+        }
+    }
+
+    void _uniform_func<miaobyte, __half>::func(Tensor<__half> &tensor, const __half low, const __half high, const unsigned int seed)
+    {
+        int size = tensor.shape.size;
+        int blockSize = 256;
+        int numBlocks = (size + blockSize - 1) / blockSize;
+        
+        kernel_uniform<<<numBlocks, blockSize>>>(tensor.data, size, low, high, seed);
+        
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess) {
+            throw std::runtime_error("Failed to launch uniform kernel");
         }
     }
 }

@@ -4,7 +4,6 @@
 
 | Operation | Author | Func Def | Math Formula | IR Instruction |
 |-----------|--------|------------|--------------|----------------|
-| concat |  none  | concat(listtensor<any> tensors, var<int32> axis)->(tensor<any> Tresult) | Tresult = concat([T1, T2...], axis=3) | concat(listtensor<any> tensors, var<int32> axis)->(tensor<any> Tresult) |
 | print |  none  | print(tensor<any> tensor1, var<string> format)->() | print(T1) | print(tensor<any> tensor1, var<string> format)->() |
 | print |  none  | print(tensor<any> tensor1)->() | print(T1) | print(tensor<any> tensor1)->() |
 | newtensor |  none  | newtensor(vector<int32> shape)->(tensor<any> tensor1) | T1 = zeros(shape) | newtensor(vector<int32> shape)->(tensor<any> tensor1) |

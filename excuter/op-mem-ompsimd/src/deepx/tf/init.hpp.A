@@ -1,13 +1,13 @@
-#ifndef DEEPX_OP_INIT_HPP
-#define DEEPX_OP_INIT_HPP
+#ifndef DEEPX_TF_INIT_HPP
+#define DEEPX_TF_INIT_HPP
 
-#include "deepx/op/op.hpp"
+#include "deepx/tf/tf.hpp"
 #include "deepx/tensorfunc/init.hpp"
 #include "stdutil/num.hpp"
-namespace deepx::op{
+namespace deepx::tf{
  
     template<typename T>
-    class Constant : public Op{
+    class Constant : public TF{
         public:
         Constant(){
             this->init("constant",deepx::dtype<T>::name(), {}, {}, false, {}, {});

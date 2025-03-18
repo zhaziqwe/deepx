@@ -1,37 +1,38 @@
 #ifndef DEEPX_TF_TFFACTORY_HPP
 #define DEEPX_TF_TFFACTORY_HPP
 
-#include <unordered_map>
-#include <string>
-#include <memory>
-#include <vector>
-#include <algorithm>
-
 #include "deepx/tf/tf.hpp"
 
 namespace deepx::tf
 {
+
     struct TypeSignature
     {
         vector<TypeDef> args;
         vector<TypeDef> returns;
 
-        bool is_compatible(const TypeSignature& other) const {
-            return is_compatible_types(args, other.args) && 
+        bool is_compatible(const TypeSignature &other) const
+        {
+            return is_compatible_types(args, other.args) &&
                    is_compatible_types(returns, other.returns);
         }
 
     private:
-        static bool is_compatible_types(const vector<TypeDef>& a, const vector<TypeDef>& b) {
-            if (a.size() != b.size()) return false;
-            for (size_t i = 0; i < a.size(); i++) {
-                if ((static_cast<uint8_t>(a[i].parts.category) & 
-                     static_cast<uint8_t>(b[i].parts.category)) == 0) {
+        static bool is_compatible_types(const vector<TypeDef> &a, const vector<TypeDef> &b)
+        {
+            if (a.size() != b.size())
+                return false;
+            for (size_t i = 0; i < a.size(); i++)
+            {
+                if ((static_cast<uint8_t>(a[i].parts.category) &
+                     static_cast<uint8_t>(b[i].parts.category)) == 0)
+                {
                     return false;
                 }
-                if (a[i].parts.precision != Precision::Any && 
-                    b[i].parts.precision != Precision::Any && 
-                    a[i].parts.precision != b[i].parts.precision) {
+                if (a[i].parts.precision != Precision::Any &&
+                    b[i].parts.precision != Precision::Any &&
+                    a[i].parts.precision != b[i].parts.precision)
+                {
                     return false;
                 }
             }
@@ -44,23 +45,28 @@ namespace deepx::tf
         vector<std::shared_ptr<TF>> tfs;
 
         // 获取匹配的TF实现
-        std::shared_ptr<TF> get_matching_tf(const vector<TypeDef>& arg_types,
-                                           const vector<TypeDef>& return_types) const {
+        std::shared_ptr<TF> get_matching_tf(const vector<TypeDef> &arg_types,
+                                            const vector<TypeDef> &return_types) const
+        {
             TypeSignature target{arg_types, return_types};
-            
-            for (const auto& tf : tfs) {
+
+            for (const auto &tf : tfs)
+            {
                 vector<TypeDef> tf_arg_types;
-                for (const auto& arg : tf->args) {
+                for (const auto &arg : tf->args)
+                {
                     tf_arg_types.push_back(arg.dtype);
                 }
-                
+
                 vector<TypeDef> tf_return_types;
-                for (const auto& ret : tf->returns) {
+                for (const auto &ret : tf->returns)
+                {
                     tf_return_types.push_back(ret.dtype);
                 }
-                
+
                 TypeSignature current{tf_arg_types, tf_return_types};
-                if (target.is_compatible(current)) {
+                if (target.is_compatible(current))
+                {
                     return tf;
                 }
             }
@@ -101,9 +107,6 @@ namespace deepx::tf
         // 输出为markdown表格格式
         string print_markdown() const;
     };
-
-    int register_all(TfFactory &tfactory);
 }
- 
 
 #endif

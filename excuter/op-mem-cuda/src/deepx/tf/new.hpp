@@ -1,6 +1,8 @@
 #ifndef DEEPX_TF_NEW_HPP
 #define DEEPX_TF_NEW_HPP
 
+#include <cuda_fp16.h>
+
 #include "deepx/tf/tf.hpp"
 #include "deepx/dtype.hpp"
 #include "deepx/mem/mem.hpp"
@@ -75,8 +77,9 @@ namespace deepx::tf
             }
             case Precision::Float16:
             {
-                error = "newtensor: Float16 has not been implemented,if you need it, please contact the author";
-                return 1;
+                Tensor<__half> t = tensorfunc::New<__half>(shape);
+                mem.addtensor(name, t);
+                break;  
             }
             case Precision::Float8E5M2:
             {

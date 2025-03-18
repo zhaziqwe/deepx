@@ -8,19 +8,7 @@
 
 namespace deepx::tf
 {
-
-    template <typename T>
-    T toT(string dtype, string value)
-    {
-        if (dtype == "int32")
-        {
-            return stoi(value);
-        }
-        else if (dtype == "float32")
-        {
-            return stof(value);
-        }
-    }
+ 
 
     class ArgSet : public TF
     {

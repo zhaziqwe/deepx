@@ -12,7 +12,7 @@ namespace deepx::tensorfunc
 {
  
     template<typename T>
-    void print(const Tensor<T> t,const std::string &f="")
+    void print(const Tensor<T> &t, const std::string &f="")
     {
         int bytes = precision_bits(t.shape.dtype)/8;
         unsigned char *host_data = new unsigned char[t.shape.size * bytes];

@@ -2,39 +2,14 @@
 #define DEEPX_TENSORFUNC_INIT_MIAO_BYTE_HPP
 
 #include <cstdint>
-#include <cuda_fp16.h>
-#include <cuda_runtime.h>
-
 #include "authors.hpp"
 #include "deepx/tensorfunc/init.hpp"
 #include "deepx/tensor.hpp"
-#include "deepx/tensorfunc/authors.hpp"
+#include "init_miaobyte.cuh"
 
 namespace deepx::tensorfunc
 {
-    // 基础模板声明
-    template <typename Author, typename T>
-    struct _constant_func {
-        static void func(Tensor<T> &tensor, const T value);
-    };
-
-    // 声明特化版本
-    template <>
-    struct _constant_func<miaobyte, float> {
-        static void func(Tensor<float> &tensor, const float value);
-    };
-
-    template <>
-    struct _constant_func<miaobyte, double> {
-        static void func(Tensor<double> &tensor, const double value);
-    };
-
-    template <>
-    struct _constant_func<miaobyte, __half> {
-        static void func(Tensor<__half> &tensor, const __half value);
-    };
-
-    // 使用实现结构体
+    // 分发器实现
     template <typename T>
     struct constantDispatcher<miaobyte, T>
     {
@@ -42,28 +17,7 @@ namespace deepx::tensorfunc
             _constant_func<miaobyte, T>::func(tensor, value);
         }
     };
- 
-    template <typename Author, typename T>
-    struct _arange_func {
-        static void func(Tensor<T> &tensor, const T start, const T step);
-    };
 
-    template <>
-    struct _arange_func<miaobyte, float> {
-        static void func(Tensor<float> &tensor, const float start, const float step);
-    };
-
-    template <>
-    struct _arange_func<miaobyte, double> {
-        static void func(Tensor<double> &tensor, const double start, const double step);
-    };
-
-    template <>
-    struct _arange_func<miaobyte, __half> {
-        static void func(Tensor<__half> &tensor, const __half start, const __half step);
-    };
-
-    // 使用实现结构体
     template <typename T>
     struct arangeDispatcher<miaobyte, T>
     {
@@ -75,13 +29,12 @@ namespace deepx::tensorfunc
     template <typename T>
     struct uniformDispatcher<miaobyte, T>
     {
-        static void uniform(Tensor<T> &tensor, const T low, const T high)
+        static void uniform(Tensor<T> &tensor, const T low, const T high, const unsigned int seed)
         {
-            //todo
+            _uniform_func<miaobyte, T>::func(tensor, low, high, seed);
         }
     };
-
-} // namespace deepx::tensorfunc
+} 
 
 #endif
  

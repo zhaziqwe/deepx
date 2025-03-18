@@ -33,13 +33,13 @@ namespace deepx::tensorfunc
     template <typename Author, typename T>
     struct uniformDispatcher
     {
-        static void uniform(Tensor<T> &tensor, const T low  , const T high  ) = delete;
+        static void uniform(Tensor<T> &tensor, const T low  , const T high  , const unsigned int seed) = delete;
     }; 
 
     template <typename Author, typename T>
-    void uniform(Tensor<T> &tensor, const T low  , const T high = T(1))
+    void uniform(Tensor<T> &tensor, const T low = T(0), const T high = T(1), const unsigned int seed = 0)
     {
-        uniformDispatcher<Author, T>::uniform(tensor, low, high);
+        uniformDispatcher<Author, T>::uniform(tensor, low, high, seed);
     }
 }
 

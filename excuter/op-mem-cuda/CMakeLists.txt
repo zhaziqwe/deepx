@@ -58,6 +58,7 @@ add_executable(${PROJECT_NAME} ${CLIENT_SOURCES})
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
     deepx
+    CUDA::cudart
 )
 # 测试
 add_subdirectory(test/tensorfunc)

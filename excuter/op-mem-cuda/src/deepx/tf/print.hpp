@@ -8,9 +8,9 @@ namespace deepx::tf{
  
     class Print : public TF{
         public:
-        Print(){
+        Print(int polymorphism=0){
             this->name="print";
-            this->funcdef();
+            this->funcdef(polymorphism);
         }
         Print(string text){
             this->parse(text);
@@ -21,11 +21,11 @@ namespace deepx::tf{
         int run(mem::Mem &mem, string &error) override{
             string name=this->args[0].textvalue;
             if (mem.existstensor(name)){
-                auto t=mem.gettensor(name);
+                auto t_ptr = mem.gettensor(name);
                 if (this->args.size() == 1){
-                    tensorfunc::print(*t);
+                    tensorfunc::print(*t_ptr);
                 }else{
-                    tensorfunc::print(*t, this->args[1].textvalue);
+                    tensorfunc::print(*t_ptr, this->args[1].textvalue);
                 }
             }else{
                 std::cerr<<"print "<<name<<" not found"<<std::endl;
@@ -36,7 +36,9 @@ namespace deepx::tf{
         }   
         void funcdef(int polymorphism=0) override {
             this->args.push_back(Param("tensor1", DataCategory::Tensor, Precision::Any));
-            this->args.push_back(Param("format", DataCategory::Var, Precision::String));
+            if (polymorphism==0) {
+                this->args.push_back(Param("format", DataCategory::Var, Precision::String));
+            }
         }
         string math_formula() const override {
             return "print(T1)";

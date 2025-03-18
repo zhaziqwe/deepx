@@ -19,7 +19,7 @@ namespace deepx::tf
         size_t arrow_pos = body.find("->");
         if (arrow_pos == string::npos)
         {
-            throw runtime_error("Invalid IR format: missing arrow");
+                throw runtime_error("Invalid IR format: missing arrow");
         }
 
         // 获取输入和输出部分的原始字符串

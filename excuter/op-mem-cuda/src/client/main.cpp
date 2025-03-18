@@ -5,6 +5,7 @@
 #include <deepx/tensorfunc/init.hpp>
 #include "deepx/tf/tf.hpp"
 #include "deepx/tf/tffactory.hpp"
+#include "client/tfs.hpp"
 #include "deepx/mem/mem.hpp"
 #include "client/udpserver.hpp"
 
@@ -23,7 +24,7 @@ int main()
     Mem mem;
     std::mutex memmutex;
 
-    client::udpserver server(8080);
+    client::udpserver server(9090);
     deepx::tf::TfFactory tf_factory;
     register_all(tf_factory);
 

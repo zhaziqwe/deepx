@@ -5,6 +5,7 @@
 #include <deepx/tensorfunc/init.hpp>
 #include "deepx/tf/tf.hpp"
 #include "deepx/tf/tffactory.hpp"
+#include "client/tfs.hpp"
 #include "deepx/mem/mem.hpp"
 #include "client/udpserver.hpp"
 
