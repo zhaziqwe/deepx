@@ -11,32 +11,11 @@
 #include "deepx/tensorfunc/elementwise.hpp"
 #include "deepx/tensorfunc/elementwise_basic.hpp"
 #include "deepx/tensorfunc/authors.hpp"
+#include "deepx/tensorfunc/cuda.hpp"
 namespace deepx::tensorfunc
 {
     // cuBLAS handle管理
-    class CublasHandle
-    {
-    public:
-        CublasHandle()
-        {
-            if (cublasCreate(&handle_) != CUBLAS_STATUS_SUCCESS)
-            {
-                throw std::runtime_error("Failed to create cuBLAS handle");
-            }
-        }
-
-        ~CublasHandle()
-        {
-            if (handle_)
-                cublasDestroy(handle_);
-        }
-
-        cublasHandle_t get() { return handle_; }
-
-    private:
-        cublasHandle_t handle_;
-    };
-
+   
     // cublas作者的特化实现
     template <>
     struct _author_add<cublas>
