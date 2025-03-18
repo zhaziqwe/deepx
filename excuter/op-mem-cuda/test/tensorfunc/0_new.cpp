@@ -2,13 +2,15 @@
 #include "deepx/tensor.hpp"
 #include "deepx/tensorfunc/new.hpp"
 #include "deepx/tensorfunc/print.hpp"
+#include "deepx/tensorfunc/init_miaobyte.hpp"
+#include "deepx/tensorfunc/authors.hpp"
 
 using namespace deepx::tensorfunc;
 using namespace deepx;
 void test_new()
 {
     Tensor<float> a=New<float>({10, 10});
-    arange(a, 1.0f, 0.1f);
+    arange<miaobyte,float>(a, 1.0f, 0.1f);
     print(a,"%.2f");
 }
 
