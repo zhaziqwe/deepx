@@ -27,15 +27,13 @@ int main()
     client::udpserver server(8080);
     deepx::tf::TfFactory tf_factory;
     register_all(tf_factory);
-
-    tf_factory.print_markdown();
-
+ 
     // 将op table输出到markdown文件
     string docdir = "../../../doc/excuter/op-mem-ompsimd/";
     std::ofstream md_file(docdir + "list.md");
     if (md_file.is_open())
     {
-        md_file << tf_factory.print_markdown();
+        md_file << tf_factory.print_markdown("op-mem-ompsimd");
         md_file.close();
     }
 

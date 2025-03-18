@@ -105,7 +105,7 @@ namespace deepx::tf
         }
         shared_ptr<TF> get_tf(const TF &other) const;
         // 输出为markdown表格格式
-        string print_markdown() const;
+        string print_markdown(string excuter_name) const;
     };
 }
 

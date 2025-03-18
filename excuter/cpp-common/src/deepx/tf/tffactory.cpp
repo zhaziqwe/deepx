@@ -71,11 +71,11 @@ namespace deepx::tf
         }
         return tf;
     }
-    string TfFactory::print_markdown() const
+    string TfFactory::print_markdown(string excuter_name) const
     {
         std::stringstream ss;
-        ss << "## excuter/op-mem-ompsimd 支持算子列表 \n\n";
-        ss << "本页面由 `excuter/op-mem-ompsimd/src/deepx/tf/tffactory.hpp` 生成，请勿手动修改 \n\n";
+        ss << "## " << excuter_name << " 支持算子列表 \n\n";
+        ss << "本页面由 `excuter/" << excuter_name << " 生成，请勿手动修改 \n\n";
         ss << "| Operation | Author | Func Def | Math Formula | IR Instruction |\n";
         ss << "|-----------|--------|------------|--------------|----------------|\n";
 
