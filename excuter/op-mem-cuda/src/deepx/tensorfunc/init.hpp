@@ -1,26 +1,26 @@
-#ifndef DEEPX_TENSORFUNC_INIT_HPP
-#define DEEPX_TENSORFUNC_INIT_HPP
+#ifndef DEEPX_TENSORFUNC_INIT_CUH
+#define DEEPX_TENSORFUNC_INIT_CUH
 
-#include "deepx/tensor.hpp"
-#include <cuda_fp16.h>  // 为了支持half精度
+#include <cuda_fp16.h> // 为了支持half精度
 #include <cuda_bf16.h>
 #include <cstdint>
+#include <cuda_runtime.h>
 
+#include "deepx/tensor.hpp"
+ 
 namespace deepx::tensorfunc
 {
-    using namespace deepx;
-
-   template <typename T>
-    void uniform(Tensor<T> &tensor,const T low = 0,const T high = 1);
-    
 
     template <typename T>
-    void constant(Tensor<T> &tensor,const T value);
-  
+    void constant(Tensor<T> &tensor, const T value);
 
     template <typename T>
-    void arange(Tensor<T> &tensor, const T start,const T step = 1);
+    void arange(Tensor<T> &tensor, const T start, const T step = 1);
  
-}
+
+    template <typename T>
+    void uniform(Tensor<T> &tensor, const T low = 0, const T high = 1);
+
+} // namespace deepx::tensorfunc
 
 #endif
