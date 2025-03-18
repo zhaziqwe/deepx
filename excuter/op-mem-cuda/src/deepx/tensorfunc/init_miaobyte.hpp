@@ -8,38 +8,60 @@
 #include "authors.hpp"
 #include "deepx/tensorfunc/init.hpp"
 #include "deepx/tensor.hpp"
-
+#include "deepx/tensorfunc/authors.hpp"
 
 namespace deepx::tensorfunc
 {
-    template <>
-    struct _author_constant<miaobyte>
-    {
-        template <typename T>
-        static void constant(Tensor<T> &tensor, const T value) = delete;
+    // 基础模板声明
+    template <typename Author, typename T>
+    struct _constant_func {
+        static void func(Tensor<T> &tensor, const T value);
     };
-    // 显式实例化声明
-    extern template struct _arange_func<miaobyte, float>;
-    extern template struct _arange_func<miaobyte, double>;
-    extern template struct _arange_func<miaobyte, __half>;
+
+    // 声明特化版本
+    template <>
+    struct _constant_func<miaobyte, float> {
+        static void func(Tensor<float> &tensor, const float value);
+    };
 
     template <>
-    struct _author_arange<miaobyte>
+    struct _constant_func<miaobyte, double> {
+        static void func(Tensor<double> &tensor, const double value);
+    };
+
+    template <>
+    struct _constant_func<miaobyte, __half> {
+        static void func(Tensor<__half> &tensor, const __half value);
+    };
+
+    // 使用实现结构体
+    template <typename T>
+    struct constantDispatcher<miaobyte, T>
     {
-        template <typename T>
-        static void arange(Tensor<T> &tensor, const T start, const T step)
-        {
-            _arange_func<miaobyte, T>::func(tensor, start, step);
+        static void constant(Tensor<T> &tensor, const T value) {
+            _constant_func<miaobyte, T>::func(tensor, value);
         }
     };
-    // 显式实例化声明
-    extern template struct _author_arange<miaobyte>::arange<double>;
-    extern template struct _author_arange<miaobyte>::arange<float>;
-    extern template struct _author_arange<miaobyte>::arange<__half>;
-
+ 
     template <typename T>
-    void uniform(Tensor<T> &tensor, const T low = 0, const T high = 1);
+    struct arangeDispatcher<miaobyte, T>
+    {
+        static void arange(Tensor<T> &tensor, const T start, const T step)
+        {
+            //todo
+        }
+    };
+    
+    template <typename T>
+    struct uniformDispatcher<miaobyte, T>
+    {
+        static void uniform(Tensor<T> &tensor, const T low, const T high)
+        {
+            //todo
+        }
+    };
 
 } // namespace deepx::tensorfunc
 
 #endif
+ 

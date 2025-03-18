@@ -1,63 +1,255 @@
 #ifndef DEEPX_TENSORFUNC_MATMUL_CUBLAS_HPP
 #define DEEPX_TENSORFUNC_MATMUL_CUBLAS_HPP
- 
+
 #include "deepx/tensor.hpp"
+
+#include "deepx/tensorfunc/matmul.hpp"
 #include "authors.hpp"
+#include "cuda.hpp"
 
 namespace deepx::tensorfunc
 {
-  
-   template <typename T>
-    struct matmulDispatcher<cublas,T>
+    using namespace deepx;
+    template <>
+    struct matmulDispatcher<cublas, float>
     {
-        static void matmul(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
+        static void matmul(const Tensor<float> &A, const Tensor<float> &B, Tensor<float> &C)
         {
             if (!check_matmul_shape(A.shape, B.shape))
             {
-                throw std::invalid_argument("A.shape could matmul with B.shape");
+                throw std::invalid_argument("A.shape could not matmul with B.shape");
             }
-            C.shape.rangeParallel(C.shape.dim - 2, [&](const std::vector<int> &indices)
-                                  {
-                        int aIdx=A.shape.linearat(indices);
-                        int bIdx=B.shape.linearat(indices);
-                        int cIdx=C.shape.linearat(indices);
-                        int m=A.shape[-2];
-                        int k=A.shape[-1];
-                        int n=B.shape[-1];
-                        for(int i=0;i<m;i++){
-                            for(int j=0;j<n;j++){
-                                T sum=0;
-                                for(int l=0;l<k;l++){
-                                    sum+=A.data[aIdx+i*k+l]*B.data[bIdx+l*n+j];
-                                }
-                                C.data[cIdx+i*n+j]=sum;
-                            }
-                        } });
+
+            static CublasHandle handle;
+            const float alpha = 1.0f;
+            const float beta = 0.0f;
+
+            int64_t batch_size = A.shape.size / (A.shape[-2] * A.shape[-1]);
+
+            // 获取矩阵维度
+            int m = A.shape[-2];
+            int k = A.shape[-1];
+            int n = B.shape[-1];
+
+            // 计算步长(stride) - 对行主序
+            int64_t stride_a = m * k;
+            int64_t stride_b = k * n;
+            int64_t stride_c = m * n;
+
+            if (batch_size > 1)
+            {
+                // 使用批量版本，注意: 为处理行主序，交换了顺序并转置操作
+                auto status = cublasSgemmStridedBatched(handle.get(),
+                                                        CUBLAS_OP_N,  // B不转置
+                                                        CUBLAS_OP_N,  // A不转置
+                                                        n, m, k,      // 交换m,n处理行主序
+                                                        &alpha,
+                                                        B.data, n, stride_b,  // B在前
+                                                        A.data, k, stride_a,  // A在后
+                                                        &beta,
+                                                        C.data, n, stride_c,  // 输出维度对应调整
+                                                        batch_size);
+
+                if (status != CUBLAS_STATUS_SUCCESS)
+                {
+                    throw std::runtime_error("cublasSgemmStridedBatched failed");
+                }
+            }
+            else
+            {
+                // 单个矩阵乘法，同样交换顺序处理行主序
+                auto status = cublasSgemm(handle.get(),
+                                        CUBLAS_OP_N,
+                                        CUBLAS_OP_N,
+                                        n, m, k,    // 交换m,n
+                                        &alpha,
+                                        B.data, n,  // B在前
+                                        A.data, k,  // A在后
+                                        &beta,
+                                        C.data, n); // 调整leading dimension
+
+                if (status != CUBLAS_STATUS_SUCCESS)
+                {
+                    throw std::runtime_error("cublasSgemm failed");
+                }
+            }
+        }
+    };
+    template <>
+    struct matmulDispatcher<cublas, double>
+    {
+        static void matmul(const Tensor<double> &A, const Tensor<double> &B, Tensor<double> &C)
+        {
+            if (!check_matmul_shape(A.shape, B.shape))
+            {
+                throw std::invalid_argument("A.shape could not matmul with B.shape");
+            }
+
+            static CublasHandle handle;
+            const double alpha = 1.0;
+            const double beta = 0.0;
+
+            // 获取批次数量
+            int64_t batch_size = A.shape.size / (A.shape[-2] * A.shape[-1]);
+
+            // 获取矩阵维度
+            int m = A.shape[-2];
+            int k = A.shape[-1];
+            int n = B.shape[-1];
+
+            // 计算步长
+            int64_t stride_a = m * k;
+            int64_t stride_b = k * n;
+            int64_t stride_c = m * n;
+
+            if (batch_size > 1)
+            {
+                auto status = cublasDgemmStridedBatched(handle.get(),
+                                                        CUBLAS_OP_N,
+                                                        CUBLAS_OP_N,
+                                                        m, n, k,
+                                                        &alpha,
+                                                        A.data, m, stride_a,
+                                                        B.data, k, stride_b,
+                                                        &beta,
+                                                        C.data, m, stride_c,
+                                                        batch_size);
+
+                if (status != CUBLAS_STATUS_SUCCESS)
+                {
+                    throw std::runtime_error("cublasDgemmStridedBatched failed");
+                }
+            }
+            else
+            {
+                // 单个矩阵乘法
+                auto status = cublasDgemm(handle.get(),
+                                          CUBLAS_OP_N,
+                                          CUBLAS_OP_N,
+                                          m, n, k,
+                                          &alpha,
+                                          A.data, m,
+                                          B.data, k,
+                                          &beta,
+                                          C.data, m);
+
+                if (status != CUBLAS_STATUS_SUCCESS)
+                {
+                    throw std::runtime_error("cublasDgemm failed");
+                }
+            }
         }
     };
 
-  template <>
-  void matmul<float>(const Tensor<float> &a, const Tensor<float> &b, Tensor<float> &c)
-  {
-  }
+    template <>
+    struct matmuladdDispatcher<cublas, float>
+    {
+        static void matmuladd(const Tensor<float> &A, const Tensor<float> &B, const float &alpha, const float &beta, Tensor<float> &C)
+        {
+            if (!check_matmul_shape(A.shape, B.shape))
+            {
+                throw std::invalid_argument("A.shape could not matmul with B.shape");
+            }
 
-  template <>
-  void matmul<double>(const Tensor<double> &a, const Tensor<double> &b, Tensor<double> &c)
-  {
-  }
-  template <typename T>
-  void matmuladd(const Tensor<T> &a, const Tensor<T> &b, const T &alpha, const T &beta, Tensor<T> &c)
-  {
-  }
+            static CublasHandle handle;
+            int64_t batch_size = A.shape.size / (A.shape[-2] * A.shape[-1]);
 
-  template <>
-  void matmuladd<float>(const Tensor<float> &a, const Tensor<float> &b, const float &alpha, const float &beta, Tensor<float> &c)
-  {
-  }
+            int m = A.shape[-2];
+            int k = A.shape[-1];
+            int n = B.shape[-1];
 
-  template <>
-  void matmuladd<double>(const Tensor<double> &a, const Tensor<double> &b, const double &alpha, const double &beta, Tensor<double> &c)
-  {
-  }
-}
+            // 计算步长
+            int64_t stride_a = m * k;
+            int64_t stride_b = k * n;
+            int64_t stride_c = m * n;
+
+            if (batch_size > 1)
+            {
+                auto status = cublasSgemmStridedBatched(handle.get(),
+                                                        CUBLAS_OP_N,
+                                                        CUBLAS_OP_N,
+                                                        n, m, k,      // 交换m,n
+                                                        &alpha,
+                                                        B.data, n, stride_b,  // B在前
+                                                        A.data, k, stride_a,  // A在后
+                                                        &beta,
+                                                        C.data, n, stride_c); // 调整leading dimension
+
+                if (status != CUBLAS_STATUS_SUCCESS)
+                {
+                    throw std::runtime_error("cublasSgemmStridedBatched failed");
+                }
+            }
+            else
+            {
+                auto status = cublasSgemm(handle.get(),
+                                        CUBLAS_OP_N,
+                                        CUBLAS_OP_N,
+                                        n, m, k,    // 交换m,n
+                                        &alpha,
+                                        B.data, n,  // B在前
+                                        A.data, k,  // A在后
+                                        &beta,
+                                        C.data, n); // 调整leading dimension
+
+                if (status != CUBLAS_STATUS_SUCCESS)
+                {
+                    throw std::runtime_error("cublasSgemm failed");
+                }
+            }
+        }
+    };
+    template <>
+    struct matmuladdDispatcher<cublas, double>
+    {
+        static void matmuladd(const Tensor<double> &A, const Tensor<double> &B, const double &alpha, const double &beta, Tensor<double> &C)
+        {
+            if (!check_matmul_shape(A.shape, B.shape))
+            {
+                throw std::invalid_argument("A.shape could not matmul with B.shape");
+            }
+
+            static CublasHandle handle;
+            int m = A.shape[-2];
+            int k = A.shape[-1];
+            int n = B.shape[-1];
+
+            int64_t batch_size = A.shape.size / (A.shape[-2] * A.shape[-1]);
+
+            if (batch_size > 1)
+            {
+                auto status = cublasDgemmStridedBatched(handle.get(),
+                                                        CUBLAS_OP_N,
+                                                        CUBLAS_OP_N,
+                                                        m, n, k,
+                                                        &alpha,
+                                                        A.data, m,
+                                                        B.data, k,
+                                                        &beta,
+                                                        C.data, m);
+
+                if (status != CUBLAS_STATUS_SUCCESS)
+                {
+                    throw std::runtime_error("cublasDgemm failed");
+                }
+            }
+            else
+            {
+                auto status = cublasDgemm(handle.get(),
+                                          CUBLAS_OP_N,
+                                          CUBLAS_OP_N,
+                                          m, n, k,
+                                          &alpha,
+                                          A.data, m,
+                                          B.data, k,
+                                          &beta,
+                                          C.data, m);
+
+                if (status != CUBLAS_STATUS_SUCCESS)
+                {
+                    throw std::runtime_error("cublasDgemm failed");
+                }
+            }
+        };
+    }
 #endif // DEEPX_TENSORFUNC_MATMUL_HPP

@@ -15,13 +15,6 @@ namespace deepx::tensorfunc
 {
     using namespace hwy::HWY_NAMESPACE;
 
-    /*
-    // std::vector<int> sumMap = reduceDimMap(tensor.shape, dims);
-    // // 计算输出形状
-    // std::vector<int> outputShape = reduceShape(tensor.shape, dims);
-    // Tensor<T> result = New<T>(outputShape);
-    // constant<T>(result, 0.0);
-    */
     template <typename T>
     void sum(const Tensor<T> &tensor, const std::vector<int> &dims, Tensor<T> &result)
     {

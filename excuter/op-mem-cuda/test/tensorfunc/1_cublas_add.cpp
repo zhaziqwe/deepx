@@ -1,4 +1,4 @@
-#include "deepx/tensorfunc/init.hpp"
+#include "deepx/tensorfunc/init_miaobyte.hpp"
 #include "deepx/tensor.hpp"
 #include "deepx/tensorfunc/new.hpp"
 #include "deepx/tensorfunc/print.hpp"

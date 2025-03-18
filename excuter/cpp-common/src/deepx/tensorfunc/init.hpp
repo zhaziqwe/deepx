@@ -3,9 +3,7 @@
 
 #include "deepx/tensor.hpp"
 #include "stdutil/error.hpp"
-
-#include "init_util.hpp"
-
+ 
 namespace deepx::tensorfunc
 {   
     template <typename Author, typename T>

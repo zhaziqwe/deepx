@@ -9,35 +9,16 @@
 
 #include "deepx/tensor.hpp"
 #include "deepx/tensorfunc/elementwise.hpp"
-#include "deepx/tensorfunc/elementwise_basic.hpp"
 #include "deepx/tensorfunc/authors.hpp"
 #include "deepx/tensorfunc/cuda.hpp"
 namespace deepx::tensorfunc
 {
-    // cuBLAS handle管理
-   
-    // cublas作者的特化实现
-    template <>
-    struct _author_add<cublas>
-    {
-        template <typename T>
-        static void add(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
-        {
-            _add_func<cublas, T>::func(A, B, C);
-        }
-
-        template <typename T>
-        static void addscalar(const Tensor<T> &input, const T value, Tensor<T> &output)
-        {
-            _addscalar_func<cublas, T>::func(input, value, output);
-        }
-    };
-
+ 
     // float特化
     template <>
-    struct _add_func<cublas, float>
+    struct  addDispatcher<cublas, float>
     {
-        static void func(const Tensor<float> &A, const Tensor<float> &B, Tensor<float> &C)
+        static void add(const Tensor<float> &A, const Tensor<float> &B, Tensor<float> &C)
         {
             if (A.shape.size != B.shape.size || A.shape.size != C.shape.size)
             {
@@ -68,9 +49,9 @@ namespace deepx::tensorfunc
 
     // double特化
     template <>
-    struct _add_func<cublas, double>
+    struct addDispatcher<cublas, double>
     {
-        static void func(const Tensor<double> &A, const Tensor<double> &B, Tensor<double> &C)
+        static void add(const Tensor<double> &A, const Tensor<double> &B, Tensor<double> &C)
         {
             if (A.shape.size != B.shape.size || A.shape.size != C.shape.size)
             {
