@@ -8,6 +8,7 @@
 #include "deepx/tensorfunc/new.hpp"
     
 #include "deepx/tensorfunc/matmul.hpp"
+#include "deepx/tensorfunc/matmul_miaobyte.hpp"
 #include "deepx/tensorfunc/init.hpp"
 #include "deepx/shape_matmul.hpp"
 #include "deepx/tensorfunc/file.hpp"
@@ -40,7 +41,7 @@ void test_tensor_matmul(){
     Tensor<float> tensor2= New<float>({2, 4,5});
     std::iota(tensor2.data, tensor2.data+tensor2.shape.size, 0);
     Tensor<float> tensor3= New<float>(matmul_shape(tensor.shape, tensor2.shape).shape);
-    matmul(tensor, tensor2, tensor3);
+    matmul<tensorfunc::miaobyte,float>(tensor, tensor2, tensor3);
 
     print(tensor3);
 }
@@ -56,7 +57,7 @@ void bench_tensor_matmul(int i) {
     std::cout<<("matmul ", i, "x", i);
     auto start = std::chrono::high_resolution_clock::now();
 
-    matmul(tensor, tensor2, tensor3);
+    matmul<tensorfunc::miaobyte,float>(tensor, tensor2, tensor3);
     auto end=std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
     save(tensor3,"4_tensor_matmul"+std::to_string(i)+"result");
@@ -65,9 +66,9 @@ void bench_tensor_matmul(int i) {
  
 int main(){
     test_tensor_matmul();
-    //test_tensor_matmul_cuda();
-    for (int i = 64; i <=4096*1024; i*=2) {
-        bench_tensor_matmul(i);
-    }
+    // //test_tensor_matmul_cuda();
+    // for (int i = 64; i <=4096*1024; i*=2) {
+    //     bench_tensor_matmul(i);
+    // }
     return 0;
 }

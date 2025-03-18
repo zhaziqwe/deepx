@@ -3,60 +3,18 @@
 
 #include <cblas.h> // 如果使用 OpenBLAS
 #include "deepx/tensor.hpp"
+#include "deepx/tensorfunc/matmul.hpp"
 
 namespace deepx::tensorfunc
 {
-  bool check_shape(const Shape &a, const Shape &b)
-  {
-    if (a[-1] != b[-2])
-    {
-      return false;
-    }
-    if (a.dim != b.dim)
-    {
-      return false;
-    }
-    for (int i = 0; i < a.dim - 2; ++i)
-    {
-      if (a[i] != b[i])
-      {
-        return false;
-      }
-    }
-    return true;
-  }
 
 
-  template <typename T>
-  void matmul(const Tensor<T> &a, const Tensor<T> &b, Tensor<T> &c)
-  {
-    if (!check_shape(a.shape, b.shape))
-    {
-      throw std::invalid_argument("a.shape could matmul with b.shape");
-    }
-    c.shape.rangeParallel(c.shape.dim - 2, [&](const std::vector<int> &indices)
-                          {
-                        int aIdx=a.shape.linearat(indices);
-                        int bIdx=b.shape.linearat(indices);
-                        int cIdx=c.shape.linearat(indices);
-                        int m=a.shape[-2];
-                        int k=a.shape[-1];
-                        int n=b.shape[-1];
-                        for(int i=0;i<m;i++){
-                            for(int j=0;j<n;j++){
-                                T sum=0;
-                                for(int l=0;l<k;l++){
-                                    sum+=a.data[aIdx+i*k+l]*b.data[bIdx+l*n+j];
-                                }
-                                c.data[cIdx+i*n+j]=sum;
-                            }
-                        } });
-  }
+
 
   template <>
   void matmul<float>(const Tensor<float> &a, const Tensor<float> &b, Tensor<float> &c)
   {
-    if (!check_shape(a.shape, b.shape))
+    if (!check_matmul_shape(a.shape, b.shape))
     {
       throw std::invalid_argument("a.shape could matmul with b.shape");
     }
