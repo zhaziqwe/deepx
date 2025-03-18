@@ -10,8 +10,6 @@
 namespace deepx::tensorfunc
 {
     using namespace hwy::HWY_NAMESPACE;
-
-
     // 通用元素级操作模板
     template <typename T, typename ScalarOpFunc, typename SimdOpFunc>
     void elementwise_A_B_C(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C,
@@ -101,10 +99,9 @@ namespace deepx::tensorfunc
     }
 
     // 通用实现
-    template <>
-    struct _author_add<miaobyte>
+    template <typename T>
+    struct addDispatcher<miaobyte,T>
     {
-        template <typename T>
         static void add(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
         {
 
@@ -121,8 +118,11 @@ namespace deepx::tensorfunc
                 auto vec_result = Add(vec1, vec2);
                 Store(vec_result, tag, c); });
         }
+    };
 
-        template <typename T>
+    template <typename T>
+    struct addscalarDispatcher<miaobyte,T>
+    {
         static void addscalar(const Tensor<T> &A, const T value, Tensor<T> &C)
         {
             elementwise_A_b_C<T>(A, value, C,
@@ -141,10 +141,9 @@ namespace deepx::tensorfunc
     };
 
     // 添加 sub 的模板特化实现
-    template <>
-    struct _author_sub<miaobyte>
+    template <typename T>
+    struct subDispatcher<miaobyte,T>
     {
-        template <typename T>
         static void sub(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
         {
             elementwise_A_B_C<T>(A, B, C,
@@ -160,8 +159,11 @@ namespace deepx::tensorfunc
                                     auto vec_result = Sub(vec1, vec2);
                                     Store(vec_result, tag, c); });
         }
+    };
 
-        template <typename T>
+    template <typename T>
+    struct subscalarDispatcher<miaobyte,T>
+    {
         static void subscalar(const Tensor<T> &A, const T value, Tensor<T> &C)
         {
             elementwise_A_b_C<T>(A, value, C,
@@ -180,10 +182,9 @@ namespace deepx::tensorfunc
     };
 
     // 添加 mul 的模板特化实现
-    template <>
-    struct _author_mul<miaobyte>
+    template <typename T>
+    struct mulDispatcher<miaobyte,T>
     {
-        template <typename T>
         static void mul(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
         {
             elementwise_A_B_C<T>(A, B, C,
@@ -199,8 +200,11 @@ namespace deepx::tensorfunc
                                     auto vec_result = Mul(vec1, vec2);
                                     Store(vec_result, tag, c); });
         }
+    };
 
-        template <typename T>
+    template <typename T>
+    struct mulscalarDispatcher<miaobyte,T>
+    {
         static void mulscalar(const Tensor<T> &A, const T value, Tensor<T> &C)
         {
             elementwise_A_b_C<T>(A, value, C,
@@ -218,11 +222,10 @@ namespace deepx::tensorfunc
         }
     };
 
-    template <>
-    struct _author_muladd<miaobyte>
+    template <typename T>
+    struct muladdDispatcher<miaobyte,T>
     {
         // A*B+C=D
-        template <typename T>
         static void muladd(const Tensor<T> &A, const Tensor<T> &B, const Tensor<T> &C,  Tensor<T> &D)
         {
 
@@ -263,10 +266,13 @@ namespace deepx::tensorfunc
                 throw std::invalid_argument("shape mismatch");
             }
         }
+    };
 
+    template <typename T>
+    struct muladdscalarDispatcher<miaobyte,T>
+    {
         // A*B*alpha+C*beta=D
-        template <typename T>
-        static void muladd(const Tensor<T> &A, const Tensor<T> &B, const T alpha, const Tensor<T> &C, const T beta,  Tensor<T> &D)
+        static void muladdscalar(const Tensor<T> &A, const Tensor<T> &B, const T alpha, const Tensor<T> &C, const T beta,  Tensor<T> &D)
         {
             if (A.shape == B.shape && A.shape == C.shape && A.shape == D.shape)
             {
@@ -319,9 +325,12 @@ namespace deepx::tensorfunc
                 throw std::invalid_argument("shape mismatch");
             }
         }
+    };
 
+    template <typename T>
+    struct mulscalaraddDispatcher<miaobyte,T>
+    {
         // A*alpha+B*beta=C
-        template <typename T>
         static void mulscalaradd(const Tensor<T> &A, const T alpha, const Tensor<T> &B, const T beta,  Tensor<T> &C)
         {
             if (A.shape == B.shape && A.shape == C.shape)
@@ -368,10 +377,9 @@ namespace deepx::tensorfunc
     };
 
     // 添加 div 的模板特化实现
-    template <>
-    struct _author_div<miaobyte>
+    template <typename T>
+    struct divDispatcher<miaobyte,T>
     {
-        template <typename T>
         static void div(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
         {
             elementwise_A_B_C<T>(A, B, C,
@@ -387,8 +395,11 @@ namespace deepx::tensorfunc
                                     auto vec_result = Div(vec1, vec2);
                                     Store(vec_result, tag, c); });
         }
+    };
 
-        template <typename T>
+    template <typename T>
+    struct divscalarDispatcher<miaobyte,T>
+    {
         static void divscalar(const Tensor<T> &A, const T value, Tensor<T> &C)
         {
             elementwise_A_b_C<T>(A, value, C,
@@ -404,8 +415,11 @@ namespace deepx::tensorfunc
                                     auto vec_result = Div(vec1, scalar);
                                     Store(vec_result, tag, c); });
         }
+    };
 
-        template <typename T>
+    template <typename T>
+    struct rdivscalarDispatcher<miaobyte,T>
+    {
         static void rdivscalar(const T value, const Tensor<T> &In, Tensor<T> &Out)
         {
             elementwise_A_b_C<T>(In, value, Out,
@@ -423,12 +437,10 @@ namespace deepx::tensorfunc
         }
     };
 
-    template <>
-    struct _author_divadd<miaobyte>
+    template <typename T>
+    struct divaddDispatcher<miaobyte,T>
     {
-
         // D= A/B+ C
-        template <typename T>
         static void divadd(const Tensor<T> &A, const Tensor<T> &B, const Tensor<T> &C,   Tensor<T> &D)
         {
             if (A.shape == B.shape && A.shape == C.shape && A.shape == D.shape)
@@ -468,9 +480,12 @@ namespace deepx::tensorfunc
                 throw std::invalid_argument("shape mismatch");
             }
         }
+    };  
 
+    template <typename T>
+    struct divscalaraddDispatcher<miaobyte,T>
+    {
         //  C= A/alpha+ B/beta
-        template <typename T>
         static void divscalaradd(const Tensor<T> &A, const T alpha, const Tensor<T> &B, const T beta,   Tensor<T> &C)
         {
             if (A.shape == B.shape && A.shape == C.shape)
@@ -514,10 +529,12 @@ namespace deepx::tensorfunc
                 throw std::invalid_argument("shape mismatch");
             }
         }
+    };
 
-        // divadd
+    template <typename T>
+    struct divaddbetaDispatcher<miaobyte,T>
+    {
         // D= A/B*alpha+ C*beta
-        template <typename T>
         static void divaddbeta(const Tensor<T> &A, const Tensor<T> &B, const T alpha, const Tensor<T> &C, const T beta,   Tensor<T> &D)
         {
             if (A.shape == B.shape && A.shape == C.shape && A.shape == D.shape)
@@ -565,13 +582,11 @@ namespace deepx::tensorfunc
         }
     };
 
-    template <>
-    struct _author_sqrt<miaobyte>
+    template <typename T>
+    struct sqrtDispatcher<miaobyte,T>
     {
-        template <typename T>
         static void sqrt(const Tensor<T> &input, Tensor<T> &output)
         {
-
             if (input.shape == output.shape)
             {
                 output.shape.rangeParallel(output.shape.dim - 1, [&input, &output](int i)
@@ -609,11 +624,10 @@ namespace deepx::tensorfunc
         }
     };
 
-    template <>
-    struct _author_pow<miaobyte>
+    template <typename T>
+    struct powDispatcher<miaobyte,T>
     {
         // C=A^B
-        template <typename T>
         static void pow(const Tensor<T> &A, Tensor<T> &B, Tensor<T> &C)
         {
             if (A.shape == B.shape && A.shape == C.shape)
@@ -628,7 +642,6 @@ namespace deepx::tensorfunc
         }
         // C=A^value
         //  highway 不支持POW
-        template <typename T>
         static void powscalar(const Tensor<T> &input, const T value, Tensor<T> &output)
         {
             if (input.shape == output.shape)
@@ -643,12 +656,10 @@ namespace deepx::tensorfunc
         }
     };
 
-    template <>
-    struct _author_log<miaobyte>
+    template <typename T>
+    struct logDispatcher<miaobyte,T>
     {   
         // hwy库没有log函数，所以只能用std::log
-
-        template <typename T>
         static void log(const Tensor<T> &input, Tensor<T> &output)
         {
             if (input.shape == output.shape)
@@ -663,11 +674,10 @@ namespace deepx::tensorfunc
         }
     };
 
-    template <>
-    struct _author_exp<miaobyte>
+    template <typename T>
+    struct expDispatcher<miaobyte,T>
     {   
         // 发现hwy库没有exp函数，所以只能用std::exp
-        template <typename T>
         static void exp(const Tensor<T> &input, Tensor<T> &output)
         {
             if (input.shape == output.shape)
@@ -682,10 +692,10 @@ namespace deepx::tensorfunc
         }
     };
 
-    template <>
-    struct _author_sin<miaobyte>
+    template <typename T>
+    struct sinDispatcher<miaobyte,T>
     {   
-        template <typename T>
+        
         static void sin(const Tensor<T> &input, Tensor<T> &output)
         {
             if (input.shape == output.shape)
@@ -725,10 +735,10 @@ namespace deepx::tensorfunc
         }
     };
 
-    template <>
-    struct _author_cos<miaobyte>
+    template <typename T>
+    struct cosDispatcher<miaobyte,T>
     {   
-        template <typename T>
+ 
         static void cos(const Tensor<T> &input, Tensor<T> &output)
         {
             if (input.shape == output.shape)
@@ -768,10 +778,10 @@ namespace deepx::tensorfunc
         }
     };
 
-    template <>
-    struct _author_tan<miaobyte>
+    template <typename T>
+    struct tanDispatcher<miaobyte,T>
     {   
-        template <typename T>
+        
         static void tan(const Tensor<T> &input, Tensor<T> &output)
         {
             if (input.shape == output.shape)
@@ -811,10 +821,9 @@ namespace deepx::tensorfunc
         }
     };
 
-    template <>
-    struct _author_max<miaobyte>
+    template <typename T>
+    struct maxDispatcher<miaobyte,T>
     {       
-        template <typename T>
         static void max(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
         {
             if (A.shape == B.shape && A.shape == C.shape)
@@ -853,8 +862,11 @@ namespace deepx::tensorfunc
                 throw std::invalid_argument("shape mismatch");
             }
         }
+    };
 
-        template <typename T>
+    template <typename T>
+    struct maxgradDispatcher<miaobyte,T>
+    {
         static void maxgrad(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &A_grad, Tensor<T> &B_grad, const Tensor<T> &output_grad)
         {
             if (A.shape == B.shape && A.shape == output_grad.shape && A.shape == A_grad.shape && A.shape == B_grad.shape)
@@ -877,8 +889,11 @@ namespace deepx::tensorfunc
                 throw std::invalid_argument("shape mismatch");
             }
         }
+    };
 
-        template <typename T>
+    template <typename T>
+    struct maxscalarDispatcher<miaobyte,T>
+    {
         static void maxscalar(const Tensor<T> &A,const T b, Tensor<T> &C)
         {
             if (A.shape == C.shape)
@@ -917,8 +932,11 @@ namespace deepx::tensorfunc
                 throw std::invalid_argument("shape mismatch");
             }
         }
+    };
 
-        template <typename T>
+    template <typename T>
+    struct maxscalargradDispatcher<miaobyte,T>
+    {
         static void maxscalargrad(const Tensor<T> &A, const T b, Tensor<T> &A_grad, const Tensor<T> &output_grad)
         {
             if (A.shape == A_grad.shape && A.shape == output_grad.shape)
@@ -940,10 +958,9 @@ namespace deepx::tensorfunc
         }
     };
 
-    template <>
-    struct _author_min<miaobyte>
+    template <typename T>
+    struct minDispatcher<miaobyte,T>
     {
-        template <typename T>
         static void min(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
         {
             if (A.shape == B.shape && A.shape == C.shape)
@@ -982,8 +999,11 @@ namespace deepx::tensorfunc
                 throw std::invalid_argument("shape mismatch");
             }
         }
+    };
 
-        template <typename T>
+    template <typename T>
+    struct mingradDispatcher<miaobyte,T>
+    {
         static void mingrad(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &A_grad, Tensor<T> &B_grad, const Tensor<T> &output_grad)
         {
             if (A.shape == B.shape && A.shape == output_grad.shape && A.shape == A_grad.shape && A.shape == B_grad.shape)
@@ -1006,8 +1026,11 @@ namespace deepx::tensorfunc
                 throw std::invalid_argument("shape mismatch");
             }
         }
+    };
 
-        template <typename T>
+    template <typename T>
+    struct minscalarDispatcher<miaobyte,T>
+    {
         static void minscalar(const Tensor<T> &A,const T b, Tensor<T> &C)
         {
             if (A.shape == C.shape)
@@ -1045,8 +1068,11 @@ namespace deepx::tensorfunc
                 throw std::invalid_argument("shape mismatch");
             }
         }
+    };  
 
-        template <typename T>
+    template <typename T>
+    struct minscalargradDispatcher<miaobyte,T>
+    {
         static void minscalargrad(const Tensor<T> &A, const T b, Tensor<T> &A_grad, const Tensor<T> &output_grad)
         {
             if (A.shape == A_grad.shape && A.shape == output_grad.shape)

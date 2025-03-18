@@ -4,193 +4,378 @@
 #include "deepx/tensor.hpp"
 #include "stdutil/error.hpp"
 
-#include "elementwise_basic.hpp"
-#include "elementwise_sin.hpp"
-#include "elementwise_compare.hpp"
-#include "elementwise_exp.hpp"
-
 namespace deepx::tensorfunc
 {
+    template <typename Author, typename T>
+    struct addDispatcher
+    {
+        static void add(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C) = delete;
+    };
 
     template <typename Author, typename T>
     void add(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
     {
-        _author_add<Author>::template add<T>(A, B, C);
+        addDispatcher<Author, T>::add(A, B, C);
     }
+
+    template <typename Author, typename T>
+    struct addscalarDispatcher
+    {
+        static void addscalar(const Tensor<T> &input, const T value, Tensor<T> &output) = delete;
+    };
+
     template <typename Author, typename T>
     void addscalar(const Tensor<T> &input, const T value, Tensor<T> &output)
     {
-        _author_add<Author>::template addscalar<T>(input, value, output);
+        addscalarDispatcher<Author, T>::addscalar(input, value, output);
     }
+
+    template <typename Author, typename T>
+    struct subDispatcher
+    {
+        static void sub(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C) = delete;
+    };
 
     template <typename Author, typename T>
     void sub(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
     {
-        _author_sub<Author>::template sub<T>(A, B, C);
+        subDispatcher<Author, T>::sub(A, B, C);
     }
+
+    template <typename Author, typename T>
+    struct subscalarDispatcher
+    {
+        static void subscalar(const Tensor<T> &input, const T value, Tensor<T> &output) = delete;
+    };
+
     template <typename Author, typename T>
     void subscalar(const Tensor<T> &input, const T value, Tensor<T> &output)
     {
-        _author_sub<Author>::template subscalar<T>(input, value, output);
+        subscalarDispatcher<Author, T>::subscalar(input, value, output);
     }
+
+    template <typename Author, typename T>
+    struct mulDispatcher
+    {
+        static void mul(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C) = delete;
+    };
 
     template <typename Author, typename T>
     void mul(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
     {
-        _author_mul<Author>::template mul<T>(A, B, C);
+        mulDispatcher<Author, T>::mul(A, B, C);
     }
+
+    template <typename Author, typename T>
+    struct mulscalarDispatcher
+    {
+        static void mulscalar(const Tensor<T> &input, const T value, Tensor<T> &output) = delete;
+    };
 
     template <typename Author, typename T>
     void mulscalar(const Tensor<T> &input, const T value, Tensor<T> &output)
     {
-        _author_mul<Author>::template mulscalar<T>(input, value, output);
+        mulscalarDispatcher<Author, T>::mulscalar(input, value, output);
     }
+
+    template <typename Author, typename T>
+    struct muladdDispatcher
+    {
+        static void muladd(const Tensor<T> &A, const Tensor<T> &B, const Tensor<T> &C, Tensor<T> &D) = delete;
+    };
 
     template <typename Author, typename T>
     void muladd(const Tensor<T> &A, const Tensor<T> &B, const Tensor<T> &C, Tensor<T> &D)
     {
-        _author_muladd<Author>::template muladd<T>(A, B, C, D);
+        muladdDispatcher<Author, T>::muladd(A, B, C, D);
     }
+
+    template <typename Author, typename T>
+    struct muladdscalarDispatcher
+    {
+        static void muladdscalar(const Tensor<T> &A, const Tensor<T> &B, const T alpha, const Tensor<T> &C, const T beta, Tensor<T> &D) = delete;
+    };
 
     template <typename Author, typename T>
     void muladdscalar(const Tensor<T> &A, const Tensor<T> &B, const T alpha, const Tensor<T> &C, const T beta, Tensor<T> &D)
     {
-        _author_muladd<Author>::template muladdscalar<T>(A, B, alpha, C, beta, D);
+        muladdscalarDispatcher<Author, T>::muladdscalar(A, B, alpha, C, beta, D);
     }
+
+    template <typename Author, typename T>
+    struct mulscalaraddDispatcher
+    {
+        static void mulscalaradd(const Tensor<T> &A, const T alpha, const Tensor<T> &B, const T beta, Tensor<T> &C) = delete;
+    };
 
     template <typename Author, typename T>
     void mulscalaradd(const Tensor<T> &A, const T alpha, const Tensor<T> &B, const T beta, Tensor<T> &C)
     {
-        _author_muladd<Author>::template mulscalaradd<T>(A, alpha, B, beta, C);
+        mulscalaraddDispatcher<Author, T>::mulscalaradd(A, alpha, B, beta, C);
     }
+
+    template <typename Author, typename T>
+    struct divDispatcher
+    {
+        static void div(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C) = delete;
+    };
 
     template <typename Author, typename T>
     void div(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
     {
-        _author_div<Author>::template div<T>(A, B, C);
+        divDispatcher<Author, T>::div(A, B, C);
     }
+
+    template <typename Author, typename T>
+    struct divscalarDispatcher
+    {
+        static void divscalar(const Tensor<T> &input, const T value, Tensor<T> &output) = delete;
+    };
 
     template <typename Author, typename T>
     void divscalar(const Tensor<T> &input, const T value, Tensor<T> &output)
     {
-        _author_div<Author>::template divscalar<T>(input, value, output);
+        divscalarDispatcher<Author, T>::divscalar(input, value, output);
     }
+
+    template <typename Author, typename T>
+    struct rdivscalarDispatcher
+    {
+        static void rdivscalar(const Tensor<T> &input, const T value, Tensor<T> &output) = delete;
+    };
 
     template <typename Author, typename T>
     void rdivscalar(const Tensor<T> &input, const T value, Tensor<T> &output)
     {
-        _author_div<Author>::template rdivscalar<T>(input, value, output);
+        rdivscalarDispatcher<Author, T>::rdivscalar(input, value, output);
     }
+
+    template <typename Author, typename T>
+    struct divaddDispatcher
+    {
+        static void divadd(const Tensor<T> &A, const Tensor<T> &B, const Tensor<T> &C, Tensor<T> &D) = delete;
+    };
 
     template <typename Author, typename T>
     void divadd(const Tensor<T> &A, const Tensor<T> &B, const Tensor<T> &C, Tensor<T> &D)
     {
-        _author_divadd<Author>::template divadd<T>(A, B, C, D);
+        divaddDispatcher<Author, T>::divadd(A, B, C, D);
     }
+
+    template <typename Author, typename T>
+    struct divscalaraddDispatcher
+    {
+        static void divscalaradd(const Tensor<T> &A, const T alpha, const Tensor<T> &B, const T beta, Tensor<T> &C) = delete;
+    };
 
     template <typename Author, typename T>
     void divscalaradd(const Tensor<T> &A, const T alpha, const Tensor<T> &B, const T beta, Tensor<T> &C)
     {
-        _author_divadd<Author>::template divscalaradd<T>(A, alpha, B, beta, C);
+        divscalaraddDispatcher<Author, T>::divscalaradd(A, alpha, B, beta, C);
     }
+
+    template <typename Author, typename T>
+    struct divaddbetaDispatcher
+    {
+        static void divaddbeta(const Tensor<T> &A, const Tensor<T> &B, const T alpha, const Tensor<T> &C, const T beta, Tensor<T> &D) = delete;
+    };
 
     template <typename Author, typename T>
     void divaddbeta(const Tensor<T> &A, const Tensor<T> &B, const T alpha, const Tensor<T> &C, const T beta, Tensor<T> &D)
     {
-        _author_divadd<Author>::template divaddbeta<T>(A, B, alpha, C, beta, D);
+        divaddbetaDispatcher<Author, T>::divaddbeta(A, B, alpha, C, beta, D);
     }
+
+    template <typename Author, typename T>
+    struct sqrtDispatcher
+    {
+        static void sqrt(const Tensor<T> &input, Tensor<T> &output) = delete;
+    };
 
     template <typename Author, typename T>
     void sqrt(const Tensor<T> &input, Tensor<T> &output)
     {
-        _author_sqrt<Author>::template sqrt<T>(input, output);
+        sqrtDispatcher<Author, T>::sqrt(input, output);
     }
+
+    template <typename Author, typename T>
+    struct powDispatcher
+    {
+        static void pow(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C) = delete;
+    };
 
     template <typename Author, typename T>
     void pow(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
     {
-        _author_pow<Author>::template pow<T>(A, B, C);
+        powDispatcher<Author, T>::pow(A, B, C);
     }
+
+    template <typename Author, typename T>
+    struct powscalarDispatcher
+    {
+        static void powscalar(const Tensor<T> &input, const T value, Tensor<T> &output) = delete;
+    };
 
     template <typename Author, typename T>
     void powscalar(const Tensor<T> &input, const T value, Tensor<T> &output)
     {
-        _author_pow<Author>::template powscalar<T>(input, value, output);
+        powscalarDispatcher<Author, T>::powscalar(input, value, output);
     }
+
+    template <typename Author, typename T>
+    struct logDispatcher
+    {
+        static void log(const Tensor<T> &input, Tensor<T> &output) = delete;
+    };
 
     template <typename Author, typename T>
     void log(const Tensor<T> &input, Tensor<T> &output)
     {
-        _author_log<Author>::template log<T>(input, output);
+        logDispatcher<Author, T>::log(input, output);
     }
+
+    template <typename Author, typename T>
+    struct expDispatcher
+    {
+        static void exp(const Tensor<T> &input, Tensor<T> &output) = delete;
+    };
 
     template <typename Author, typename T>
     void exp(const Tensor<T> &input, Tensor<T> &output)
     {
-        _author_exp<Author>::template exp<T>(input, output);
+        expDispatcher<Author, T>::exp(input, output);
     }
+
+    template <typename Author, typename T>
+    struct sinDispatcher
+    {
+        static void sin(const Tensor<T> &input, Tensor<T> &output) = delete;
+    };
 
     template <typename Author, typename T>
     void sin(const Tensor<T> &input, Tensor<T> &output)
     {
-        _author_sin<Author>::template sin<T>(input, output);
+        sinDispatcher<Author, T>::sin(input, output);
     }
+
+    template <typename Author, typename T>
+    struct cosDispatcher
+    {
+        static void cos(const Tensor<T> &input, Tensor<T> &output) = delete;
+    };
+
     template <typename Author, typename T>
     void cos(const Tensor<T> &input, Tensor<T> &output)
     {
-        _author_cos<Author>::template cos<T>(input, output);
+        cosDispatcher<Author, T>::cos(input, output);
     }
+
+    template <typename Author, typename T>
+    struct tanDispatcher
+    {
+        static void tan(const Tensor<T> &input, Tensor<T> &output) = delete;
+    };
+
     template <typename Author, typename T>
     void tan(const Tensor<T> &input, Tensor<T> &output)
     {
-        _author_tan<Author>::template tan<T>(input, output);
+        tanDispatcher<Author, T>::tan(input, output);
     }
+
+    template <typename Author, typename T>
+    struct maxDispatcher
+    {
+        static void max(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C) = delete;
+    };
 
     template <typename Author, typename T>
     void max(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
     {
-        _author_max<Author>::template max<T>(A, B, C);
+        maxDispatcher<Author, T>::max(A, B, C);
     }
+
+    template <typename Author, typename T>
+    struct maxgradDispatcher
+    {
+        static void maxgrad(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &A_grad, Tensor<T> &B_grad, const Tensor<T> &output_grad) = delete;
+    };
 
     template <typename Author, typename T>
     void maxgrad(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &A_grad, Tensor<T> &B_grad, const Tensor<T> &output_grad)
     {
-        _author_max<Author>::template maxgrad<T>(A, B, A_grad, B_grad, output_grad);
+        maxgradDispatcher<Author, T>::maxgrad(A, B, A_grad, B_grad, output_grad);
     }
+
+    template <typename Author, typename T>
+    struct maxscalarDispatcher
+    {
+        static void maxscalar(const Tensor<T> &A, T b, Tensor<T> &C) = delete;
+    };
 
     template <typename Author, typename T>
     void maxscalar(const Tensor<T> &A, T b, Tensor<T> &C)
     {
-        _author_max<Author>::template maxscalar<T>(A, b, C);
+        maxscalarDispatcher<Author, T>::maxscalar(A, b, C);
     }
+
+    template <typename Author, typename T>
+    struct maxscalargradDispatcher
+    {
+        static void maxscalargrad(const Tensor<T> &A, const T b, Tensor<T> &A_grad, const Tensor<T> &output_grad) = delete;
+    };
 
     template <typename Author, typename T>
     void maxscalargrad(const Tensor<T> &A, const T b, Tensor<T> &A_grad, const Tensor<T> &output_grad)
     {
-        _author_max<Author>::template maxscalargrad<T>(A, b, A_grad, output_grad);
+        maxscalargradDispatcher<Author, T>::maxscalargrad(A, b, A_grad, output_grad);
     }
+
+    template <typename Author, typename T>
+    struct minDispatcher
+    {
+        static void min(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C) = delete;
+    };
+
     template <typename Author, typename T>
     void min(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
     {
-        _author_min<Author>::template min<T>(A, B, C);
+        minDispatcher<Author, T>::min(A, B, C);
     }
+
+    template <typename Author, typename T>
+    struct mingradDispatcher
+    {
+        static void mingrad(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &A_grad, Tensor<T> &B_grad, const Tensor<T> &output_grad) = delete;
+    };
 
     template <typename Author, typename T>
     void mingrad(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &A_grad, Tensor<T> &B_grad, const Tensor<T> &output_grad)
     {
-        _author_min<Author>::template mingrad<T>(A, B, A_grad, B_grad, output_grad);
+        mingradDispatcher<Author, T>::mingrad(A, B, A_grad, B_grad, output_grad);
     }
+
+    template <typename Author, typename T>
+    struct minscalarDispatcher
+    {
+        static void minscalar(const Tensor<T> &A, T b, Tensor<T> &C) = delete;
+    };
 
     template <typename Author, typename T>
     void minscalar(const Tensor<T> &A, T b, Tensor<T> &C)
     {
-        _author_min<Author>::template minscalar<T>(A, b, C);
+        minscalarDispatcher<Author, T>::minscalar(A, b, C);
     }
+
+    template <typename Author, typename T>
+    struct minscalargradDispatcher
+    {
+        static void minscalargrad(const Tensor<T> &A, const T b, Tensor<T> &A_grad, const Tensor<T> &output_grad) = delete;
+    };
 
     template <typename Author, typename T>
     void minscalargrad(const Tensor<T> &A, const T b, Tensor<T> &A_grad, const Tensor<T> &output_grad)
     {
-        _author_min<Author>::template minscalargrad<T>(A, b, A_grad, output_grad);
+        minscalargradDispatcher<Author, T>::minscalargrad(A, b, A_grad, output_grad);
     }
 } // namespace deepx::tensorfunc
 

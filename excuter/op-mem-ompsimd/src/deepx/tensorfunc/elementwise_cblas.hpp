@@ -9,12 +9,11 @@
 #include "deepx/tensorfunc/authors.hpp"
 namespace deepx::tensorfunc
 {
-
     // float特化
     template <>
-    struct _add_func<cblas, float>
+    struct addDispatcher<cblas, float>
     {
-        static void func(const Tensor<float> &A, const Tensor<float> &B, Tensor<float> &C)
+        static void add(const Tensor<float> &A, const Tensor<float> &B, Tensor<float> &C)
         {
             if (A.shape == B.shape && A.shape == C.shape)
             {
@@ -35,9 +34,9 @@ namespace deepx::tensorfunc
 
     // double特化
     template <>
-    struct _add_func<cblas, double>
+    struct addDispatcher<cblas, double>
     {
-        static void func(Tensor<double> &A, const Tensor<double> &B, Tensor<double> &C)
+        static void add(Tensor<double> &A, const Tensor<double> &B, Tensor<double> &C)
         {
             if (A.shape == B.shape && A.shape == C.shape)
             {
@@ -53,21 +52,12 @@ namespace deepx::tensorfunc
             }
         }
     };
-    template <>
-    struct _author_add<cblas>
-    {
-        template <typename T>
-        static void add(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
-        {
-            _add_func<cblas, T>::func(A, B, C);
-        }
-    };
 
     // float特化
     template <>
-    struct _sub_func<cblas, float>
+    struct subDispatcher<cblas, float>
     {
-        static void func(const Tensor<float> &A, const Tensor<float> &B, Tensor<float> &C)
+        static void sub(const Tensor<float> &A, const Tensor<float> &B, Tensor<float> &C)
         {
             // 先复制A到C，再累加B (C = 1*A - 1*B)
             if (A.shape == B.shape && A.shape == C.shape)
@@ -87,9 +77,9 @@ namespace deepx::tensorfunc
 
     // double特化
     template <>
-    struct _sub_func<cblas, double>
+    struct subDispatcher<cblas, double>
     {
-        static void func(const Tensor<double> &A, const Tensor<double> &B, Tensor<double> &C)
+        static void sub(const Tensor<double> &A, const Tensor<double> &B, Tensor<double> &C)
         {
             if (A.shape == B.shape && A.shape == C.shape)
             {
@@ -105,14 +95,6 @@ namespace deepx::tensorfunc
             }
         }
     };
-    template <>
-    struct _author_sub<cblas>
-    {
-        template <typename T>
-        static void sub(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
-        {
-            _sub_func<cblas, T>::func(A, B, C);
-        }
-    };
+
 } // namespace deepx::tensorfunc
 #endif // DEEPX_TENSORFUNC_ELEMENTWISE_CBLAS_HPP
