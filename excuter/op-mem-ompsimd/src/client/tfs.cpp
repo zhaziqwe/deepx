@@ -1,11 +1,12 @@
+#include "client/tfs.hpp"
+
 #include "deepx/tf/arg.hpp"
-#include "deepx/tf/tf.hpp"
 #include "deepx/tf/new.hpp"
 #include "deepx/tf/print.hpp"
 #include "deepx/tf/changeshape.hpp"
-#include "deepx/dtype.hpp"
 #include "deepx/tf/tffactory.hpp"
-#include "client/tfs.hpp"
+
+#include "deepx/tensorfunc/authors.hpp"
 namespace deepx::tf
 {
    
@@ -34,8 +35,8 @@ namespace deepx::tf
     // io
     void register_util(TfFactory &opfactory)
     {
-        opfactory.add_tf(std::make_shared<Print>());
-        opfactory.add_tf(std::make_shared<Print>(1));
+        opfactory.add_tf(std::make_shared<Print<tensorfunc::miaobyte>>());
+        opfactory.add_tf(std::make_shared<Print<tensorfunc::miaobyte>>(1));
     }
 
     // // elementwise

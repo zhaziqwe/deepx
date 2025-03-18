@@ -3,7 +3,7 @@
 #include <numeric>
 #include <chrono>
 
-#include "deepx/tensorfunc/print.hpp"
+#include "deepx/tensorfunc/print_miaobyte.hpp"
 #include "deepx/tensor.hpp"
 #include "deepx/tensorfunc/new.hpp"
     
@@ -44,7 +44,7 @@ void test_tensor_matmul(){
     Tensor<float> tensor3= New<float>(matmul_shape(tensor.shape, tensor2.shape).shape);
     matmul<tensorfunc::miaobyte,float>(tensor, tensor2, tensor3);
 
-    print(tensor3);
+    print<miaobyte>(tensor3);
 }
 
 void bench_tensor_matmul(int i) {

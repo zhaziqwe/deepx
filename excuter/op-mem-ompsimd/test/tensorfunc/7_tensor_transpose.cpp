@@ -5,28 +5,28 @@
 #include "deepx/tensor.hpp"
 #include "deepx/tensorfunc/changeshape.hpp"
 #include "deepx/tensorfunc/new.hpp"
-#include "deepx/tensorfunc/print.hpp"
+#include "deepx/tensorfunc/print_miaobyte.hpp"
 #include "stdutil/vector.hpp"
 #include "tensorutil.hpp"
 #include "deepx/shape_transpose.hpp"
-
+#include "deepx/tensorfunc/authors.hpp"
 
 using namespace deepx::tensorfunc;
 using namespace deepx;
 using namespace std;
 void test_transpose()
 {
-    std::vector<int> shape=randomshape(2,4,1,6);
+    std::vector<int> shape = randomshape(2, 4, 1, 6);
     Tensor tensor = New<float>(shape);
-    std::iota(tensor.data,tensor.data+tensor.shape.size,1);
-    print(tensor);
+    std::iota(tensor.data, tensor.data + tensor.shape.size, 1);
+    print<miaobyte>(tensor);
 
-    vector<int> dimOrder=swaplastTwoDimOrder(shape);
+    vector<int> dimOrder = swaplastTwoDimOrder(shape);
 
-    std::vector<int> resultshape=transposeShape(tensor.shape.shape, dimOrder);
+    std::vector<int> resultshape = transposeShape(tensor.shape.shape, dimOrder);
     Tensor result = New<float>(resultshape);
-    transpose(tensor,result, dimOrder);
-    print(result);
+    transpose(tensor, result, dimOrder);
+    print<miaobyte>(result);
 }
 
 int main()

@@ -1,8 +1,7 @@
 #ifndef DEEPX_TENSORFUNC_INIT_MIAO_BYTE_HPP
 #define DEEPX_TENSORFUNC_INIT_MIAO_BYTE_HPP
 
-#include <cstdint>
-#include "authors.hpp"
+#include "deepx/tensorfunc/authors.hpp"
 #include "deepx/tensorfunc/init.hpp"
 #include "deepx/tensor.hpp"
 #include "init_miaobyte.cuh"

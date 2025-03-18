@@ -3,7 +3,7 @@
 
 #include "deepx/tensor.hpp"
 #include "deepx/tensorfunc/elementwise.hpp"
-#include "deepx/tensorfunc/print.hpp"
+#include "deepx/tensorfunc/print_miaobyte.hpp"
 #include "deepx/tensorfunc/new.hpp"
 #include "deepx/tensorfunc/init.hpp"
 #include "deepx/tensorfunc/authors.hpp"
@@ -19,19 +19,19 @@ void test_sub(){
     Tensor<int16_t> b_int16=New<int16_t>(shape);
     std::iota(a_int16.data,a_int16.data+a_int16.shape.size,1);
     std::iota(b_int16.data,b_int16.data+b_int16.shape.size,2);
-    print(a_int16,"%d");
-    print(b_int16,"%d");
+    print<miaobyte>(a_int16,"%d");
+    print<miaobyte>(b_int16,"%d");
     sub<tensorfunc::miaobyte,int16_t>(a_int16, b_int16,a_int16);  
-    print(a_int16,"%d");
+    print<miaobyte>(a_int16,"%d");
 
     Tensor<float> a_float=New<float>(shape);
     Tensor<float> b_float=New<float>(shape);
     std::iota(a_float.data,a_float.data+a_float.shape.size,1.0f);
     std::iota(b_float.data,b_float.data+b_float.shape.size,2.0f);
-    print(a_float);
-    print(b_float);
+    print<miaobyte>(a_float);
+    print<miaobyte>(b_float);
     sub<tensorfunc::miaobyte,float>(a_float, b_float,a_float);  
-    print(a_float);
+    print<miaobyte>(a_float);
 }
 void test_sub_1(){
     std::vector<int> shape=randomshape(1,1,1,100);
@@ -39,18 +39,18 @@ void test_sub_1(){
     Tensor<float> b=New<float>(shape);
     std::iota(a.data,a.data+a.shape.size,1.0f);
     std::iota(b.data,b.data+b.shape.size,101.0f);
-    print(a);
-    print(b);
+    print<miaobyte>(a);
+    print<miaobyte>(b);
     sub<tensorfunc::miaobyte,float>(a, b,a);  
-    print(a);
+    print<miaobyte>(a);
 }
 void test_sub_scalar(){
     std::vector<int> shape=randomshape(1,1,1,100);
     Tensor<float> a=New<float>(shape);
     std::iota(a.data,a.data+a.shape.size,1.0f);
-    print(a);
+    print<miaobyte>(a);
     subscalar<tensorfunc::miaobyte,float>(a, 100.0f,a);
-    print(a);
+    print<miaobyte>(a);
 }
 int main(int argc, char** argv){
     if (argc!=2){

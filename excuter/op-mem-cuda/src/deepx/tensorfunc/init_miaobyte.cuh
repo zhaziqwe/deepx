@@ -4,7 +4,7 @@
 #include <cuda_fp16.h>
 #include <cuda_runtime.h>
 #include "deepx/tensor.hpp"
-#include "authors.hpp"
+#include "deepx/tensorfunc/authors.hpp"
 
 namespace deepx::tensorfunc
 {

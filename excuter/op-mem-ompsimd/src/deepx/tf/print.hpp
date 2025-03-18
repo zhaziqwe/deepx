@@ -3,46 +3,65 @@
 
 #include "deepx/tf/tf.hpp"
 #include "deepx/tensorfunc/print.hpp"
+#include "deepx/tensorfunc/print_miaobyte.hpp"
+#include "deepx/tensorfunc/authors.hpp"
+namespace deepx::tf
+{
 
-namespace deepx::tf{
- 
-    class Print : public TF{
-        public:
-        Print(int polymorphism=0){
-            this->name="print";
+    template <typename Author>
+    class Print : public TF
+    {
+    public:
+        Print(int polymorphism = 0)
+        {
+            this->name = "print";
+            this->author = Author::name();
             this->funcdef(polymorphism);
         }
-        Print(string text){
+        Print(string text)
+        {
             this->parse(text);
-            if (this->name!="print"){
-                throw std::runtime_error("Invalid name: "+this->name);
+            this->author = Author::name();
+            if (this->name != "print")
+            {
+                throw std::runtime_error("Invalid name: " + this->name);
             }
         }
-        int run(mem::Mem &mem, string &error) override{
-            string name=this->args[0].textvalue;
-            if (mem.existstensor(name)){
-                auto t=mem.gettensor(name);
-                if (this->args.size() == 1){
-                    tensorfunc::print(*t);
-                }else{
-                    tensorfunc::print(*t, this->args[1].textvalue);
+        int run(mem::Mem &mem, string &error) override
+        {
+            string name = this->args[0].textvalue;
+            if (mem.existstensor(name))
+            {
+                auto t = mem.gettensor(name);
+                if (this->args.size() == 1)
+                {
+                    tensorfunc::print<Author, void>(*t);
                 }
-            }else{
-                std::cerr<<"print "<<name<<" not found"<<std::endl;
-                error="print "+name+" not found";
+                else
+                {
+                    tensorfunc::print<Author, void>(*t, this->args[1].textvalue);
+                }
+            }
+            else
+            {
+                std::cerr << "print " << name << " not found" << std::endl;
+                error = "print " + name + " not found";
                 return 1;
             }
             return 0;
-        }   
-        void funcdef(int polymorphism=0) override {
+        }
+        void funcdef(int polymorphism = 0) override
+        {
             this->args.push_back(Param("tensor1", DataCategory::Tensor, Precision::Any));
-            if (polymorphism==0) {
+            if (polymorphism == 0)
+            {
                 this->args.push_back(Param("format", DataCategory::Var, Precision::String));
             }
         }
-        string math_formula() const override {
+        string math_formula() const override
+        {
             return "print(T1)";
         }
     };
-}   
+}
 #endif

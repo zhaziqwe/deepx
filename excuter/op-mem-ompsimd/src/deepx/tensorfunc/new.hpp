@@ -49,8 +49,7 @@ namespace deepx::tensorfunc
 
     template <typename T>
     Tensor<T> New(const std::initializer_list<int> &shapedata,T *data=nullptr)
-    {
-        
+    {  
         Shape shape(shapedata);
         shape.dtype=precision<T>();
         // 分配内存

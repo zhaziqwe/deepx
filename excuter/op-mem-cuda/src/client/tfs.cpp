@@ -3,6 +3,7 @@
 #include "deepx/tf/new.hpp"
 #include "deepx/tf/print.hpp"
 #include "deepx/dtype.hpp"
+#include "deepx/tensorfunc/init_miaobyte.cuh"
 #include "deepx/tf/tffactory.hpp"
 
 namespace deepx::tf
@@ -33,8 +34,8 @@ namespace deepx::tf
     // io
     void register_util(TfFactory &opfactory)
     {
-        opfactory.add_tf(std::make_shared<Print>());
-        opfactory.add_tf(std::make_shared<Print>(1));
+        opfactory.add_tf(std::make_shared<Print<tensorfunc::miaobyte>>());
+        opfactory.add_tf(std::make_shared<Print<tensorfunc::miaobyte>>(1));
     }
 
     // // elementwise

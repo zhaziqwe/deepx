@@ -2,7 +2,7 @@
 
 #include "deepx/tensor.hpp"
 #include "deepx/tensorfunc/changeshape.hpp"
-#include "deepx/tensorfunc/print.hpp"
+#include "deepx/tensorfunc/print_miaobyte.hpp"
 #include "deepx/tensorfunc/new.hpp"
 #include "deepx/tensorfunc/init_miaobyte.hpp"
 #include "deepx/tensorfunc/elementwise.hpp"
@@ -25,7 +25,7 @@ void test_broadcast()
     //
     // reshape
     // broadcast(tensor, result);
-    print(result);
+    print<miaobyte>(result);
 }
 void bench_broadcast(int i)
 {

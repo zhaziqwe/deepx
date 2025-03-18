@@ -9,7 +9,7 @@
 #include "deepx/shape_concat.hpp"
 #include "deepx/tensorfunc/new.hpp"
 #include "deepx/tensorfunc/init.hpp"
-#include "deepx/tensorfunc/print.hpp"
+#include "deepx/tensorfunc/print_miaobyte.hpp"
 #include "stdutil/vector.hpp"
 #include "deepx/mem/mem.hpp"
 
@@ -40,7 +40,7 @@ void test_concat(){
         Shape shape=concatShape(tensors,i);
         Tensor<float> result=New<float>(shape.shape);
         concat(tensors,i,result);
-        print(result);
+        print<miaobyte>(result);
     }
     std::cout<<"================"<<std::endl;
 /*

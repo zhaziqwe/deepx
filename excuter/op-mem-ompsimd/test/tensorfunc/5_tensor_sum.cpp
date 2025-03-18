@@ -11,7 +11,7 @@
 #include "deepx/shape_reduce.hpp"
 #include "deepx/tensorfunc/new.hpp"
 #include "deepx/tensorfunc/init_miaobyte.hpp"
-#include "deepx/tensorfunc/print.hpp"
+#include "deepx/tensorfunc/print_miaobyte.hpp"
 #include "deepx/tensorfunc/file.hpp"
 
 #include <omp.h>
@@ -25,7 +25,7 @@ void test_sum()
     Shape shape({2, 3, 4});
     deepx::Tensor<float> tensor= New<float>(shape.shape);
     constant<miaobyte,float>(tensor,float(1));
-    print(tensor);
+    print<miaobyte>(tensor);
     cout<<""<<endl;
     std::vector<std::vector<int>> result = combination(3);
     for (const auto &comb : result)
@@ -34,7 +34,7 @@ void test_sum()
         Shape sumshape=reduceShape(shape,comb);
         Tensor<float> r = New<float>(sumshape.shape);
         sum(tensor, comb, r);
-        print(r);
+        print<miaobyte>(r);
     }
 /*
 []=>[2, 3, 4]
