@@ -173,7 +173,8 @@ namespace deepx::tensorfunc
                                                         B.data, n, stride_b,  // B在前
                                                         A.data, k, stride_a,  // A在后
                                                         &beta,
-                                                        C.data, n, stride_c); // 调整leading dimension
+                                                        C.data, n, stride_c,  // 调整leading dimension
+                                                        batch_size);          // 添加缺失的batch_size参数
 
                 if (status != CUBLAS_STATUS_SUCCESS)
                 {
@@ -218,19 +219,25 @@ namespace deepx::tensorfunc
 
             if (batch_size > 1)
             {
+                // 计算步长
+                int64_t stride_a = m * k;
+                int64_t stride_b = k * n;
+                int64_t stride_c = m * n;
+
                 auto status = cublasDgemmStridedBatched(handle.get(),
                                                         CUBLAS_OP_N,
                                                         CUBLAS_OP_N,
-                                                        m, n, k,
+                                                        n, m, k,      // 交换m,n处理行主序
                                                         &alpha,
-                                                        A.data, m,
-                                                        B.data, k,
+                                                        B.data, n, stride_b,  // B在前
+                                                        A.data, k, stride_a,  // A在后
                                                         &beta,
-                                                        C.data, m);
+                                                        C.data, n, stride_c,  // 输出维度对应调整
+                                                        batch_size);
 
                 if (status != CUBLAS_STATUS_SUCCESS)
                 {
-                    throw std::runtime_error("cublasDgemm failed");
+                    throw std::runtime_error("cublasDgemmStridedBatched failed");
                 }
             }
             else
@@ -251,5 +258,6 @@ namespace deepx::tensorfunc
                 }
             }
         };
-    }
+    };
+};
 #endif // DEEPX_TENSORFUNC_MATMUL_HPP

@@ -43,12 +43,32 @@ namespace deepx::tensorfunc
         }
     };
  
+    template <typename Author, typename T>
+    struct _arange_func {
+        static void func(Tensor<T> &tensor, const T start, const T step);
+    };
+
+    template <>
+    struct _arange_func<miaobyte, float> {
+        static void func(Tensor<float> &tensor, const float start, const float step);
+    };
+
+    template <>
+    struct _arange_func<miaobyte, double> {
+        static void func(Tensor<double> &tensor, const double start, const double step);
+    };
+
+    template <>
+    struct _arange_func<miaobyte, __half> {
+        static void func(Tensor<__half> &tensor, const __half start, const __half step);
+    };
+
+    // 使用实现结构体
     template <typename T>
     struct arangeDispatcher<miaobyte, T>
     {
-        static void arange(Tensor<T> &tensor, const T start, const T step)
-        {
-            //todo
+        static void arange(Tensor<T> &tensor, const T start, const T step) {
+            _arange_func<miaobyte, T>::func(tensor, start, step);
         }
     };
     
