@@ -2,7 +2,7 @@
 #include "deepx/tensorfunc/elementwise.hpp"
 #include "deepx/tensorfunc/elementwise_miaobyte.hpp"
 #include "deepx/tensor.hpp"
-#include "deepx/tensorfunc/init.hpp"
+#include "deepx/tensorfunc/init_miaobyte.hpp"
 #include "deepx/tensorfunc/print.hpp"
 #include "deepx/tensorfunc/new.hpp"
 #include "deepx/tensorfunc/authors.hpp"
@@ -17,7 +17,7 @@ void test_max(){
     std::iota(A.data,A.data+A.shape.size,0);
     print(A);
     Tensor<float> B=New<float>(shape);
-    constant(B,float(55));
+    constant<miaobyte,float>(B,float(55));
     print(B);
     Tensor<float> C=New<float>(shape);
     Tensor<float> D=New<float>(shape);

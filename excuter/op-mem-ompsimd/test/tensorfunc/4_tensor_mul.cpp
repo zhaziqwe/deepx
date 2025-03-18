@@ -6,7 +6,7 @@
 #include "deepx/tensorfunc/elementwise_miaobyte.hpp"
 #include "deepx/tensorfunc/print.hpp"
 #include "deepx/tensorfunc/new.hpp"
-#include "deepx/tensorfunc/init.hpp"
+#include "deepx/tensorfunc/init_miaobyte.hpp"
 #include "tensorutil.hpp"
 #include "deepx/tensorfunc/authors.hpp"
 using namespace deepx;
@@ -50,8 +50,8 @@ void test_muladd(){
     Tensor<float> a=New<float>(shape);
     Tensor<float> b=New<float>(shape);
     Tensor<float> c=New<float>(shape);
-    arange(a,1.0f);
-    arange(b,101.0f);
+    arange<miaobyte,float>(a,1.0f,1);
+    arange<miaobyte,float>(b,101.0f,1);
     print(a);
     print(b);
     mulscalaradd<tensorfunc::miaobyte,float>(a, 2.0f, b, -1.0f,c);

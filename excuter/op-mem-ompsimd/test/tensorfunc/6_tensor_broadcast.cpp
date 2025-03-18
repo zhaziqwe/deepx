@@ -4,7 +4,7 @@
 #include "deepx/tensorfunc/changeshape.hpp"
 #include "deepx/tensorfunc/print.hpp"
 #include "deepx/tensorfunc/new.hpp"
-#include "deepx/tensorfunc/init.hpp"
+#include "deepx/tensorfunc/init_miaobyte.hpp"
 #include "deepx/tensorfunc/elementwise.hpp"
 #include "deepx/tensorfunc/elementwise_cblas.hpp"
 #include "deepx/tensorfunc/elementwise_miaobyte.hpp"
@@ -42,9 +42,9 @@ void bench_broadcast(int i)
 
 void bench_broadcast_add(int i){
     Tensor tensor = New<float>({i,i});
-    uniform(tensor,0.0f,1.0f);
+    uniform<miaobyte,float>(tensor,0.0f,1.0f);
     Tensor other = New<float>({i,i});
-    uniform(other,0.0f,1.0f);
+    uniform<miaobyte,float>(other,0.0f,1.0f);
     std::cout <<  "broadcast add "<<tensor.shape.shape<<std::endl;
     auto start = std::chrono::high_resolution_clock::now();
     add<tensorfunc::cblas,float>(tensor, other,tensor);
@@ -54,9 +54,9 @@ void bench_broadcast_add(int i){
 }
 void bench_broadcast_mul(int i){
     Tensor tensor = New<float>({i,i});
-    uniform(tensor,0.0f,1.0f);
+    uniform<miaobyte,float>(tensor,0.0f,1.0f);
     Tensor other = New<float>({i,i});
-    uniform(other,0.0f,1.0f);
+    uniform<miaobyte,float>(other,0.0f,1.0f);
     std::cout <<  "broadcast mul "<<tensor.shape.shape<<std::endl;
     auto start = std::chrono::high_resolution_clock::now();
     mul<tensorfunc::miaobyte,float>(tensor, other,tensor);

@@ -9,7 +9,7 @@
  
 #include "deepx/tensor.hpp"
 #include "deepx/shape_reduce.hpp"
-#include "deepx/tensorfunc/init.hpp"
+#include "deepx/tensorfunc/init_miaobyte.hpp"
 
 namespace deepx::tensorfunc
 {
@@ -25,7 +25,7 @@ namespace deepx::tensorfunc
     template <typename T>
     void sum(const Tensor<T> &tensor, const std::vector<int> &dims, Tensor<T> &result)
     {
-        constant(result,T(0));
+        constant<miaobyte,T>(result,T(0));
 
         std::vector<int> sorted_dims = dims;
         if (dims.size()==0){

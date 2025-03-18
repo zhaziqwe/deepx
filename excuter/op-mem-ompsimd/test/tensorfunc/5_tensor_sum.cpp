@@ -10,7 +10,7 @@
 #include "deepx/vector_combination.hpp"
 #include "deepx/shape_reduce.hpp"
 #include "deepx/tensorfunc/new.hpp"
-#include "deepx/tensorfunc/init.hpp"
+#include "deepx/tensorfunc/init_miaobyte.hpp"
 #include "deepx/tensorfunc/print.hpp"
 #include "deepx/tensorfunc/file.hpp"
 
@@ -24,7 +24,7 @@ void test_sum()
 
     Shape shape({2, 3, 4});
     deepx::Tensor<float> tensor= New<float>(shape.shape);
-    constant(tensor,float(1));
+    constant<miaobyte,float>(tensor,float(1));
     print(tensor);
     cout<<""<<endl;
     std::vector<std::vector<int>> result = combination(3);

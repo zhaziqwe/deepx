@@ -9,7 +9,8 @@
     
 #include "deepx/tensorfunc/matmul.hpp"
 #include "deepx/tensorfunc/matmul_miaobyte.hpp"
-#include "deepx/tensorfunc/init.hpp"
+#include "deepx/tensorfunc/init_miaobyte.hpp"
+#include "deepx/tensorfunc/authors.hpp"
 #include "deepx/shape_matmul.hpp"
 #include "deepx/tensorfunc/file.hpp"
 
@@ -48,10 +49,10 @@ void test_tensor_matmul(){
 
 void bench_tensor_matmul(int i) {
     Tensor<float> tensor= New<float>({i,i});
-    uniform(tensor);
+    uniform<miaobyte,float>(tensor,0,1);
     save(tensor,"4_tensor_matmul"+std::to_string(i)+"tensor");
     Tensor<float> tensor2= New<float>({i,i});
-    uniform(tensor2);
+    uniform<miaobyte,float>(tensor2,0,1);
     save(tensor2,"4_tensor_matmul"+std::to_string(i)+"tensor2");
     Tensor<float> tensor3= New<float>(matmul_shape(tensor.shape, tensor2.shape).shape);
     std::cout<<("matmul ", i, "x", i);
