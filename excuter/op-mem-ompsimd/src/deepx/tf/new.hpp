@@ -12,17 +12,13 @@ namespace deepx::tf
     class NewTensor : public TF
     {
     public:
-        NewTensor()
+               NewTensor(vector<Param> args, vector<Param> returns)
         {
             this->name = "newtensor";
-            this->funcdef();
+            this->args = args;
+            this->returns = returns;
         }
-        // support polymorphism=0 or 1
-        NewTensor(int polymorphism = 0)
-        {
-            this->name = "newtensor";
-            this->funcdef(polymorphism);
-        }
+ 
         NewTensor(string text, bool call = false)
         {
             this->parse(text);
@@ -143,21 +139,7 @@ namespace deepx::tf
             return 0;
         };
 
-        void funcdef(int polymorphism = 0) override
-        {
-            switch (polymorphism)
-            {
-
-            case 1:
-                this->args.push_back(Param("shape", DataCategory::Var, Precision::String));
-                break;
-            case 0:
-            default:
-                this->args.push_back(Param("shape", DataCategory::Vector, Precision::Int32));
-                break;
-            }
-            this->returns.push_back(Param("tensor1", DataCategory::Tensor, Precision::Any));
-        };
+         
 
         string math_formula() const override
         {
@@ -171,7 +153,7 @@ namespace deepx::tf
         CopyTensor()
         {
             this->name = "copytensor";
-            this->funcdef();
+
         }
         CopyTensor(string text)
         {
@@ -189,11 +171,7 @@ namespace deepx::tf
             //  tensorfunc::copytensor(*src,*dst);
             return 0;
         }
-        void funcdef(int polymorphism = 0) override
-        {
-            this->args.push_back(Param("src", DataCategory::Tensor, Precision::Any));
-            this->args.push_back(Param("dst", DataCategory::Tensor, Precision::Any));
-        }
+
         string math_formula() const override
         {
             return "T2.data = T1.data";
@@ -206,7 +184,7 @@ namespace deepx::tf
         CloneTensor()
         {
             this->name = "clonetensor";
-            this->funcdef();
+
         }
         int run(mem::Mem &mem, string &error) override
         {
@@ -217,11 +195,6 @@ namespace deepx::tf
             return 0;
         }
 
-        void funcdef(int polymorphism = 0) override
-        {
-            this->args.push_back(Param("src", DataCategory::Tensor, Precision::Any));
-            this->args.push_back(Param("dst", DataCategory::Var, Precision::String));
-        }
         string math_formula() const override
         {
             return "T2 = T1.clone()";
@@ -234,7 +207,7 @@ namespace deepx::tf
         DelTensor()
         {
             this->name = "deltensor";
-            this->funcdef();
+
         }
         DelTensor(string text)
         {
@@ -250,10 +223,7 @@ namespace deepx::tf
             mem.delete_tensor(name);
             return 0;
         }
-        void funcdef(int polymorphism=0) override
-        {
-            this->args.push_back(Param("tensor1", DataCategory::Tensor, Precision::Any));
-        }
+
         string math_formula() const override
         {
             return "del T1";

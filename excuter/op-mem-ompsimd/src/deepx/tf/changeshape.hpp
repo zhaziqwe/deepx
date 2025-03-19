@@ -15,7 +15,7 @@ namespace deepx::tf
         Concat()
         {
             this->name=_name;
-            this->funcdef();
+
         }
         Concat(string text)
         {
@@ -24,12 +24,7 @@ namespace deepx::tf
                 throw std::runtime_error("Invalid name: "+this->name);
             }
         }
-        void funcdef(int polymorphism=0) override
-        {
-            this->args.push_back(Param("tensors", DataCategory::ListTensor, Precision::Any));
-            this->args.push_back(Param("axis", DataCategory::Var, Precision::Int32));
-            this->returns.push_back(Param("Tresult", DataCategory::Tensor, Precision::Any));
-        }
+
         string math_formula() const override
         {
             return "Tresult = concat([T1, T2...], axis=3)";

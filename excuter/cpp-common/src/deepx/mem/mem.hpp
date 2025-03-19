@@ -173,12 +173,31 @@ namespace deepx::mem
                     result->data = ptr_tensor->data;
                     break;
                 }
+                case Precision::Int64:
+                {
+                    auto ptr_tensor = std::static_pointer_cast<Tensor<int64_t>>(ptr);
+                    result->data = ptr_tensor->data;
+                    break;
+                }
                 case Precision::Int32:
                 {
                     auto ptr_tensor = std::static_pointer_cast<Tensor<int32_t>>(ptr);
                     result->data = ptr_tensor->data;
                     break;
                 }
+                case Precision::Int16:
+                {
+                    auto ptr_tensor = std::static_pointer_cast<Tensor<int16_t>>(ptr);
+                    result->data = ptr_tensor->data;
+                    break;
+                }   
+                case Precision::Int8:
+                {
+                    auto ptr_tensor = std::static_pointer_cast<Tensor<int8_t>>(ptr);
+                    result->data = ptr_tensor->data;
+                    break;
+                }
+                
                 default:
                     throw std::runtime_error("Unsupported dtype: " + precision_str(ptr->shape.dtype));
             }

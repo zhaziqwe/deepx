@@ -33,8 +33,22 @@ namespace deepx::tf
                 {
                     Param("name", DataCategory::Vector, Precision::Any),
                 })));
-        tffactory.add_tf(std::make_shared<NewTensor>(0));
-        tffactory.add_tf(std::make_shared<NewTensor>(1));
+        tffactory.add_tf(std::make_shared<NewTensor>(vector<Param>(
+            {
+                Param("shape", DataCategory::Vector, Precision::Int32),
+            }),
+            vector<Param>(
+                {
+                    Param("tensor1", DataCategory::Tensor, Precision::Any),
+                })));
+         tffactory.add_tf(std::make_shared<NewTensor>(vector<Param>(
+            {
+                Param("shape", DataCategory::Var, Precision::String),
+            }),
+            vector<Param>(
+                {
+                    Param("tensor1", DataCategory::Tensor, Precision::Any),
+                })));
         // opfactory.add_op(DelTensor<float>());
     }
 

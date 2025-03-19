@@ -446,10 +446,6 @@ namespace deepx::tf
         return true;
     }
 
-    void TF::funcdef(int polymorphism)
-    {
-        // 基类的默认实现为空
-        // 派生类需要重写这个函数来定义具体的函数签名
-    }
+
  
 }

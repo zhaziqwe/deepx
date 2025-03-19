@@ -53,8 +53,7 @@ namespace deepx::tf
             throw NotImplementError(name);
         }
         virtual string math_formula() const;
-        virtual void funcdef(int polymorphism=0);
-        
+
         void parse(const string &str);
         std::string to_string(bool show_extra=false, bool show_name=true) const;
         void init(const string &opname,

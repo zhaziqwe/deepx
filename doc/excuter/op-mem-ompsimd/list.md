@@ -4,7 +4,7 @@
 
 | Operation | Author | Func Def | Math Formula | IR Instruction |
 |-----------|--------|------------|--------------|----------------|
-| concat |  none  | concat(listtensor<any> tensors, var<int32> axis)->(tensor<any> Tresult) | Tresult = concat([T1, T2...], axis=3) | concat(listtensor<any> tensors, var<int32> axis)->(tensor<any> Tresult) |
+| concat |  none  | concat()->() | Tresult = concat([T1, T2...], axis=3) | concat()->() |
 | constant | miaobyte | constant(tensor<any> t, var<any> value)->() | print(T1) | constant(tensor<any> t, var<any> value)->() |
 | print | miaobyte | print(tensor<any> )->() | print(T1) | print(tensor<any> )->() |
 | print | miaobyte | print(tensor<any> , var<string> )->() | print(T1) | print(tensor<any> , var<string> )->() |

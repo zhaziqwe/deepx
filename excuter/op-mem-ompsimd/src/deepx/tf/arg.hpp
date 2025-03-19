@@ -28,11 +28,7 @@ namespace deepx::tf
                 throw std::runtime_error("Invalid name: " + this->name);
             }
         }
-        void funcdef(int polymorphism = 0) override
-        {
-            this->args.push_back(Param("value", DataCategory::Var, Precision::Any));
-            this->returns.push_back(Param("name", DataCategory::Var, Precision::Any));
-        }
+
         string math_formula() const override
         {
             return "var argname = argvalue";
@@ -97,11 +93,7 @@ namespace deepx::tf
                 throw std::runtime_error("Invalid name: " + this->name);
             }
         }
-        void funcdef(int polymorphism = 0) override
-        {
-            this->args.push_back(Param("shape", DataCategory::Vector, Precision::Any));
-            this->returns.push_back(Param("name", DataCategory::Vector, Precision::Any));
-        }
+
         string math_formula() const override
         {
             return "shape = [3  4  5]";
