@@ -12,11 +12,12 @@ namespace deepx::tf
     class Print : public TF
     {
     public:
-        Print(int polymorphism = 0)
+        Print(vector<Param> args, vector<Param> returns)
         {
             this->name = "print";
             this->author = Author::name();
-            this->funcdef(polymorphism);
+            this->args = args;
+            this->returns = returns;
         }
         Print(string text)
         {

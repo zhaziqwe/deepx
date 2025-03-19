@@ -8,29 +8,18 @@
 
 namespace deepx::tf
 {
-
-    template <typename T>
-    T toT(string dtype, string value)
-    {
-        if (dtype == "int32")
-        {
-            return stoi(value);
-        }
-        else if (dtype == "float32")
-        {
-            return stof(value);
-        }
-    }
-
     class ArgSet : public TF
     {
     public:
-        ArgSet()
+        ArgSet(vector<Param> args, vector<Param> returns)
         {
             this->name = "argset";
-            this->funcdef();
+            this->author = "";
+            this->args = args;
+            this->returns = returns;
         }
-        ArgSet(string text, bool call = false)
+ 
+        ArgSet(string text)
         {
             this->parse(text);
             if (this->name != "argset")
@@ -82,7 +71,7 @@ namespace deepx::tf
                 break;
             }
             default:
-                error = "Unsupported dtype: " + dtype_str(this->args[0].dtype);
+                error = "Unsupportednone dtype: " + dtype_str(this->args[0].dtype);
                 return 1;
             }
             return 0;
@@ -92,10 +81,12 @@ namespace deepx::tf
     class VecSet : public TF
     {
     public:
-        VecSet()
+        VecSet(vector<Param> args, vector<Param> returns)
         {
             this->name = "vecset";
-            this->funcdef(0);
+            this->author = "";
+            this->args = args;
+            this->returns = returns;
         }
         VecSet(string text)
         {

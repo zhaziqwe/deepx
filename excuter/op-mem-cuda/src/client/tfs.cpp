@@ -3,17 +3,31 @@
 #include "deepx/tf/new.hpp"
 #include "deepx/tf/print.hpp"
 #include "deepx/dtype.hpp"
-#include "deepx/tensorfunc/init_miaobyte.cuh"
 #include "deepx/tf/tffactory.hpp"
 
 namespace deepx::tf
 {
-  
+
     // tensor
     void register_lifecycle(TfFactory &tffactory)
     {
-        tffactory.add_tf(std::make_shared<ArgSet>());
-        tffactory.add_tf(std::make_shared<VecSet>());
+        tffactory.add_tf(std::make_shared<ArgSet>(vector<Param>(
+                                                      {
+                                                          Param("value", DataCategory::Var, Precision::Any),
+                                                      }),
+                                                  vector<Param>(
+                                                      {
+                                                          Param("name", DataCategory::Var, Precision::Any),
+                                                      })));
+         tffactory.add_tf(std::make_shared<VecSet>(
+            vector<Param>(
+                {
+                    Param("value", DataCategory::Vector, Precision::Any),
+                }),
+            vector<Param>(
+                {
+                    Param("name", DataCategory::Vector, Precision::Any),
+                })));
         tffactory.add_tf(std::make_shared<NewTensor>(0));
         tffactory.add_tf(std::make_shared<NewTensor>(1));
         // opfactory.add_op(DelTensor<float>());
@@ -34,8 +48,18 @@ namespace deepx::tf
     // io
     void register_util(TfFactory &opfactory)
     {
-        opfactory.add_tf(std::make_shared<Print<tensorfunc::miaobyte>>());
-        opfactory.add_tf(std::make_shared<Print<tensorfunc::miaobyte>>(1));
+        opfactory.add_tf(std::make_shared<Print<tensorfunc::miaobyte>>(vector<Param>(
+                                                                           {
+                                                                               Param("", DataCategory::Tensor, Precision::Any),
+                                                                           }),
+                                                                       vector<Param>()));
+
+        opfactory.add_tf(std::make_shared<Print<tensorfunc::miaobyte>>(vector<Param>(
+                                                                           {
+                                                                               Param("", DataCategory::Tensor, Precision::Any),
+                                                                               Param("", DataCategory::Var, Precision::String),
+                                                                           }),
+                                                                       vector<Param>()));
     }
 
     // // elementwise
@@ -99,7 +123,7 @@ namespace deepx::tf
         //     opfactory.add_op(Transpose<float>());
         //     opfactory.add_op(Reshape<float>());
         //     opfactory.add_op(Expand<float>());
-        //tffactory.add_tf(std::make_shared<Concat>());
+        // tffactory.add_tf(std::make_shared<Concat>());
     }
     // // reduce
     // void register_reduce(OpFactory &opfactory)

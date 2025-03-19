@@ -13,10 +13,12 @@ namespace deepx::tf
     class ArgSet : public TF
     {
     public:
-        ArgSet()
+         ArgSet(vector<Param> args, vector<Param> returns)
         {
             this->name = "argset";
-            this->funcdef();
+            this->author = "";
+            this->args = args;
+            this->returns = returns;
         }
         ArgSet(string text, bool call = false)
         {
@@ -80,10 +82,12 @@ namespace deepx::tf
     class VecSet : public TF
     {
     public:
-        VecSet()
+        VecSet(vector<Param> args, vector<Param> returns)
         {
             this->name = "vecset";
-            this->funcdef(0);
+            this->author = "";
+            this->args = args;
+            this->returns = returns;
         }
         VecSet(string text)
         {
