@@ -44,7 +44,7 @@ jobs:
       with:
         path: |
           excuter/op-mem-ompsimd/build
-          excuter/common/build
+          excuter/cpp-common/build
           ~/.ccache
         key: ${{ runner.os }}-build-${{ hashFiles('**/CMakeLists.txt') }}
         restore-keys: |
@@ -76,10 +76,10 @@ jobs:
         # 确保头文件正确安装
         sudo cp -r ../hwy /usr/local/include/
 
-    # 构建 common 库
+    # 构建 cpp-common 库
     - name: Build Common Library
       run: |
-        cd excuter/common
+        cd excuter/cpp-common
         mkdir -p build && cd build
         cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER_LAUNCHER=ccache ..
         cmake --build . --config Release -j$(nproc)
