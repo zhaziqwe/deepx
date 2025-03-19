@@ -44,6 +44,36 @@ namespace deepx::tensorfunc
     template void launch_add<int32_t>(int numBlocks, int blockSize, const int32_t*  a, const  int32_t* b,  int32_t* c, int size);
     template void launch_add<int16_t>(int numBlocks, int blockSize, const int16_t*  a, const  int16_t* b,  int16_t* c, int size);
     template void launch_add<int8_t>(int numBlocks, int blockSize, const int8_t*  a, const  int8_t* b,  int8_t* c, int size);
+
+
+    template <typename T>
+    __global__ void addscalar_kernel(const T* A, const T scalar, T* C, int size) {
+        int idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx < size) {
+            C[idx] = A[idx] + scalar;
+        }
+    }   
+    template __global__ void addscalar_kernel<double>(const double* A, const double scalar, double* C, int size);   
+    template __global__ void addscalar_kernel<float>(const float* A, const float scalar, float* C, int size);
+    template __global__ void addscalar_kernel<half>(const half* A, const half scalar, half* C, int size);
+    template __global__ void addscalar_kernel<nv_bfloat16>(const nv_bfloat16* A, const nv_bfloat16 scalar, nv_bfloat16* C, int size);
+    template __global__ void addscalar_kernel<int64_t>(const int64_t* A, const int64_t scalar, int64_t* C, int size);
+    template __global__ void addscalar_kernel<int32_t>(const int32_t* A, const int32_t scalar, int32_t* C, int size);
+    template __global__ void addscalar_kernel<int16_t>(const int16_t* A, const int16_t scalar, int16_t* C, int size);
+    template __global__ void addscalar_kernel<int8_t>(const int8_t* A, const int8_t scalar, int8_t* C, int size);
+    
+    template <typename T>
+    void launch_addscalar(const int numBlocks, const int blockSize, const T* a, const T scalar, T* c, const int size) {
+        addscalar_kernel<<<numBlocks, blockSize>>>(a, scalar, c, size);
+    }   
+    template void launch_addscalar<double>(const int numBlocks, const int blockSize, const double* a, const double scalar, double* c, const int size);
+    template void launch_addscalar<float>(const int numBlocks, const int blockSize, const float* a, const float scalar, float* c, const int size);
+    template void launch_addscalar<half>(const int numBlocks, const int blockSize, const half* a, const half scalar, half* c, const int size);
+    template void launch_addscalar<nv_bfloat16>(const int numBlocks, const int blockSize, const nv_bfloat16* a, const nv_bfloat16 scalar, nv_bfloat16* c, const int size);
+    template void launch_addscalar<int64_t>(const int numBlocks, const int blockSize, const int64_t* a, const int64_t scalar, int64_t* c, const int size);  
+    template void launch_addscalar<int32_t>(const int numBlocks, const int blockSize, const int32_t* a, const int32_t scalar, int32_t* c, const int size);
+    template void launch_addscalar<int16_t>(const int numBlocks, const int blockSize, const int16_t* a, const int16_t scalar, int16_t* c, const int size);
+    template void launch_addscalar<int8_t>(const int numBlocks, const int blockSize, const int8_t* a, const int8_t scalar, int8_t* c, const int size);
 }
 
 #endif // DEEPX_TENSORFUNC_ELEMENTWISE_MIAO_BYTE_BASIC_CUH

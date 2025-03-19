@@ -5,6 +5,9 @@
 #include "deepx/tensorfunc/cuda.hpp"
 #include "deepx/tensorfunc/authors.hpp"
 #include "deepx/tensorfunc/elementwise_miaobyte_basic.cuh"
+
+#include "stdutil/error.hpp"
+
 namespace deepx::tensorfunc
 {
     // CUDA kernel函数声明
@@ -16,13 +19,27 @@ namespace deepx::tensorfunc
         static void add(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
         {
             if (A.shape.size != B.shape.size || A.shape.size != C.shape.size) {
-                throw std::runtime_error("Tensor shapes must match for addition");
+                throw TensorShapeError("add");
             }
-            const int blockSize = 256;
+            const int blockSize = A.shape.size > 256 ? 256 : A.shape.size;
             int numBlocks = (A.shape.size + blockSize - 1) / blockSize;
             launch_add(numBlocks, blockSize, A.data, B.data, C.data, A.shape.size);
            
         }   
+    };
+
+    template <typename T>
+    struct addscalarDispatcher<miaobyte, T>
+    {
+        static void addscalar(const Tensor<T> &A, const T scalar, Tensor<T> &C)
+        {
+            if (A.shape.size != C.shape.size) {
+                throw TensorShapeError("addscalar");
+            }
+            const int blockSize = A.shape.size > 256 ? 256 : A.shape.size;
+            int numBlocks = (A.shape.size + blockSize - 1) / blockSize;
+            launch_addscalar(numBlocks, blockSize, A.data, scalar, C.data, A.shape.size);
+        }
     };
 }
 

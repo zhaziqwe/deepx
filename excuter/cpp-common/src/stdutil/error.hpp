@@ -16,4 +16,11 @@ public:
         : std::logic_error("Unsupported method: " + method_name) {}
 };
 
+class TensorShapeError : public std::logic_error {
+public:
+    explicit TensorShapeError(const std::string& operation)
+        : std::logic_error("Tensor shape error for operation: " + operation) {}
+};
+
+
 #endif // STDUTIL_ERROR_HPP
