@@ -1,8 +1,6 @@
-add_executable(1_argset 1_argset.cpp)
-target_link_libraries(1_argset deepx_ompsimd)
 
-# add_executable(1_mem 1_mem.cpp)
-# target_link_libraries(1_mem deepx_ompsimd)
+ add_executable(1_mem 1_mem.cpp)
+ target_link_libraries(1_mem deepx_ompsimd)
 
 # add_executable(1_relu 1_relu.cpp)
 # target_link_libraries(1_relu deepx_ompsimd)

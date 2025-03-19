@@ -1,7 +1,7 @@
 #include "deepx/tensorfunc/init_miaobyte.hpp"
 #include "deepx/tensor.hpp"
 #include "deepx/tensorfunc/new.hpp"
-#include "deepx/tensorfunc/print.hpp"
+#include "deepx/tensorfunc/print_miaobyte.hpp"
 #include "deepx/tensorfunc/elementwise.hpp"
 #include "deepx/tensorfunc/elementwise_cublas_basic.hpp"
 using namespace deepx::tensorfunc;
@@ -15,8 +15,8 @@ void test_add()
     Tensor<float> c=New<float>({10, 10});
     constant<miaobyte,float>(c, 0.0f);
 
-    add<deepx::tensorfunc::cublas,float>(a, b, c);
-    print(c,"%.2f");
+    add<cublas,float>(a, b, c);
+    print<miaobyte>(c,"%.2f");
 }
 
 int main()

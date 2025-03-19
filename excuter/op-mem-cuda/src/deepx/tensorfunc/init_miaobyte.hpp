@@ -4,7 +4,7 @@
 #include "deepx/tensorfunc/authors.hpp"
 #include "deepx/tensorfunc/init.hpp"
 #include "deepx/tensor.hpp"
-#include "init_miaobyte.cuh"
+#include "deepx/tensorfunc/init_miaobyte.cuh"
 
 namespace deepx::tensorfunc
 {

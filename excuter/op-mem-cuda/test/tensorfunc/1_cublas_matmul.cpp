@@ -1,7 +1,7 @@
 #include "deepx/tensorfunc/init_miaobyte.hpp"
 #include "deepx/tensor.hpp"
 #include "deepx/tensorfunc/new.hpp"
-#include "deepx/tensorfunc/print.hpp"
+#include "deepx/tensorfunc/print_miaobyte.hpp"
 #include "deepx/tensorfunc/matmul.hpp"
 #include "deepx/tensorfunc/matmul_cublas.hpp"
 
@@ -26,14 +26,14 @@ void test_matmul()
     constant<miaobyte,float>(c, 0.0f);
 
     // 打印输入矩阵
-    print(a, "%.2f");
-    print(b, "%.2f");
+    print<miaobyte>(a, "%.2f");
+    print<miaobyte>(b, "%.2f");
 
     // 执行矩阵乘法 C = A × B
     matmul<deepx::tensorfunc::cublas,float>(a, b, c);
 
     // 打印结果
-    print(c, "%.2f");
+    print<miaobyte>(c, "%.2f");
 }
 
 void test_matmul_batch()
@@ -51,14 +51,14 @@ void test_matmul_batch()
     constant<miaobyte,float>(c, 0.0f);
 
     // 打印输入矩阵
-    print(a, "%.2f");
-    print(b, "%.2f");
+    print<miaobyte>(a, "%.2f");
+    print<miaobyte>(b, "%.2f");
 
     // 执行矩阵乘法 C = A × B
     matmul<deepx::tensorfunc::cublas,float>(a, b, c);
 
     // 打印结果
-    print(c, "%.2f");
+    print<miaobyte>(c, "%.2f");
 }
 
 int main(int argc, char **argv)

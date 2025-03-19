@@ -19,6 +19,11 @@ namespace deepx::tensorfunc{
     public:
         static std::string name() { return "cblas"; }
     };
+
+    class cublas{
+    public:
+        static std::string name() { return "cublas"; }
+    };
 }
 
 #endif

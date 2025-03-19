@@ -2,12 +2,13 @@
 #include "deepx/tf/tf.hpp"
 #include "deepx/tf/new.hpp"
 #include "deepx/tf/print.hpp"
+#include "deepx/tf/init.hpp"
 #include "deepx/dtype.hpp"
 #include "deepx/tf/tffactory.hpp"
-
+#include "deepx/tensorfunc/authors.hpp"
 namespace deepx::tf
 {
-
+    using namespace deepx::tensorfunc;
     // tensor
     void register_lifecycle(TfFactory &tffactory)
     {
@@ -33,18 +34,22 @@ namespace deepx::tf
         // opfactory.add_op(DelTensor<float>());
     }
 
-    // // init
-    // void register_init(OpFactory &opfactory)
-    // {
-    //     opfactory.add_op(Uniform<float>());
-    //     opfactory.add_op(Uniform<double>());
+    // init
+    void register_init(TfFactory &tffactory)
+    {
+        //     opfactory.add_op(Uniform<float>());
+        //     opfactory.add_op(Uniform<double>());
 
-    //     opfactory.add_op(Constant<float>());
-    //     opfactory.add_op(Constant<double>());
+        tffactory.add_tf(std::make_shared<Constant<miaobyte>>(vector<Param>(
+                                                        {
+                                                            Param("t", DataCategory::Tensor, Precision::Any),
+                                                            Param("value", DataCategory::Var, Precision::Any),
+                                                        }),
+                                                    vector<Param>()));
 
-    //     opfactory.add_op(Arange<float>());
-    //     opfactory.add_op(Arange<double>());
-    // }
+        //     opfactory.add_op(Arange<float>());
+        //     opfactory.add_op(Arange<double>());
+    }
     // io
     void register_util(TfFactory &opfactory)
     {
@@ -142,7 +147,7 @@ namespace deepx::tf
     int register_all(TfFactory &tffactory)
     {
         register_lifecycle(tffactory);
-        // register_init(opfactory);
+        register_init(tffactory);
         register_util(tffactory);
         // register_elementwise(opfactory);
         // register_matmul(opfactory);

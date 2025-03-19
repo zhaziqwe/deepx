@@ -1,11 +1,14 @@
 #ifndef DEEPX_TENSORFUNC_MATMUL_CUBLAS_HPP
 #define DEEPX_TENSORFUNC_MATMUL_CUBLAS_HPP
 
+#include "cublas_v2.h"
+#include <cuda_fp16.h> // 为了支持half精度
+#include <cuda_bf16.h>
 #include "deepx/tensor.hpp"
 
 #include "deepx/tensorfunc/matmul.hpp"
-#include "authors.hpp"
-#include "cuda.hpp"
+#include "deepx/tensorfunc/authors.hpp"
+#include "deepx/tensorfunc/cuda.hpp"
 
 namespace deepx::tensorfunc
 {
