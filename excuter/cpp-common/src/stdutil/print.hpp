@@ -32,6 +32,12 @@ namespace stdutil
         case Precision::Float64:
             printf(format.c_str(), ((double *)data)[offset]);
             break;
+        case Precision::Float16:
+            printf(format.c_str(), ((float *)data)[offset]);
+            break;  
+        case Precision::BFloat16:
+            printf(format.c_str(), ((float *)data)[offset]);
+            break;
         }
     }
 
