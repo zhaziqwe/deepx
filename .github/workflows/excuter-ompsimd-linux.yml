@@ -1,4 +1,4 @@
-name: Excuter/omp-simd-linux Build
+name: Excuter/ompsimd-linux Build
 on: [push, pull_request]
 
 env:

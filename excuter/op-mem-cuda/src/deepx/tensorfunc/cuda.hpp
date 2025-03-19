@@ -29,7 +29,7 @@ namespace deepx::tensorfunc
     private:
         cublasHandle_t handle_;
     };
-
+ 
 }
 
 #endif

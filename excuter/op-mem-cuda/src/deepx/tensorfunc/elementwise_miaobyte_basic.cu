@@ -1,7 +1,6 @@
 #ifndef DEEPX_TENSORFUNC_ELEMENTWISE_MIAO_BYTE_BASIC_CUH
 #define DEEPX_TENSORFUNC_ELEMENTWISE_MIAO_BYTE_BASIC_CUH
 
-#include "deepx/tensorfunc/elementwise.hpp"
 #include "deepx/tensorfunc/cuda.hpp"
 #include "deepx/tensorfunc/authors.hpp"
 

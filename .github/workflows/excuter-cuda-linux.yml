@@ -21,20 +21,19 @@ jobs:
         
     # 安装 CUDA
     - name: Setup CUDA
-      uses: Jimver/cuda-toolkit@v0.2.14
-      with:
-        cuda: ${{ env.CUDA_VERSION }}
-        method: 'network'
-        sub-packages: '["nvcc", "cudart", "cublas", "cublas-dev", "cusolver", "cusolver-dev", "thrust", "nvrtc", "nvrtc-dev"]'
+      run: |
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.0-1_all.deb
+        sudo dpkg -i cuda-keyring_1.0-1_all.deb
+        sudo apt-get update
+        sudo apt-get install -y \
+          cuda-toolkit-12-1 \
+          cuda-libraries-dev-12-1 \
+          cuda-nvcc-12-1 \
+          cuda-cudart-dev-12-1
 
     # 安装 cuDNN
     - name: Install cuDNN
       run: |
-        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
-        sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
-        sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub
-        sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /"
-        sudo apt-get update
         sudo apt-get install -y libcudnn8=$CUDNN_VERSION libcudnn8-dev=$CUDNN_VERSION
 
     # 安装 CUTLASS
