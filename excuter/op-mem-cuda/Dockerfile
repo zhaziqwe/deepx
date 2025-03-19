@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /home/
 # CUDA 已经预装，无需额外配置
-ADD common common
+ADD cpp-common cpp-common
 ADD op-mem-cuda op-mem-cuda
 WORKDIR /home/op-mem-cuda
 

@@ -57,7 +57,6 @@ target_link_libraries( deepx_ompsimd
     yaml-cpp
     ${JEMALLOC_LIBRARIES}    
     openblas
-    # OpenBLAS
     OpenMP::OpenMP_CXX
     hwy
 )
