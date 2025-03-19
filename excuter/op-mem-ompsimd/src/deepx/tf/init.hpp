@@ -83,7 +83,7 @@ namespace deepx::tf
         };
         string math_formula() const override
         {
-            return "print(T1)";
+            return "constant(T1,value)";
         }
         shared_ptr<TF> clone() const override
         {

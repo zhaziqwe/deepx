@@ -41,6 +41,20 @@ namespace deepx::tensorfunc
             launch_addscalar(numBlocks, blockSize, A.data, scalar, C.data, A.shape.size);
         }
     };
+
+    template <typename T>
+    struct subDispatcher<miaobyte, T>
+    {
+        static void sub(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
+        {
+            if (A.shape.size != B.shape.size || A.shape.size != C.shape.size) { 
+                throw TensorShapeError("sub");
+            }
+            const int blockSize = A.shape.size > 256 ? 256 : A.shape.size;
+            int numBlocks = (A.shape.size + blockSize - 1) / blockSize;
+            launch_sub(numBlocks, blockSize, A.data, B.data, C.data, A.shape.size);
+        }
+    };
 }
 
 #endif // DEEPX_TENSORFUNC_ELEMENTWISE_MIAO_BYTE_BASIC_HPP

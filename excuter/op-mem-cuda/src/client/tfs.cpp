@@ -105,10 +105,15 @@ namespace deepx::tf
                                                              {
                                                                  Param("c", DataCategory::Tensor, Precision::Any),
                                                              })));
-
-        //     opfactory.add_op(Add_cblas<float>());
-        //     opfactory.add_op(Add_cblas<double>());
-
+        tffactory.add_tf(std::make_shared<Add<cublas>>(vector<Param>(
+                                                             {
+                                                                 Param("a", DataCategory::Tensor, Precision::Any),
+                                                                 Param("b", DataCategory::Tensor, Precision::Any),
+                                                             }),
+                                                         vector<Param>(
+                                                             {
+                                                                 Param("c", DataCategory::Tensor, Precision::Any),
+                                                             })));
         tffactory.add_tf(std::make_shared<Addscalar<miaobyte>>(vector<Param>(
                                                                    {
                                                                        Param("A", DataCategory::Tensor, Precision::Any),
@@ -118,9 +123,17 @@ namespace deepx::tf
                                                                    {
                                                                        Param("C", DataCategory::Tensor, Precision::Any),
                                                                    })));
-        //     opfactory.add_op(Sub_miaobyte<float>());
-        //     opfactory.add_op(Sub_miaobyte<double>());
 
+        tffactory.add_tf(std::make_shared<Sub<miaobyte>>(vector<Param>(
+                                                                   {
+                                                                       Param("A", DataCategory::Tensor, Precision::Any),
+                                                                       Param("B", DataCategory::Tensor, Precision::Any),
+                                                                   }),
+                                                               vector<Param>(
+                                                                   {
+                                                                       Param("C", DataCategory::Tensor, Precision::Any),
+                                                                   })));
+        
         //     opfactory.add_op(Sub_cblas<float>());
         //     opfactory.add_op(Sub_cblas<double>());
 

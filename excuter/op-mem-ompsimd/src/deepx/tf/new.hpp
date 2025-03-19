@@ -12,13 +12,13 @@ namespace deepx::tf
     class NewTensor : public TF
     {
     public:
-               NewTensor(vector<Param> args, vector<Param> returns)
+        NewTensor(vector<Param> args, vector<Param> returns)
         {
             this->name = "newtensor";
             this->args = args;
             this->returns = returns;
         }
- 
+
         NewTensor(string text, bool call = false)
         {
             this->parse(text);
@@ -46,14 +46,16 @@ namespace deepx::tf
                 vector<string> value_strs;
                 stringstream ss(this->args[0].textvalue);
                 string item;
-                while (ss >> item) {
+                while (ss >> item)
+                {
                     value_strs.push_back(item);
                 }
                 vector<int32_t> values;
-                for (const auto &str : value_strs) {
+                for (const auto &str : value_strs)
+                {
                     values.push_back(stoi(str));
                 }
-                shape=values;
+                shape = values;
             }
             switch (type.precision())
             {
@@ -139,11 +141,9 @@ namespace deepx::tf
             return 0;
         };
 
-         
-
         string math_formula() const override
         {
-            return "T1 = zeros(shape)";
+            return "T1 =Tensor(shape=[...])";
         }
         shared_ptr<TF> clone() const override
         {
@@ -157,7 +157,6 @@ namespace deepx::tf
         CopyTensor()
         {
             this->name = "copytensor";
-
         }
         CopyTensor(string text)
         {
@@ -192,7 +191,6 @@ namespace deepx::tf
         CloneTensor()
         {
             this->name = "clonetensor";
-
         }
         int run(shared_ptr<MemBase> mem, string &error) override
         {
@@ -206,7 +204,7 @@ namespace deepx::tf
         string math_formula() const override
         {
             return "T2 = T1.clone()";
-            }
+        }
         shared_ptr<TF> clone() const override
         {
             return make_shared<CloneTensor>(*this);
@@ -219,7 +217,6 @@ namespace deepx::tf
         DelTensor()
         {
             this->name = "deltensor";
-
         }
         DelTensor(string text)
         {
