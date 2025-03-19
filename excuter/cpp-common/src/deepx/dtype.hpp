@@ -1,7 +1,6 @@
 #ifndef DEEPX_DTYPE_HPP
 #define DEEPX_DTYPE_HPP
 
-#include <typeinfo>
 #include <string>
 namespace deepx
 {
@@ -229,32 +228,7 @@ namespace deepx
         return TypeDef(category, precision);
     }
 
-    // 获取类型对应的Precision
-    template <typename T>
-    constexpr Precision precision()
-    {
-        if constexpr (std::is_same_v<T, double>)
-            return Precision::Float64;
-        else if constexpr (std::is_same_v<T, float>)
-            return Precision::Float32;
-        // else if constexpr (std::is_same_v<T, half>) return Precision::Float16;
-        // else if constexpr (std::is_same_v<T, nv_bfloat16>) return Precision::BFloat16;
-        else if constexpr (std::is_same_v<T, int64_t>)
-            return Precision::Int64;
-        else if constexpr (std::is_same_v<T, int32_t>)
-            return Precision::Int32;
-        else if constexpr (std::is_same_v<T, int16_t>)
-            return Precision::Int16;
-        else if constexpr (std::is_same_v<T, int8_t>)
-            return Precision::Int8;
-        // else if constexpr (std::is_same_v<T, int4_t>) return Precision::Int4;
-        else if constexpr (std::is_same_v<T, bool>)
-            return Precision::Bool;
-        else if constexpr (std::is_same_v<T, std::string>)
-            return Precision::String;
-        else
-            return Precision::Any;
-    }
+
 
     // 修改precision_str函数以使用标准命名格式
     inline std::string precision_str(Precision p)

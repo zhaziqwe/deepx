@@ -17,7 +17,7 @@
 #include "stdutil/num.hpp"
 namespace deepx::tf
 {
-    using mem::Mem;
+    using mem::MemBase;
     using namespace std;
     using namespace std::chrono;
     
@@ -49,7 +49,7 @@ namespace deepx::tf
         TF &operator=(const TF &) = default;
         
         string op_name();
-        virtual int run(Mem &mem,string &error){
+        virtual int run(shared_ptr<MemBase> mem,string &error){
             throw NotImplementError(name);
         }
         virtual string math_formula() const;
@@ -61,7 +61,7 @@ namespace deepx::tf
                   const vector<Param> &returns);
 
         template<typename T>
-        T getvar(int idx, mem::Mem &mem,bool arg=true){
+        T getvar(int idx, shared_ptr<MemBase> mem,bool arg=true){
             vector<Param> &vars=arg?args:returns;
             if(idx<0){
                 idx = vars.size()+idx;
@@ -73,7 +73,7 @@ namespace deepx::tf
                 T value=T(std::stof(vars[idx].textvalue));
                 return value;
             }
-            return mem.getarg<T>(vars[idx].textvalue);
+            return mem->getarg<T>(vars[idx].textvalue);
         }
 
         template<typename T>
@@ -97,6 +97,11 @@ namespace deepx::tf
 
         std::string dtypes() const;
         bool check_dtype(const TF &other) const;
+
+        // 添加虚拟克隆方法
+        virtual shared_ptr<TF> clone() const {
+            return make_shared<TF>(*this);
+        }
     };
 
     class OpResp

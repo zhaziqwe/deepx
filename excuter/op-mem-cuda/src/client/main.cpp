@@ -6,7 +6,7 @@
 #include "deepx/tf/tf.hpp"
 #include "deepx/tf/tffactory.hpp"
 #include "client/tfs.hpp"
-#include "deepx/mem/mem.hpp"
+#include "deepx/mem/mem_cuda.hpp"
 #include "client/udpserver.hpp"
 
 using namespace deepx::tensorfunc;
@@ -21,7 +21,7 @@ bool kIrLog = []()
 
 int main()
 {
-    Mem mem;
+    shared_ptr<MemBase> mem = make_shared<Mem>();
     std::mutex memmutex;
 
     client::udpserver server(9090);
@@ -73,7 +73,6 @@ int main()
             (*src).init(op.name, op.args, op.returns);
             memmutex.lock();
             opresp.start_at = chrono::system_clock::now();
-
             int ret = (*src).run(mem,opresp.message);
             memmutex.unlock();
             if (ret != 0)

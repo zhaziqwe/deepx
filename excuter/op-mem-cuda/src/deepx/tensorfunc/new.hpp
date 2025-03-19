@@ -4,7 +4,7 @@
 #include <cuda_runtime.h>
 #include <stdexcept>
 #include "deepx/tensor.hpp"
-
+#include "deepx/dtype_cuda.hpp"
 // 具体的张量类
 namespace deepx::tensorfunc
 {
@@ -35,6 +35,7 @@ namespace deepx::tensorfunc
     Tensor<T> New(const std::vector<int> &shapedata, T *data = nullptr)
     {
         Shape shape(shapedata);
+        shape.dtype=precision<T>();
         Tensor<T> tensor(shape);
         tensor.device = CUDA; // 使用 CUDA 设备
         tensor.deleter = dataFree<T>;
@@ -53,6 +54,7 @@ namespace deepx::tensorfunc
     Tensor<T> New(const std::initializer_list<int> &shapedata, T *data = nullptr)
     {
         Shape shape(shapedata);
+        shape.dtype=precision<T>();
         Tensor<T> tensor(shape);
         tensor.device = CUDA; // 使用 CUDA 设备
         tensor.deleter = dataFree<T>;

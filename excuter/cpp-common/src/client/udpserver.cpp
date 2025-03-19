@@ -1,5 +1,6 @@
 #include <sstream>
- 
+#include <queue>
+
 #include "client/udpserver.hpp"
 
 namespace client

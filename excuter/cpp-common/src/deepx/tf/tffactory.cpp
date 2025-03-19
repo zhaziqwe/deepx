@@ -69,7 +69,9 @@ namespace deepx::tf
             }
             return nullptr;
         }
-        return tf;
+
+        // 使用clone()方法创建新实例，而不是直接复制构造
+        return tf->clone();
     }
     string TfFactory::print_markdown(string excuter_name) const
     {

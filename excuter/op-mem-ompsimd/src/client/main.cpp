@@ -7,6 +7,7 @@
 #include "deepx/tf/tffactory.hpp"
 #include "client/tfs.hpp"
 #include "deepx/mem/mem.hpp"
+#include "deepx/mem/mem_ompsimd.hpp"
 #include "client/udpserver.hpp"
 
 using namespace deepx::tensorfunc;
@@ -21,7 +22,7 @@ bool kIrLog = []()
 
 int main()
 {
-    Mem mem;
+    shared_ptr<MemBase> mem = make_shared<Mem>();
     std::mutex memmutex;
 
     client::udpserver server(8080);

@@ -1,48 +1,33 @@
-#ifndef DEEPX_MEM_MEM_HPP
-#define DEEPX_MEM_MEM_HPP
+#ifndef DEEPX_MEM_MEMBASE_HPP
+#define DEEPX_MEM_MEMBASE_HPP
 
 #include <any>
 #include <unordered_map>
 #include <vector>
-#include <atomic>
 #include <memory>
-#include "deepx/tensor.hpp"
+#include "iostream"
 
+#include "deepx/tensor.hpp"
 namespace deepx::mem
 {
     using namespace std;
-    class Mem
-    {
-    private:
-        unordered_map<string, std::any> args;
 
+    class MemBase
+    {
+    protected:
+        unordered_map<string, std::any> args;
         std::unordered_map<std::string, std::shared_ptr<TensorBase>> mem;
         int tempidx = 0;
+
     public:
-        Mem() = default;
-        ~Mem() = default;
-        Mem(const Mem &other)
+        // 基本操作接口
+        virtual void clear()
         {
-            args = other.args;
-            mem = other.mem;
+            args.clear();
+            mem.clear();
         }
-        Mem(Mem &&other) noexcept
-        {
-            args = std::move(other.args);
-            mem = std::move(other.mem);
-        }
-        Mem &operator=(const Mem &other)
-        {
-            args = other.args;
-            mem = other.mem;
-            return *this;
-        }
-        Mem &operator=(Mem &&other) noexcept
-        {
-            args = std::move(other.args);
-            mem = std::move(other.mem);
-            return *this;
-        }
+
+        // 通用的arg操作
         template <typename T>
         void addarg(const string &name, const T value)
         {
@@ -136,7 +121,7 @@ namespace deepx::mem
         template <typename T>
         shared_ptr<Tensor<T>> gettensor(const string &name) const
         {
-            if (mem.find(name)== mem.end())
+            if (mem.find(name) == mem.end())
             {
                 throw std::runtime_error("tensor not found: " + name);
             }
@@ -144,66 +129,7 @@ namespace deepx::mem
             return std::static_pointer_cast<Tensor<T>>(ptr);
         }
 
-        //TODO 
-        shared_ptr<Tensor<void>> gettensor(const string &name) const
-        {
-            if (mem.find(name) == mem.end())
-            {
-                throw std::runtime_error("tensor not found: " + name);
-            }
-            auto ptr = mem.at(name);
-            auto result = make_shared<Tensor<void>>();
-            result->shape = ptr->shape;
-            result->device = ptr->device;
-            result->deleter = nullptr;
-            result->copyer = nullptr;
-            result->newer = nullptr;
-
-            switch (ptr->shape.dtype)
-            {
-                case Precision::Float64:
-                {
-                    auto ptr_tensor = std::static_pointer_cast<Tensor<double>>(ptr);
-                    result->data = ptr_tensor->data;
-                    break;
-                }
-                case Precision::Float32:
-                {
-                    auto ptr_tensor = std::static_pointer_cast<Tensor<float>>(ptr);
-                    result->data = ptr_tensor->data;
-                    break;
-                }
-                case Precision::Int64:
-                {
-                    auto ptr_tensor = std::static_pointer_cast<Tensor<int64_t>>(ptr);
-                    result->data = ptr_tensor->data;
-                    break;
-                }
-                case Precision::Int32:
-                {
-                    auto ptr_tensor = std::static_pointer_cast<Tensor<int32_t>>(ptr);
-                    result->data = ptr_tensor->data;
-                    break;
-                }
-                case Precision::Int16:
-                {
-                    auto ptr_tensor = std::static_pointer_cast<Tensor<int16_t>>(ptr);
-                    result->data = ptr_tensor->data;
-                    break;
-                }   
-                case Precision::Int8:
-                {
-                    auto ptr_tensor = std::static_pointer_cast<Tensor<int8_t>>(ptr);
-                    result->data = ptr_tensor->data;
-                    break;
-                }
-                
-                default:
-                    throw std::runtime_error("Unsupported dtype: " + precision_str(ptr->shape.dtype));
-            }
-
-            return result;
-        }
+        virtual shared_ptr<Tensor<void>> gettensor(const string &name) const = 0;
 
         // 获取多个张量
         template <typename T>
@@ -225,7 +151,6 @@ namespace deepx::mem
             return tensors;
         }
 
-
         void delete_tensor(const string &name)
         {
             mem.erase(name);
@@ -235,11 +160,6 @@ namespace deepx::mem
         {
             args.erase(name);
         }
-        void clear()
-        {
-            args.clear();
-            mem.clear();
-        };
     };
 }
-#endif // DEEPX_MEM_MEM_HPP
+#endif // DEEPX_MEM_MEMBASE_HPP

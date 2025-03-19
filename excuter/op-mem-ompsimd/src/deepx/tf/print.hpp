@@ -28,12 +28,12 @@ namespace deepx::tf
                 throw std::runtime_error("Invalid name: " + this->name);
             }
         }
-        int run(mem::Mem &mem, string &error) override
+        int run(shared_ptr<MemBase> mem, string &error) override
         {
             string name = this->args[0].textvalue;
-            if (mem.existstensor(name))
+            if (mem->existstensor(name))
             {
-                auto t = mem.gettensor(name);
+                auto t = mem->gettensor(name);
                 if (this->args.size() == 1)
                 {
                     tensorfunc::print<Author, void>(*t);
@@ -55,6 +55,10 @@ namespace deepx::tf
         string math_formula() const override
         {
             return "print(T1)";
+        }
+        shared_ptr<TF> clone() const override
+        {
+            return make_shared<Print<Author>>(*this);
         }
     };
 }

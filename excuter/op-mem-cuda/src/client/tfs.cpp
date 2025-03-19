@@ -51,9 +51,7 @@ namespace deepx::tf
     // init
     void register_init(TfFactory &tffactory)
     {
-        //     opfactory.add_op(Uniform<float>());
-        //     opfactory.add_op(Uniform<double>());
-
+ 
         tffactory.add_tf(std::make_shared<Constant<miaobyte>>(vector<Param>(
                                                                   {
                                                                       Param("t", DataCategory::Tensor, Precision::Any),
@@ -61,8 +59,21 @@ namespace deepx::tf
                                                                   }),
                                                               vector<Param>()));
 
-        //     opfactory.add_op(Arange<float>());
-        //     opfactory.add_op(Arange<double>());
+        tffactory.add_tf(std::make_shared<Arange<miaobyte>>(vector<Param>(
+                                                                  {
+                                                                      Param("t", DataCategory::Tensor, Precision::Any),
+                                                                      Param("start", DataCategory::Var, Precision::Any),
+                                                                      Param("step", DataCategory::Var, Precision::Any),
+                                                                  }),
+                                                              vector<Param>()));
+        tffactory.add_tf(std::make_shared<Uniform<miaobyte>>(vector<Param>(
+                                                                  {
+                                                                      Param("t", DataCategory::Tensor, Precision::Any),
+                                                                      Param("low", DataCategory::Var, Precision::Any),
+                                                                      Param("high", DataCategory::Var, Precision::Any),
+                                                                      Param("seed", DataCategory::Var, Precision::Int32),
+                                                                  }),
+                                                              vector<Param>()));
     }
     // io
     void register_util(TfFactory &opfactory)

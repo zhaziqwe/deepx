@@ -34,21 +34,21 @@ namespace deepx::tf
                     Param("name", DataCategory::Vector, Precision::Any),
                 })));
         tffactory.add_tf(std::make_shared<NewTensor>(vector<Param>(
-            {
-                Param("shape", DataCategory::Vector, Precision::Int32),
-            }),
-            vector<Param>(
-                {
-                    Param("tensor1", DataCategory::Tensor, Precision::Any),
-                })));
-         tffactory.add_tf(std::make_shared<NewTensor>(vector<Param>(
-            {
-                Param("shape", DataCategory::Var, Precision::String),
-            }),
-            vector<Param>(
-                {
-                    Param("tensor1", DataCategory::Tensor, Precision::Any),
-                })));
+                                                         {
+                                                             Param("shape", DataCategory::Vector, Precision::Int32),
+                                                         }),
+                                                     vector<Param>(
+                                                         {
+                                                             Param("tensor1", DataCategory::Tensor, Precision::Any),
+                                                         })));
+        tffactory.add_tf(std::make_shared<NewTensor>(vector<Param>(
+                                                         {
+                                                             Param("shape", DataCategory::Var, Precision::String),
+                                                         }),
+                                                     vector<Param>(
+                                                         {
+                                                             Param("tensor1", DataCategory::Tensor, Precision::Any),
+                                                         })));
         // opfactory.add_op(DelTensor<float>());
     }
 
@@ -59,14 +59,27 @@ namespace deepx::tf
         //     opfactory.add_op(Uniform<double>());
 
         tffactory.add_tf(std::make_shared<Constant<miaobyte>>(vector<Param>(
-                                                        {
-                                                            Param("t", DataCategory::Tensor, Precision::Any),
-                                                            Param("value", DataCategory::Var, Precision::Any),
-                                                        }),
-                                                    vector<Param>()));
+                                                                  {
+                                                                      Param("t", DataCategory::Tensor, Precision::Any),
+                                                                      Param("value", DataCategory::Var, Precision::Any),
+                                                                  }),
+                                                              vector<Param>()));
 
-        //     opfactory.add_op(Arange<float>());
-        //     opfactory.add_op(Arange<double>());
+        tffactory.add_tf(std::make_shared<Arange<miaobyte>>(vector<Param>(
+                                                                {
+                                                                    Param("t", DataCategory::Tensor, Precision::Any),
+                                                                    Param("start", DataCategory::Var, Precision::Any),
+                                                                    Param("step", DataCategory::Var, Precision::Any),
+                                                                }),
+                                                            vector<Param>()));
+        tffactory.add_tf(std::make_shared<Uniform<miaobyte>>(vector<Param>(
+                                                                 {
+                                                                     Param("t", DataCategory::Tensor, Precision::Any),
+                                                                     Param("low", DataCategory::Var, Precision::Any),
+                                                                     Param("high", DataCategory::Var, Precision::Any),
+                                                                     Param("seed", DataCategory::Var, Precision::Int32),
+                                                                 }),
+                                                             vector<Param>()));
     }
     // io
     void register_util(TfFactory &opfactory)

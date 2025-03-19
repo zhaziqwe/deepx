@@ -3,6 +3,7 @@
 
 #include "deepx/tensor.hpp"
 #include "deepx/dtype.hpp"
+#include "deepx/dtype_ompsimd.hpp"
 #include "deepx/tensorfunc/new_mempool.hpp"
 
 // 具体的张量类
@@ -30,7 +31,7 @@ namespace deepx::tensorfunc
     Tensor<T> New(const std::vector<int> &shapedata,T *data=nullptr)
     {   
         Shape shape(shapedata);
- 
+        shape.dtype=precision<T>();
         // 分配内存
     
         // 创建tensor并返回

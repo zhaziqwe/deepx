@@ -1,11 +1,12 @@
 #include <cuda_fp16.h>
+#include <cuda_bf16.h>
 #include <curand_kernel.h>
 
 #include "init_miaobyte.hpp"
 #include "init_miaobyte.cuh"
 #include "deepx/tensor.hpp"
 #include "deepx/tensorfunc/authors.hpp"
-#include <cuda_fp16.h>
+
 
 namespace deepx::tensorfunc
 {
@@ -20,20 +21,6 @@ namespace deepx::tensorfunc
     }
 
     // 实现特化版本的成员函数
-    void _constant_func<miaobyte, float>::func(Tensor<float> &tensor, const float value)
-    {
-        int size = tensor.shape.size;
-        int blockSize = 256;
-        int numBlocks = (size + blockSize - 1) / blockSize;
-
-        kernel_constant<<<numBlocks, blockSize>>>(tensor.data, size, value);
-
-        cudaError_t err = cudaGetLastError();
-        if (err != cudaSuccess)
-        {
-            throw std::runtime_error("Failed to launch constant kernel");
-        }
-    }
 
     void _constant_func<miaobyte, double>::func(Tensor<double> &tensor, const double value)
     {
@@ -49,6 +36,21 @@ namespace deepx::tensorfunc
             throw std::runtime_error("Failed to launch constant kernel");
         }
     }
+    void _constant_func<miaobyte, float>::func(Tensor<float> &tensor, const float value)
+    {
+        int size = tensor.shape.size;
+        int blockSize = 256;
+        int numBlocks = (size + blockSize - 1) / blockSize;
+
+        kernel_constant<<<numBlocks, blockSize>>>(tensor.data, size, value);
+
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess)
+        {
+            throw std::runtime_error("Failed to launch constant kernel");
+        }
+    }
+
 
     void _constant_func<miaobyte, __half>::func(Tensor<__half> &tensor, const __half value)
     {
@@ -64,6 +66,18 @@ namespace deepx::tensorfunc
             throw std::runtime_error("Failed to launch constant kernel");
         }
     }
+
+    void _constant_func<miaobyte, __nv_bfloat16>::func(Tensor<__nv_bfloat16> &tensor, const __nv_bfloat16 value)
+    {
+        int size = tensor.shape.size;
+        int blockSize = 256;
+        int numBlocks = (size + blockSize - 1) / blockSize;
+        kernel_constant<<<numBlocks, blockSize>>>(tensor.data, size, value);
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess)
+            throw std::runtime_error("Failed to launch bfloat16 constant kernel");
+    }   
+
     void _constant_func<miaobyte, int64_t>::func(Tensor<int64_t> &tensor, const int64_t value)
     {
         int size = tensor.shape.size;
@@ -121,6 +135,20 @@ namespace deepx::tensorfunc
         }
     }
 
+    void _arange_func<miaobyte, double>::func(Tensor<double> &tensor, const double start, const double step)
+    {
+        int size = tensor.shape.size;
+        int blockSize = 256;
+        int numBlocks = (size + blockSize - 1) / blockSize;
+
+        kernel_arange<<<numBlocks, blockSize>>>(tensor.data, size, start, step);
+
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess)
+        {
+            throw std::runtime_error("Failed to launch arange kernel");
+        }
+    }
     void _arange_func<miaobyte, float>::func(Tensor<float> &tensor, const float start, const float step)
     {
         int size = tensor.shape.size;
@@ -136,20 +164,6 @@ namespace deepx::tensorfunc
         }
     }
 
-    void _arange_func<miaobyte, double>::func(Tensor<double> &tensor, const double start, const double step)
-    {
-        int size = tensor.shape.size;
-        int blockSize = 256;
-        int numBlocks = (size + blockSize - 1) / blockSize;
-
-        kernel_arange<<<numBlocks, blockSize>>>(tensor.data, size, start, step);
-
-        cudaError_t err = cudaGetLastError();
-        if (err != cudaSuccess)
-        {
-            throw std::runtime_error("Failed to launch arange kernel");
-        }
-    }
 
     void _arange_func<miaobyte, __half>::func(Tensor<__half> &tensor, const __half start, const __half step)
     {
@@ -166,6 +180,62 @@ namespace deepx::tensorfunc
         }
     }
 
+    void _arange_func<miaobyte, __nv_bfloat16>::func(Tensor<__nv_bfloat16> &tensor, const __nv_bfloat16 start, const __nv_bfloat16 step)
+    {
+        int size = tensor.shape.size;
+        int blockSize = 256;
+        int numBlocks = (size + blockSize - 1) / blockSize;
+        kernel_arange<<<numBlocks, blockSize>>>(tensor.data, size, start, step);
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess)
+            throw std::runtime_error("Failed to launch bfloat16 arange kernel");
+    }
+
+    void _arange_func<miaobyte, int64_t>::func(Tensor<int64_t> &tensor, const int64_t start, const int64_t step)
+    {
+        int size = tensor.shape.size;
+        int blockSize = 256;
+        int numBlocks = (size + blockSize - 1) / blockSize;
+        kernel_arange<<<numBlocks, blockSize>>>(tensor.data, size, start, step);
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess)
+            throw std::runtime_error("Failed to launch int64 arange kernel");
+    }
+
+    void _arange_func<miaobyte, int32_t>::func(Tensor<int32_t> &tensor, const int32_t start, const int32_t step)
+    {
+        int size = tensor.shape.size;
+        int blockSize = 256;
+        int numBlocks = (size + blockSize - 1) / blockSize; 
+        kernel_arange<<<numBlocks, blockSize>>>(tensor.data, size, start, step);
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess)
+            throw std::runtime_error("Failed to launch int32 arange kernel");
+    }
+
+    void _arange_func<miaobyte, int16_t>::func(Tensor<int16_t> &tensor, const int16_t start, const int16_t step)    
+    {
+        int size = tensor.shape.size;
+        int blockSize = 256;
+        int numBlocks = (size + blockSize - 1) / blockSize;
+        kernel_arange<<<numBlocks, blockSize>>>(tensor.data, size, start, step);    
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess)
+            throw std::runtime_error("Failed to launch int16 arange kernel");
+    }
+
+    void _arange_func<miaobyte, int8_t>::func(Tensor<int8_t> &tensor, const int8_t start, const int8_t step)
+    {
+        int size = tensor.shape.size;
+        int blockSize = 256;
+        int numBlocks = (size + blockSize - 1) / blockSize;
+        kernel_arange<<<numBlocks, blockSize>>>(tensor.data, size, start, step);
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess)
+            throw std::runtime_error("Failed to launch int8 arange kernel");
+    }
+
+    // 添加kernel函数
     template <typename T>
     __global__ void kernel_uniform(T *data, int size, T low, T high, unsigned int seed)
     {
@@ -185,6 +255,20 @@ namespace deepx::tensorfunc
         }
     }
 
+    void _uniform_func<miaobyte, double>::func(Tensor<double> &tensor, const double low, const double high, const unsigned int seed)
+    {
+        int size = tensor.shape.size;
+        int blockSize = 256;
+        int numBlocks = (size + blockSize - 1) / blockSize;
+
+        kernel_uniform<<<numBlocks, blockSize>>>(tensor.data, size, low, high, seed);
+
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess)
+        {
+            throw std::runtime_error("Failed to launch uniform kernel");
+        }
+    }
     void _uniform_func<miaobyte, float>::func(Tensor<float> &tensor, const float low, const float high, const unsigned int seed)
     {
         int size = tensor.shape.size;
@@ -200,20 +284,6 @@ namespace deepx::tensorfunc
         }
     }
 
-    void _uniform_func<miaobyte, double>::func(Tensor<double> &tensor, const double low, const double high, const unsigned int seed)
-    {
-        int size = tensor.shape.size;
-        int blockSize = 256;
-        int numBlocks = (size + blockSize - 1) / blockSize;
-
-        kernel_uniform<<<numBlocks, blockSize>>>(tensor.data, size, low, high, seed);
-
-        cudaError_t err = cudaGetLastError();
-        if (err != cudaSuccess)
-        {
-            throw std::runtime_error("Failed to launch uniform kernel");
-        }
-    }
 
     void _uniform_func<miaobyte, __half>::func(Tensor<__half> &tensor, const __half low, const __half high, const unsigned int seed)
     {
@@ -229,4 +299,66 @@ namespace deepx::tensorfunc
             throw std::runtime_error("Failed to launch uniform kernel");
         }
     }
+
+    void _uniform_func<miaobyte, __nv_bfloat16>::func(Tensor<__nv_bfloat16> &tensor, const __nv_bfloat16 low, const __nv_bfloat16 high, const unsigned int seed)
+    {
+        int size = tensor.shape.size;
+        int blockSize = 256;
+        int numBlocks = (size + blockSize - 1) / blockSize;
+
+        kernel_uniform<<<numBlocks, blockSize>>>(tensor.data, size, low, high, seed);
+
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess)
+            throw std::runtime_error("Failed to launch bfloat16 uniform kernel");
+    }
+
+    void _uniform_func<miaobyte, int64_t>::func(Tensor<int64_t> &tensor, const int64_t low, const int64_t high, const unsigned int seed)
+    {
+        int size = tensor.shape.size;
+        int blockSize = 256;
+        int numBlocks = (size + blockSize - 1) / blockSize;
+
+        kernel_uniform<<<numBlocks, blockSize>>>(tensor.data, size, low, high, seed);
+
+        cudaError_t err = cudaGetLastError();   
+        if (err != cudaSuccess)
+            throw std::runtime_error("Failed to launch int64 uniform kernel");
+    }
+
+    void _uniform_func<miaobyte, int32_t>::func(Tensor<int32_t> &tensor, const int32_t low, const int32_t high, const unsigned int seed)
+    {
+        int size = tensor.shape.size;
+        int blockSize = 256;
+        int numBlocks = (size + blockSize - 1) / blockSize;
+
+        kernel_uniform<<<numBlocks, blockSize>>>(tensor.data, size, low, high, seed);   
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess)
+            throw std::runtime_error("Failed to launch int32 uniform kernel");
+    }
+
+    void _uniform_func<miaobyte, int16_t>::func(Tensor<int16_t> &tensor, const int16_t low, const int16_t high, const unsigned int seed)
+    {
+        int size = tensor.shape.size;
+        int blockSize = 256;
+        int numBlocks = (size + blockSize - 1) / blockSize;
+
+        kernel_uniform<<<numBlocks, blockSize>>>(tensor.data, size, low, high, seed);
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess)
+            throw std::runtime_error("Failed to launch int16 uniform kernel");
+    }
+
+    void _uniform_func<miaobyte, int8_t>::func(Tensor<int8_t> &tensor, const int8_t low, const int8_t high, const unsigned int seed)    
+    {
+        int size = tensor.shape.size;
+        int blockSize = 256;
+        int numBlocks = (size + blockSize - 1) / blockSize;
+
+        kernel_uniform<<<numBlocks, blockSize>>>(tensor.data, size, low, high, seed);
+        cudaError_t err = cudaGetLastError();
+        if (err != cudaSuccess)
+            throw std::runtime_error("Failed to launch int8 uniform kernel");
+    }   
 }

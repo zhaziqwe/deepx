@@ -32,7 +32,7 @@ namespace deepx::tf
         {
             return "var argname = argvalue";
         }
-        int run(mem::Mem &mem, string &error) override
+        int run(shared_ptr<MemBase> mem, string &error) override
         {
             string name = this->args[0].textvalue;
             if (this->args.size() != 1)
@@ -51,19 +51,19 @@ namespace deepx::tf
             case Precision::Int32:
             {
                 int value = atoi(this->args[0].textvalue.c_str());
-                mem.addarg(name, value);
+                mem->addarg(name, value);
                 break;
             }
             case Precision::Float32:
             {
                 float value = stof(this->args[0].textvalue.c_str());
-                mem.addarg(name, value);
+                mem->addarg(name, value);
                 break;
             }
             case Precision::Float64:
             {
                 double value = stod(this->args[0].textvalue.c_str());
-                mem.addarg(name, value);
+                mem->addarg(name, value);
                 break;
             }
             default:
@@ -71,6 +71,10 @@ namespace deepx::tf
                 return 1;
             }
             return 0;
+        }
+        shared_ptr<TF> clone() const override
+        {
+            return make_shared<ArgSet>(*this);
         }
     };
 
@@ -97,7 +101,7 @@ namespace deepx::tf
         {
             return "shape = [3  4  5]";
         }
-        int run(mem::Mem &mem, string &error) override
+        int run(shared_ptr<MemBase> mem, string &error) override
         {
             string name = this->returns[0].textvalue;
             TypeDef datatype = this->returns[0].dtype;
@@ -124,7 +128,7 @@ namespace deepx::tf
                 for (const auto &str : value_strs) {
                     values.push_back(stoll(str));
                 }
-                mem.addvector(name, values);
+                mem->addvector(name, values);
                 break;
             }
             case Precision::Int32:
@@ -133,7 +137,7 @@ namespace deepx::tf
                 for (const auto &str : value_strs) {
                     values.push_back(stoi(str));
                 }
-                mem.addvector(name, values);
+                mem->addvector(name, values);
                 break;
             }
             case Precision::Int16:
@@ -142,7 +146,7 @@ namespace deepx::tf
                 for (const auto &str : value_strs) {
                     values.push_back(static_cast<int16_t>(stoi(str)));
                 }
-                mem.addvector(name, values);
+                mem->addvector(name, values);
                 break;
             }
             case Precision::Int8:
@@ -151,7 +155,7 @@ namespace deepx::tf
                 for (const auto &str : value_strs) {
                     values.push_back(static_cast<int8_t>(stoi(str)));
                 }
-                mem.addvector(name, values);
+                mem->addvector(name, values);
                 break;
             }
             case Precision::Float64:
@@ -160,7 +164,7 @@ namespace deepx::tf
                 for (const auto &str : value_strs) {
                     values.push_back(stod(str));
                 }
-                mem.addvector(name, values);
+                mem->addvector(name, values);
                 break;
             }
             case Precision::Float32:
@@ -169,7 +173,7 @@ namespace deepx::tf
                 for (const auto &str : value_strs) {
                     values.push_back(stof(str));
                 }
-                mem.addvector(name, values);
+                mem->addvector(name, values);
                 break;
             }
             case Precision::Bool:
@@ -178,12 +182,12 @@ namespace deepx::tf
                 for (const auto &str : value_strs) {
                     values.push_back(str == "true" || str == "1");
                 }
-                mem.addvector(name, values);
+                mem->addvector(name, values);
                 break;
             }
             case Precision::String:
             {
-                mem.addvector(name, value_strs);
+                mem->addvector(name, value_strs);
                 break;
             }
             case Precision::Float16:
@@ -201,6 +205,10 @@ namespace deepx::tf
                 return 1;
             }
             return 0;
+        }
+        shared_ptr<TF> clone() const override
+        {
+            return make_shared<VecSet>(*this);
         }
     };
 }

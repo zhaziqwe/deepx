@@ -19,19 +19,25 @@ namespace deepx::tf
         size_t arrow_pos = body.find("->");
         if (arrow_pos == string::npos)
         {
-                throw runtime_error("Invalid IR format: missing arrow");
+            throw runtime_error("Invalid IR format: missing arrow");
         }
 
         // 获取输入和输出部分的原始字符串
         string input_part = body.substr(0, arrow_pos);
         string output_part = body.substr(arrow_pos + 2);
 
-        // 提取函数名
+        // 提取函数名 - 修改这部分逻辑
         size_t space_pos = input_part.find(' ');
         size_t paren_pos = input_part.find('(');
-        size_t name_end = std::min(
-            space_pos != string::npos ? space_pos : input_part.length(),
-            paren_pos != string::npos ? paren_pos : input_part.length());
+        size_t name_end;
+        
+        if (paren_pos != string::npos && (space_pos == string::npos || paren_pos < space_pos)) {
+            // 如果有括号且括号在空格之前,使用括号位置
+            name_end = paren_pos;
+        } else {
+            // 否则使用空格位置或字符串末尾
+            name_end = space_pos != string::npos ? space_pos : input_part.length();
+        }
         string func_name = input_part.substr(0, name_end);
 
         // 处理输入部分，去掉函数名

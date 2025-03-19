@@ -27,7 +27,7 @@ namespace deepx::tf
                 throw std::runtime_error("Invalid name: " + this->name);
             }
         }
-        int run(mem::Mem &mem, string &error) override
+        int run(shared_ptr<MemBase> mem, string &error) override
         {
             string name = this->returns[0].textvalue;
             TypeDef type = this->returns[0].dtype;
@@ -39,7 +39,7 @@ namespace deepx::tf
             vector<int> shape;
             if (this->args.size() == 1 && !is_positive_integer(this->args[0].textvalue))
             {
-                shape = mem.getvector<int32_t>(this->args[0].textvalue);
+                shape = mem->getvector<int32_t>(this->args[0].textvalue);
             }
             else
             {
@@ -60,13 +60,13 @@ namespace deepx::tf
             case Precision::Float32:
             {
                 Tensor<float> t = tensorfunc::New<float>(shape);
-                mem.addtensor(name, t);
+                mem->addtensor(name, t);
                 break;
             }
             case Precision::Float64:
             {
                 Tensor<double> t = tensorfunc::New<double>(shape);
-                mem.addtensor(name, t);
+                mem->addtensor(name, t);
                 break;
             }
             case Precision::Float16:
@@ -92,25 +92,25 @@ namespace deepx::tf
             case Precision::Int64:
             {
                 Tensor<int64_t> t = tensorfunc::New<int64_t>(shape);
-                mem.addtensor(name, t);
+                mem->addtensor(name, t);
                 break;
             }
             case Precision::Int32:
             {
                 Tensor<int32_t> t = tensorfunc::New<int32_t>(shape);
-                mem.addtensor(name, t);
+                mem->addtensor(name, t);
                 break;
             }
             case Precision::Int16:
             {
                 Tensor<int16_t> t = tensorfunc::New<int16_t>(shape);
-                mem.addtensor(name, t);
+                mem->addtensor(name, t);
                 break;
             }
             case Precision::Int8:
             {
                 Tensor<int8_t> t = tensorfunc::New<int8_t>(shape);
-                mem.addtensor(name, t);
+                mem->addtensor(name, t);
                 break;
             }
             case Precision::Int4:
@@ -121,13 +121,13 @@ namespace deepx::tf
             case Precision::Bool:
             {
                 Tensor<bool> t = tensorfunc::New<bool>(shape);
-                mem.addtensor(name, t);
+                mem->addtensor(name, t);
                 break;
             }
             case Precision::String:
             {
                 Tensor<string> t = tensorfunc::New<string>(shape);
-                mem.addtensor(name, t);
+                mem->addtensor(name, t);
                 break;
             }
             default:
@@ -144,6 +144,10 @@ namespace deepx::tf
         string math_formula() const override
         {
             return "T1 = zeros(shape)";
+        }
+        shared_ptr<TF> clone() const override
+        {
+            return make_shared<NewTensor>(*this);
         }
     };
 
@@ -163,7 +167,7 @@ namespace deepx::tf
                 throw std::runtime_error("Invalid name: " + this->name);
             }
         }
-        int run(mem::Mem &mem, string &error) override
+        int run(shared_ptr<MemBase> mem, string &error) override
         {
             // TODO
             //  auto src=mem.gettensor<T>(this->args[0].name);
@@ -176,6 +180,10 @@ namespace deepx::tf
         {
             return "T2.data = T1.data";
         }
+        shared_ptr<TF> clone() const override
+        {
+            return make_shared<CopyTensor>(*this);
+        }
     };
 
     class CloneTensor : public TF
@@ -186,7 +194,7 @@ namespace deepx::tf
             this->name = "clonetensor";
 
         }
-        int run(mem::Mem &mem, string &error) override
+        int run(shared_ptr<MemBase> mem, string &error) override
         {
             // TODO
             //  auto src=mem.gettensor<T>(this->args[0]);
@@ -198,6 +206,10 @@ namespace deepx::tf
         string math_formula() const override
         {
             return "T2 = T1.clone()";
+            }
+        shared_ptr<TF> clone() const override
+        {
+            return make_shared<CloneTensor>(*this);
         }
     };
 
@@ -217,16 +229,20 @@ namespace deepx::tf
                 throw std::runtime_error("Invalid name: " + this->name);
             }
         }
-        int run(mem::Mem &mem, string &error) override
+        int run(shared_ptr<MemBase> mem, string &error) override
         {
             string name = this->args[0].textvalue;
-            mem.delete_tensor(name);
+            mem->delete_tensor(name);
             return 0;
         }
 
         string math_formula() const override
         {
             return "del T1";
+        }
+        shared_ptr<TF> clone() const override
+        {
+            return make_shared<DelTensor>(*this);
         }
     };
 }

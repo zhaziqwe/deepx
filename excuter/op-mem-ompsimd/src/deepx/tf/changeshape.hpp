@@ -29,7 +29,7 @@ namespace deepx::tf
         {
             return "Tresult = concat([T1, T2...], axis=3)";
         }
-        int run(mem::Mem &mem, string &error) override
+        int run(shared_ptr<MemBase> mem, string &error) override
         {
             //TODO，去掉T
             // std::vector<Tensor<T> *> input;
@@ -42,7 +42,10 @@ namespace deepx::tf
             // tensorfunc::concat(input, axis, *output);
             return 0;
         };
- 
+        shared_ptr<TF> clone() const override
+        {
+            return make_shared<Concat>(*this);
+        }
     };
 
     // class Split : public TF

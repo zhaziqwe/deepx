@@ -1,29 +1,28 @@
 #include <memory>
-#include "deepx/op/op.hpp"
-#include "deepx/mem/mem.hpp"
+#include "deepx/mem/mem_ompsimd.hpp"
 #include "deepx/tensor.hpp"
 #include "deepx/tensorfunc/new.hpp"
-#include "deepx/tensorfunc/init.hpp"
-#include "deepx/tensorfunc/print.hpp"
+#include "deepx/tensorfunc/init_miaobyte.hpp"
+#include "deepx/tensorfunc/print_miaobyte.hpp"
+#include "deepx/tensorfunc/authors.hpp"
 
-using namespace deepx::tf;
-using namespace deepx;
 using namespace deepx::mem;
+using namespace deepx;
 using namespace deepx::tensorfunc;
 using namespace std;
 int main()
 {
-    Mem mem;
+    shared_ptr<MemBase> mem=make_shared<Mem>();
     for (int i = 0; i < 10; i++)
     {
         Tensor<float> tensor = New<float>({1, 2, 3});
-        uniform(tensor,0.0f,1.0f);
-        mem.addtensor("tensor" + std::to_string(i),  tensor );
+        uniform<miaobyte>(tensor,0.0f,1.0f);
+        mem->addtensor("tensor" + std::to_string(i),  tensor );
     }
  
-    cout << mem.existstensor(string("tensor0")) << endl;
-    print(*(mem.gettensor<float>(string("tensor0")).get()));
-    mem.clear();
+    cout << mem->existstensor(string("tensor0")) << endl;
+    print<miaobyte>(*(mem->gettensor<float>(string("tensor0")).get()));
+    mem->clear();
  
     return 0;
 }
