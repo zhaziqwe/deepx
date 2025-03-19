@@ -6,6 +6,7 @@
 #include "deepx/tf/init.hpp"
 #include "deepx/tf/print.hpp"
 #include "deepx/tf/changeshape.hpp"
+#include "deepx/tf/elementwise.hpp"
 #include "deepx/tf/tffactory.hpp"
 
 #include "deepx/tensorfunc/authors.hpp"
@@ -84,69 +85,79 @@ namespace deepx::tf
     // io
     void register_util(TfFactory &opfactory)
     {
-        opfactory.add_tf(std::make_shared<Print<tensorfunc::miaobyte>>(vector<Param>(
-                                                                           {
-                                                                               Param("", DataCategory::Tensor, Precision::Any),
-                                                                           }),
-                                                                       vector<Param>()));
+        opfactory.add_tf(std::make_shared<Print<miaobyte>>(vector<Param>(
+                                                               {
+                                                                   Param("", DataCategory::Tensor, Precision::Any),
+                                                               }),
+                                                           vector<Param>()));
 
-        opfactory.add_tf(std::make_shared<Print<tensorfunc::miaobyte>>(vector<Param>(
-                                                                           {
-                                                                               Param("", DataCategory::Tensor, Precision::Any),
-                                                                               Param("", DataCategory::Var, Precision::String),
-                                                                           }),
-                                                                       vector<Param>()));
+        opfactory.add_tf(std::make_shared<Print<miaobyte>>(vector<Param>(
+                                                               {
+                                                                   Param("", DataCategory::Tensor, Precision::Any),
+                                                                   Param("", DataCategory::Var, Precision::String),
+                                                               }),
+                                                           vector<Param>()));
     }
 
-    // // elementwise
-    // void register_elementwise(OpFactory &opfactory)
-    // {
-    //     opfactory.add_op(Add_miaobyte<float>());
-    //     opfactory.add_op(Add_miaobyte<double>());
-    //     opfactory.add_op(Add_miaobyte<int8_t>());
-    //     opfactory.add_op(Add_miaobyte<int16_t>());
-    //     opfactory.add_op(Add_miaobyte<int32_t>());
-    //     opfactory.add_op(Add_miaobyte<int64_t>());
+    // elementwise
+    void register_elementwise(TfFactory &tffactory)
+    {
+        tffactory.add_tf(std::make_shared<Add<miaobyte>>(vector<Param>(
+                                                             {
+                                                                 Param("a", DataCategory::Tensor, Precision::Any),
+                                                                 Param("b", DataCategory::Tensor, Precision::Any),
+                                                             }),
+                                                         vector<Param>(
+                                                             {
+                                                                 Param("c", DataCategory::Tensor, Precision::Any),
+                                                             })));
 
-    //     opfactory.add_op(Add_cblas<float>());
-    //     opfactory.add_op(Add_cblas<double>());
+         tffactory.add_tf(std::make_shared<Add<cblas>>(vector<Param>(
+                                                             {
+                                                                 Param("a", DataCategory::Tensor, Precision::Float64|Precision::Float32),
+                                                                 Param("b", DataCategory::Tensor, Precision::Float64|Precision::Float32),
+                                                             }),
+                                                         vector<Param>(
+                                                             {
+                                                                 Param("c", DataCategory::Tensor, Precision::Float64|Precision::Float32),
+                                                             })));
+ 
+        //     opfactory.add_op(Addscalar_miaobyte<float>());
+        //     opfactory.add_op(Addscalar_miaobyte<double>());
 
-    //     opfactory.add_op(Addscalar_miaobyte<float>());
-    //     opfactory.add_op(Addscalar_miaobyte<double>());
+        //     opfactory.add_op(Sub_miaobyte<float>());
+        //     opfactory.add_op(Sub_miaobyte<double>());
 
-    //     opfactory.add_op(Sub_miaobyte<float>());
-    //     opfactory.add_op(Sub_miaobyte<double>());
+        //     opfactory.add_op(Sub_cblas<float>());
+        //     opfactory.add_op(Sub_cblas<double>());
 
-    //     opfactory.add_op(Sub_cblas<float>());
-    //     opfactory.add_op(Sub_cblas<double>());
+        //     opfactory.add_op(Mul_miaobyte<float>());
+        //     opfactory.add_op(Mul_miaobyte<double>());
 
-    //     opfactory.add_op(Mul_miaobyte<float>());
-    //     opfactory.add_op(Mul_miaobyte<double>());
+        //     opfactory.add_op(Mulscalar_miaobyte<float>());
+        //     opfactory.add_op(Mulscalar_miaobyte<double>());
 
-    //     opfactory.add_op(Mulscalar_miaobyte<float>());
-    //     opfactory.add_op(Mulscalar_miaobyte<double>());
+        //     opfactory.add_op(Div_miaobyte<float>());
+        //     opfactory.add_op(Div_miaobyte<double>());
 
-    //     opfactory.add_op(Div_miaobyte<float>());
-    //     opfactory.add_op(Div_miaobyte<double>());
+        //     opfactory.add_op(Divscalar_miaobyte<float>());
+        //     opfactory.add_op(Divscalar_miaobyte<double>());
 
-    //     opfactory.add_op(Divscalar_miaobyte<float>());
-    //     opfactory.add_op(Divscalar_miaobyte<double>());
+        //     opfactory.add_op(RDivscalar_miaobyte<float>());
+        //     opfactory.add_op(RDivscalar_miaobyte<double>());
 
-    //     opfactory.add_op(RDivscalar_miaobyte<float>());
-    //     opfactory.add_op(RDivscalar_miaobyte<double>());
+        //     opfactory.add_op(Sqrt_miaobyte<float>());
+        //     opfactory.add_op(Sqrt_miaobyte<double>());
 
-    //     opfactory.add_op(Sqrt_miaobyte<float>());
-    //     opfactory.add_op(Sqrt_miaobyte<double>());
+        //     opfactory.add_op(Exp_miaobyte<float>());
+        //     opfactory.add_op(Exp_miaobyte<double>());
 
-    //     opfactory.add_op(Exp_miaobyte<float>());
-    //     opfactory.add_op(Exp_miaobyte<double>());
+        //     opfactory.add_op(Pow_miaobyte<float>());
+        //     opfactory.add_op(Pow_miaobyte<double>());
 
-    //     opfactory.add_op(Pow_miaobyte<float>());
-    //     opfactory.add_op(Pow_miaobyte<double>());
-
-    //     opfactory.add_op(Powscalar_miaobyte<float>());
-    //     opfactory.add_op(Powscalar_miaobyte<double>());
-    // }
+        //     opfactory.add_op(Powscalar_miaobyte<float>());
+        //     opfactory.add_op(Powscalar_miaobyte<double>());
+    }
     // // matmul
     // void register_matmul(OpFactory &opfactory)
     // {
@@ -180,7 +191,7 @@ namespace deepx::tf
         register_lifecycle(tffactory);
         register_init(tffactory);
         register_util(tffactory);
-        // register_elementwise(opfactory);
+        register_elementwise(tffactory);
         // register_matmul(opfactory);
         register_changeshape(tffactory);
         // register_reduce(opfactory);

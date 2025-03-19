@@ -5,6 +5,7 @@
 #include <cmath>
 #include <hwy/highway.h>
 #include "deepx/tensor.hpp"
+#include "deepx/tensorfunc/elementwise.hpp"
 #include "deepx/tensorfunc/authors.hpp"
 
 namespace deepx::tensorfunc

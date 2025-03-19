@@ -9,7 +9,10 @@ namespace deepx::tensorfunc
     template <typename Author, typename T>
     struct addDispatcher
     {
-        static void add(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C) = delete;
+        static void add(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
+        {
+            throw NotImplementError("add");
+        }
     };
 
     template <typename Author, typename T>
