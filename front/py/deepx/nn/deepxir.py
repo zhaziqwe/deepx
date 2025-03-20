@@ -7,70 +7,61 @@ class DeepxIR:
                 name:str,
                 dtype:str,
                 args: List[str], 
-                returns: List[str], 
-                grad: bool = False,
-                args_grad: Optional[List[str]] = None,
-                returns_grad: Optional[List[str]] = None):
+                returns: List[str],
+                author:str):
         """
         初始化操作节点
         Args:
-            args: 输入参数名称列表（如["input", "weight"]）
-            returns: 输出参数名称列表（如["output"]）
-            grad: 是否需要进行梯度计算
-            args_grad: 输入参数的梯度名称列表（与args一一对应，空字符串表示无梯度）
-            returns_grad: 输出参数的梯度名称列表（与returns一一对应）
+            args: 输入参数名称列表,如["input", "weight"]
+            returns: 输出参数名称列表,如["output"]
+            author: tensorfunc的作者名称,如"miaobyte"
         """
-        # 基础参数校验
-        if grad:
-            if args_grad is None:
-                args_grad = [""] * len(args)
-            if returns_grad is None:
-                returns_grad = [""] * len(returns)
-                
-            if len(args_grad) != len(args):
-                raise ValueError("args_grad必须与args长度一致")
-            if len(returns_grad) != len(returns):
-                raise ValueError("returns_grad必须与returns长度一致")
-
+ 
         self._name = name  
         self._dtype = dtype
         self._args = args
         self._returns = returns
-        self._grad = grad
-        self._args_grad = args_grad if grad else []
-        self._returns_grad = returns_grad if grad else []
+        self._author = author
         self._id=None
         self._created_at=time.time()
         self._sent_at=None
 
     def __str__(self):
+        # 函数名部分
         if self._dtype == None or self._dtype == '':
             parts = [self._name]
         else:
-            parts = [f"{self._name}@{self._dtype}"]  # 常规类型显示
+            parts = [f"{self._name}@{self._dtype}"]
         
-        # 处理输入参数
-        for i in range(len(self._args)):
-            arg_part = str(self._args[i])
-            if self._grad and self._args_grad[i]:
-                arg_part += f"({self._args_grad[i]})"
-            parts.append(arg_part)
+        # 处理输入参数部分 - 使用括号和逗号分隔
+        args_parts = []
+        for arg in self._args:
+            args_parts.append(str(arg))
+        
+        # 添加输入参数括号和逗号分隔
+        parts.append("(" + ", ".join(args_parts) + ")")
         
         # 添加箭头
-        arrow = "->" if not self._grad else "<-"
-        parts.append(arrow)
+        parts.append("->")
         
-        # 处理输出参数
-        for i in range(len(self._returns)):
-            ret_part = str(self._returns[i])
-            if self._grad and self._returns_grad[i]:
-                ret_part += f"({self._returns_grad[i]})"
-            parts.append(ret_part)
+        # 处理输出参数部分 - 使用括号和逗号分隔
+        returns_parts = []
+        for ret in self._returns:
+            returns_parts.append(str(ret))
+        
+        # 添加输出参数括号和逗号分隔
+        parts.append("(" + ", ".join(returns_parts) + ")")
 
+        # 添加元数据
         parts.append("//")
-        parts.append(f"id={self._id}")
+        if self._id is not None:
+            parts.append(f"id={self._id}")
+        if self._author:
+            parts.append(f"author={self._author}")
         parts.append(f"created_at={self._created_at}")
-        parts.append(f"sent_at={self._sent_at}")
+        if self._sent_at is not None:
+            parts.append(f"sent_at={self._sent_at}")
+        
         return ' '.join(parts)
 
 class DeepxIRResp:
