@@ -1,0 +1,27 @@
+name: 自动合并PR
+
+on:
+  workflow_run:
+    workflows: ["Excuter/ompsimd-linux Build", "Excuter/cuda-linux Build"] # 列出您所有需要等待完成的CI工作流
+    types:
+      - completed
+    branches:
+      - main  # 仅在针对main分支的PR上运行
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: 自动合并PR
+        uses: pascalgn/automerge-action@v0.15.6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MERGE_LABELS: "auto-merge,!work-in-progress,!do-not-merge"
+          MERGE_METHOD: "squash"
+          MERGE_COMMIT_MESSAGE: "自动合并: PR #{pullRequest.number} {pullRequest.title}"
+          MERGE_FORKS: "true"
+          MERGE_RETRIES: "6"
+          MERGE_RETRY_SLEEP: "10000"
+          UPDATE_LABELS: "auto-merge"
+          UPDATE_METHOD: "merge" 

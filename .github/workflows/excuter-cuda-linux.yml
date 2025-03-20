@@ -3,7 +3,7 @@ on: [push, pull_request]
 
 env:
   CUDA_VERSION: "12.1.0"
-  CUDNN_VERSION: "8.9.2.*"
+  CUDNN_VERSION: "8.9.2"
   CUTLASS_VERSION: "3.4.1"
 
 jobs:
@@ -19,83 +19,57 @@ jobs:
       with:
         fetch-depth: 0
         
-    # 安装 CUDA
-    - name: Setup CUDA
+    # 使用NVIDIA官方Docker镜像，避免依赖安装问题
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v2
+      
+    # 使用预装CUDA和工具的NVIDIA容器
+    - name: Build and Test in Docker Container
       run: |
-        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.0-1_all.deb
-        sudo dpkg -i cuda-keyring_1.0-1_all.deb
-        sudo apt-get update
-        sudo apt-get install -y \
-          cuda-toolkit-12-1 \
-          cuda-libraries-dev-12-1 \
-          cuda-nvcc-12-1 \
-          cuda-cudart-dev-12-1
-
-    # 安装 cuDNN
-    - name: Install cuDNN
-      run: |
-        sudo apt-get install -y libcudnn8=$CUDNN_VERSION libcudnn8-dev=$CUDNN_VERSION
-
-    # 安装 CUTLASS
-    - name: Install CUTLASS
-      run: |
-        git clone --depth 1 --branch v$CUTLASS_VERSION https://github.com/NVIDIA/cutlass.git
-        cd cutlass
-        mkdir build && cd build
-        cmake .. -DCUTLASS_ENABLE_TESTS=OFF -DCUTLASS_UNITY_BUILD_ENABLED=ON
-        sudo cmake --install . --prefix /usr/local
-        
-    # 系统依赖安装
-    - name: Install Dependencies (Ubuntu)
-      if: matrix.os == 'ubuntu-22.04'
-      env:
-        DEBIAN_FRONTEND: noninteractive
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          build-essential \
-          cmake \
-          libyaml-cpp-dev \
-          libgtest-dev \
-          clang \
-          git \
-          ninja-build
-
-    # 设置 ccache
-    - name: Setup ccache
-      uses: hendrikmuhs/ccache-action@v1.2
-
-    # 构建缓存
-    - name: Cache Build
-      uses: actions/cache@v3
-      with:
-        path: |
-          excuter/op-mem-cuda/build
-          excuter/common/build
-          ~/.ccache
-        key: ${{ runner.os }}-cuda-build-${{ hashFiles('**/CMakeLists.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-cuda-build-
-
-    # 构建 common 库
-    - name: Build Common Library
-      run: |
-        cd excuter/common
-        mkdir -p build && cd build
-        cmake -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-          -GNinja ..
-        ninja
-        
-    # 构建 CUDA 执行器
-    - name: CMake Build
-      run: |
-        cd excuter/op-mem-cuda
-        mkdir -p build && cd build
-        cmake -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-          -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-${{ env.CUDA_VERSION }} \
-          -DCMAKE_CUDA_ARCHITECTURES="60;70;75;80;86" \
-          -DCUTLASS_DIR=/usr/local \
-          -GNinja ..
-        ninja
+        docker run --rm -v ${{ github.workspace }}:/workspace \
+          -w /workspace \
+          nvidia/cuda:12.1.0-devel-ubuntu22.04 \
+          /bin/bash -c "
+            # 安装系统依赖
+            apt-get update && \
+            DEBIAN_FRONTEND=noninteractive apt-get install -y \
+              build-essential \
+              cmake \
+              libyaml-cpp-dev \
+              libgtest-dev \
+              clang \
+              git \
+              ninja-build \
+              ccache \
+              wget \
+              && \
+            
+            # 安装 cuDNN
+            wget https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-x86_64/cudnn-linux-x86_64-${CUDNN_VERSION}-archive.tar.xz && \
+            tar -xf cudnn-linux-x86_64-${CUDNN_VERSION}-archive.tar.xz -C /usr/local && \
+            
+            # 安装 CUTLASS
+            git clone --depth 1 --branch v${CUTLASS_VERSION} https://github.com/NVIDIA/cutlass.git && \
+            cd cutlass && \
+            mkdir build && cd build && \
+            cmake .. -DCUTLASS_ENABLE_TESTS=OFF -DCUTLASS_UNITY_BUILD_ENABLED=ON && \
+            cmake --install . --prefix /usr/local && \
+            cd /workspace && \
+            
+            # 构建 common 库
+            cd excuter/common && \
+            mkdir -p build && cd build && \
+            cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -GNinja .. && \
+            ninja && \
+            
+            # 构建 CUDA 执行器
+            cd ../../op-mem-cuda && \
+            mkdir -p build && cd build && \
+            cmake -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+              -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda \
+              -DCMAKE_CUDA_ARCHITECTURES=\"60;70;75;80;86\" \
+              -DCUTLASS_DIR=/usr/local \
+              -GNinja .. && \
+            ninja
+          "
