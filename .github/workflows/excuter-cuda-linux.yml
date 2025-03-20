@@ -3,7 +3,8 @@ on: [push, pull_request]
 
 env:
   CUDA_VERSION: "12.1.0"
-  CUDNN_VERSION: "8.9.7"
+  CUDA_MAJOR_VERSION: "12"
+  CUDNN_VERSION: "8.9.7.29"
   CUTLASS_VERSION: "3.4.1"
 
 jobs:
@@ -44,9 +45,9 @@ jobs:
               wget \
               && \
             
-            # 安装 cuDNN - 使用更新的下载链接
-            wget https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-x86_64/cudnn-linux-x86_64-${CUDNN_VERSION}_cuda12-archive.tar.xz && \
-            tar -xf cudnn-linux-x86_64-${CUDNN_VERSION}_cuda12-archive.tar.xz -C /usr/local && \
+            # 安装 cuDNN - 使用更新的下载链接格式
+            wget https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-x86_64/cudnn-linux-x86_64-${CUDNN_VERSION}_cuda${CUDA_MAJOR_VERSION}-archive.tar.xz && \
+            tar -xf cudnn-linux-x86_64-${CUDNN_VERSION}_cuda${CUDA_MAJOR_VERSION}-archive.tar.xz -C /usr/local && \
             
             # 安装 CUTLASS
             git clone --depth 1 --branch v${CUTLASS_VERSION} https://github.com/NVIDIA/cutlass.git && \
