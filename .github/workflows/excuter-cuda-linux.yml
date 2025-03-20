@@ -49,12 +49,11 @@ jobs:
             wget https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/linux-x86_64/cudnn-linux-x86_64-${CUDNN_VERSION}_cuda${CUDA_MAJOR_VERSION}-archive.tar.xz && \
             tar -xf cudnn-linux-x86_64-${CUDNN_VERSION}_cuda${CUDA_MAJOR_VERSION}-archive.tar.xz -C /usr/local && \
             
-            # 安装 CUTLASS
+            # 安装 CUTLASS - 仅安装头文件而不是共享库
             git clone --depth 1 --branch v${CUTLASS_VERSION} https://github.com/NVIDIA/cutlass.git && \
             cd cutlass && \
-            mkdir build && cd build && \
-            cmake .. -DCUTLASS_ENABLE_TESTS=OFF -DCUTLASS_UNITY_BUILD_ENABLED=ON && \
-            cmake --install . --prefix /usr/local && \
+            # 直接复制头文件到系统目录
+            cp -r include/* /usr/local/include/ && \
             cd /workspace && \
             
             # 构建 common 库
