@@ -125,9 +125,9 @@ def add(
         requires_grad:bool=False,
         author='miaobyte')->Tensor:
     if isinstance(b,Tensor):
-        return Add.apply(a,b,out,author,requires_grad)
+        return Add.apply(a,b,out,author,requires_grad=requires_grad)
     else:
-        return AddScalar.apply(a,b,out,author,requires_grad)
+        return AddScalar.apply(a,b,out,author,requires_grad=requires_grad)
 
 
 #sub
@@ -157,9 +157,9 @@ def sub(
         requires_grad:bool=False,
         author='miaobyte')->Tensor:  
     if isinstance(b,Tensor):
-        return Sub.apply(a,b,out,author,requires_grad)
+        return Sub.apply(a,b,out,author,requires_grad=requires_grad)
     else:
-        return SubScalar.apply(a,b,out,author,requires_grad)
+        return SubScalar.apply(a,b,out,author,requires_grad=requires_grad)
 
 #mul
 OpNode.register("mul")
@@ -193,9 +193,9 @@ def mul(
         requires_grad:bool=False,
         author='miaobyte')->Tensor:
     if isinstance(b,Tensor):
-        return Mul.apply(a,b,out,author,requires_grad)
+        return Mul.apply(a,b,out,author,requires_grad=requires_grad)
     else:
-        return MulScalar.apply(a,b,out,author,requires_grad)
+        return MulScalar.apply(a,b,out,author,requires_grad=requires_grad)
  
 
 #div
@@ -228,10 +228,10 @@ class DivScalar(Function):
 OpNode.register("rdivscalar")
 class RDivScalar(Function):
     @staticmethod
-    def forward(ctx:Context, a, b,out,author='miaobyte'):
+    def forward(ctx:Context, a,b,out,author='miaobyte'):
         if ctx.requires_grad:
             ctx.save_data('b',b)
-        return _A_b_elementwiseop_C(a, b, "rdivscalar", out,author)
+        return _a_B_elementwiseop_C(a, b, "rdivscalar", out,author)
     
     @staticmethod
     def backward(ctx:Context, out_grad):
@@ -244,14 +244,14 @@ def div(
         requires_grad:bool=False,
         author='miaobyte')->Tensor:
     if isinstance(b,Tensor) and isinstance(a,Tensor):
-        return Div.apply(a,b,out,author,requires_grad)
+        return Div.apply(a,b,out,author,requires_grad=requires_grad)
     else:
         if isinstance(a,Tensor):
             #C=A/b
-            return DivScalar.apply(a,b,"divscalar",out,author,requires_grad)
+            return DivScalar.apply(a,b,out,author,requires_grad=requires_grad)
         else:
             #C=a/B
-            return RDivScalar.apply(a,b,"rdivscalar",out,author,requires_grad)
+            return RDivScalar.apply(a,b,out,author,requires_grad=requires_grad)
 
 OpNode.register("compare")
 class Compare(Function):
@@ -299,9 +299,9 @@ def max(
         requires_grad:bool=False,
         author='miaobyte')->Tensor:
     if  isinstance(b,int) or isinstance(b,float):
-        return MaxScalar.apply(a,b,"maxscalar",out,author,requires_grad)
+        return MaxScalar.apply(a,b,out,author,requires_grad)
     else:
-        return Max.apply(a,b,"max",out,author,requires_grad)
+        return Max.apply(a,b,out,author,requires_grad=requires_grad)
 
 
 OpNode.register("min")
@@ -337,9 +337,9 @@ def min(
         requires_grad:bool=False,
         author='miaobyte')->Tensor:
     if  isinstance(b,int) or isinstance(b,float):
-        return MinScalar.apply(a,b,"minscalar",out,author,requires_grad)
+        return MinScalar.apply(a,b,out,author,requires_grad=requires_grad)
     else:
-        return Min.apply(a,b,"min",out,author,requires_grad)
+        return Min.apply(a,b,out,author,requires_grad=requires_grad)
 
 #clamp,TODO
 
@@ -362,7 +362,7 @@ def sqrt(
         out:Union[Tensor,str]='',
         requires_grad:bool=False,
         author='miaobyte')->Tensor:
-    return Sqrt.apply(input,out,author,requires_grad)
+    return Sqrt.apply(input,out,author,requires_grad=requires_grad)
 
 OpNode.register("pow")
 class Pow(Function):
@@ -397,9 +397,9 @@ def pow(
         requires_grad:bool=False,
         author='miaobyte')->Tensor:
     if  isinstance(b,int) or isinstance(b,float):
-        return PowScalar.apply(a,b,out,author,requires_grad)
+        return PowScalar.apply(a,b,out,author,requires_grad=requires_grad)
     else:
-        return Pow.apply(a,b,out,author,requires_grad)
+        return Pow.apply(a,b,out,author,requires_grad=requires_grad)
 
 #exp
 OpNode.register("exp")
@@ -420,7 +420,7 @@ def exp(
         out:Union[Tensor,str]='',
         requires_grad:bool=False,
         author='miaobyte')->Tensor:
-    return Exp.apply(a,out,author,requires_grad)  
+    return Exp.apply(a,out,author,requires_grad=requires_grad)  
 #log
 OpNode.register("log")
 class Log(Function):
@@ -440,7 +440,7 @@ def log(
         out:Union[Tensor,str]='',
         requires_grad:bool=False,
         author='miaobyte')->Tensor:
-    return Log.apply(a,out,author,requires_grad)
+    return Log.apply(a,out,author,requires_grad=requires_grad)
 
 OpNode.register("rsqrt")
 class Rsqrt(Function):
@@ -460,7 +460,7 @@ def rsqrt(
         out:Union[Tensor,str]='',
         requires_grad:bool=False,
         author='miaobyte')->Tensor:
-    return Rsqrt.apply(input,out,author,requires_grad)
+    return Rsqrt.apply(input,out,author,requires_grad=requires_grad)
 
  
 
