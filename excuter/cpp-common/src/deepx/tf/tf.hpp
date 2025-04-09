@@ -25,9 +25,11 @@ namespace deepx::tf
     {
         TypeDef dtype;
         string textvalue;
-        any value;
+ 
         Param(const string &textvalue = "", const DataCategory &dt = DataCategory::Unknown, const Precision &prec = Precision::Any)
             : textvalue(textvalue), dtype(make_dtype(dt, prec)) {}
+
+        
     };
 
     // TF:Tensor Function的缩写
@@ -75,6 +77,29 @@ namespace deepx::tf
             {
                 throw std::invalid_argument("Invalid argument index");
             }
+            // 处理布尔类型
+            if constexpr (std::is_same<T, bool>::value)
+            {
+                const string &value = vars[idx].textvalue;
+                // 转换为小写再判断
+                string lower_value = value;
+                std::transform(lower_value.begin(), lower_value.end(), lower_value.begin(),
+                               [](unsigned char c)
+                               { return std::tolower(c); });
+
+                if (lower_value == "true")
+                {
+                    return true;
+                }
+                else if (lower_value == "false")
+                {
+                    return false;
+                }
+                else
+                {
+                    throw std::invalid_argument("Invalid bool value:" + value);
+                }
+            }
             if (is_float(vars[idx].textvalue))
             {
                 T value = T(std::stof(vars[idx].textvalue));
@@ -83,10 +108,8 @@ namespace deepx::tf
             return mem->getarg<T>(vars[idx].textvalue);
         }
 
-        
-
         template <typename T>
-        vector<T> getvector(int idx,bool arg = true)
+        vector<T> getvector(int idx, bool arg = true)
         {
             vector<Param> &vars = arg ? args : returns;
             if (idx < 0)
