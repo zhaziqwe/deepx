@@ -3,13 +3,14 @@
 
 #include <vector>
 #include <stdexcept>
+
 #include "deepx/tensor.hpp"
 #include "deepx/tensorfunc/changeshape.hpp"
-#include "deepx/tensorfunc/authors.hpp"
 #include "deepx/tensorfunc/changeshape_miaobyte.cuh"
-#include "deepx/tensorfunc/cuda.hpp"
+#include "deepx/tensorfunc/authors.hpp"
 #include "deepx/shape_changeshape.hpp"
 #include "stdutil/error.hpp"
+
 namespace deepx::tensorfunc
 {
     template <typename T>
@@ -51,9 +52,8 @@ namespace deepx::tensorfunc
             {
                 throw std::runtime_error("Dimension order size must match tensor dimension size for transpose");
             }
-            auto [actual_blocks, optimal_block_size] = BestDims(tensor.shape.size);
-            launch_transpose<T>(actual_blocks, optimal_block_size,
-                                tensor.data, tensor.shape.strides.data(),
+           
+            launch_transpose<T>(tensor.data, tensor.shape.strides.data(),
                                 output.data, output.shape.strides.data(),
                                 tensor.shape.dim, tensor.shape.size, dim_order.data());
         }

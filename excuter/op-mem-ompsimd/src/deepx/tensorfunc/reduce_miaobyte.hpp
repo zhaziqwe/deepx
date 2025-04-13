@@ -2,15 +2,12 @@
 #define DEEPX_TENSORFUNC_REDUCE_MIAOBYTE_HPP
 
 #include <vector>
-#include <algorithm>
 #include <stdexcept>
 #include <hwy/highway.h>
 
-#include <deepx/vector_combination.hpp>
-#include "deepx/tensor.hpp"
-
 #include "deepx/tensorfunc/highway.hpp"
 #include "deepx/shape_reduce.hpp"
+#include "deepx/tensor.hpp"
 #include "deepx/tensorfunc/reduce.hpp"
 #include "deepx/tensorfunc/init_miaobyte.hpp"
 
@@ -22,7 +19,7 @@ namespace deepx::tensorfunc
     template <typename T>
     struct sumDispatcher<miaobyte, T>
     {
-        static void sum(const Tensor<T> &tensor, const std::vector<int> &dims, Tensor<T> &result, const bool keepdims)
+        static void sum(const Tensor<T> &tensor, const std::vector<int> &dims, const bool keepdims, Tensor<T> &result)
         {
             constant<miaobyte, T>(result, T(0));
             std::vector<int> checkeddims = checkedDims(tensor.shape.shape, dims);
@@ -39,7 +36,7 @@ namespace deepx::tensorfunc
                         {
                             newIndices[j++] = indices[i];
                         }else if (keepdims && (reduced_dims[i] == 1)) {
-                            newIndices[j++] = indices[i];
+                            newIndices[j++] = 0;
                         }
                     }
                     int outputIdx = result.shape.linearat(newIndices);
@@ -58,7 +55,7 @@ namespace deepx::tensorfunc
                         {
                             newIndices[j++] = indices[i];
                         }else if (keepdims && (reduced_dims[i] == 1)) {
-                            newIndices[j++] = indices[i];
+                            newIndices[j++] = 0;
                         }
                     }
                     int outputIdx = result.shape.linearat(newIndices);
@@ -98,13 +95,13 @@ namespace deepx::tensorfunc
     template <typename T>
     struct prodDispatcher<miaobyte, T>
     {
-        static void prod(const Tensor<T> &tensor, const std::vector<int> &dims, Tensor<T> &result, const bool keepdims)
+        static void prod(const Tensor<T> &tensor, const std::vector<int> &dims, const bool keepdims, Tensor<T> &result)
         {
             std::vector<int> checkeddims = checkedDims(tensor.shape.shape, dims);
             std::vector<int> reduced_dims = reducedDim(tensor.shape.shape, checkeddims);
             const int minshape_1 = Lanes(ScalableTag<T>());
             // 如果dims的最后一个元素是tensor.shape.dim-1，则说明reduceprod的数据不连续（不对齐），无法simd（需要不停跳跃）
-            constant<miaobyte,T>(result, T(1));
+            constant<miaobyte, T>(result, T(1));
             if (reduced_dims.rbegin()[0] == tensor.shape.dim - 1 || tensor.shape.dim > reduced_dims.size() || tensor.shape[-1] >= minshape_1)
             {
                 tensor.shape.rangeParallel(tensor.shape.dim, [&tensor, &result, &reduced_dims, keepdims](const int idx_linear, const std::vector<int> &indices, std::vector<int> &newIndices)
@@ -115,7 +112,7 @@ namespace deepx::tensorfunc
                                 if (reduced_dims[i]==0) {
                                         newIndices[j++]=indices[i];
                                     }else if (keepdims && (reduced_dims[i] == 1)) {
-                                        newIndices[j++]=indices[i];
+                                        newIndices[j++]=0;
                                     }
                                 }
                             // 累加求和
@@ -136,7 +133,7 @@ namespace deepx::tensorfunc
                                                    {
                                                        newIndices[j++] = indices[i];
                                                    }else if (keepdims && (reduced_dims[i] == 1)) {
-                                                       newIndices[j++] = indices[i];
+                                                       newIndices[j++] = 0;
                                                    }
                                                }
                                                // 累加求和
@@ -181,7 +178,7 @@ namespace deepx::tensorfunc
     template <typename T>
     struct reducemaxDispatcher<miaobyte, T>
     {
-        static void reducemax(const Tensor<T> &tensor, const std::vector<int> &dims, Tensor<T> &result, const bool keepdims)
+        static void reducemax(const Tensor<T> &tensor, const std::vector<int> &dims, const bool keepdims, Tensor<T> &result)
         {
             std::vector<int> checkeddims = checkedDims(tensor.shape.shape, dims);
             std::vector<int> reduced_dims = reducedDim(tensor.shape.shape, checkeddims);
@@ -198,13 +195,12 @@ namespace deepx::tensorfunc
                                 if (reduced_dims[i]==0) {
                                         newIndices[j++]=indices[i];
                                     }else if (keepdims && (reduced_dims[i] == 1)) {
-                                        newIndices[j++]=indices[i];
+                                        newIndices[j++]=0;
                                     }
                                 }
                             // 累加求和
                             int outputIdx=result.shape.linearat(newIndices);
-                            result.data[outputIdx]=std::max(result.data[outputIdx],tensor.data[idx_linear]);
-                            }, result.shape.dim);
+                            result.data[outputIdx]=std::max(result.data[outputIdx],tensor.data[idx_linear]); }, result.shape.dim);
             }
             else
             {
@@ -219,7 +215,7 @@ namespace deepx::tensorfunc
                                                    {
                                                        newIndices[j++] = indices[i];
                                                    }else if (keepdims && (reduced_dims[i] == 1)) {
-                                                       newIndices[j++] = indices[i];
+                                                       newIndices[j++] =0;
                                                    }
                                                }
                                                
@@ -255,8 +251,7 @@ namespace deepx::tensorfunc
                                                    maxt = std::max(maxt,tensor.data[i + j]);
                                                }
  
-                                               result.data[outputIdx] = std::max(result.data[outputIdx],maxt);
-                                                }, result.shape.dim);
+                                               result.data[outputIdx] = std::max(result.data[outputIdx],maxt); }, result.shape.dim);
             }
         }
     };
@@ -264,7 +259,7 @@ namespace deepx::tensorfunc
     template <typename T>
     struct reduceminDispatcher<miaobyte, T>
     {
-        static void reducemin(const Tensor<T> &tensor, const std::vector<int> &dims, Tensor<T> &result, const bool keepdims)
+        static void reducemin(const Tensor<T> &tensor, const std::vector<int> &dims, const bool keepdims, Tensor<T> &result)
         {
             std::vector<int> checkeddims = checkedDims(tensor.shape.shape, dims);
             std::vector<int> reduced_dims = reducedDim(tensor.shape.shape, checkeddims);
@@ -281,14 +276,13 @@ namespace deepx::tensorfunc
                                 if (reduced_dims[i]==0) {
                                         newIndices[j++]=indices[i];
                                     }else if (keepdims && (reduced_dims[i] == 1)) {
-                                        newIndices[j++]=indices[i];
+                                        newIndices[j++]=0;
                                     }
                                 }
                             // 累加求和
                             int outputIdx=result.shape.linearat(newIndices);
  
-                            result.data[outputIdx]=std::min(result.data[outputIdx],tensor.data[idx_linear]);
-                            }, result.shape.dim);
+                            result.data[outputIdx]=std::min(result.data[outputIdx],tensor.data[idx_linear]); }, result.shape.dim);
             }
             else
             {
@@ -303,7 +297,7 @@ namespace deepx::tensorfunc
                                                    {
                                                        newIndices[j++] = indices[i];
                                                    }else if (keepdims && (reduced_dims[i] == 1)) {
-                                                       newIndices[j++] = indices[i];
+                                                       newIndices[j++] = 0;
                                                    }
                                                }
                                                
@@ -339,8 +333,7 @@ namespace deepx::tensorfunc
                                                    mint = std::min(mint,tensor.data[i + j]);
                                                }
  
-                                               result.data[outputIdx] = std::min(result.data[outputIdx],mint); 
-                                               }, result.shape.dim);
+                                               result.data[outputIdx] = std::min(result.data[outputIdx],mint); }, result.shape.dim);
             }
         }
     };

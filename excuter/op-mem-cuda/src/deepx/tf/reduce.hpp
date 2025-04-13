@@ -1,11 +1,11 @@
 #ifndef DEEPX_TF_REDUCE_HPP
 #define DEEPX_TF_REDUCE_HPP
 
-#include "deepx/tensor.hpp"
-#include "deepx/tensorfunc/reduce_miaobyte.hpp"
 #include <vector>
-#include "deepx/tf/tf.hpp"
-#include "deepx/dtype.hpp"
+#include <cuda_fp16.h>
+#include <cuda_bf16.h>
+
+#include "deepx/tensorfunc/reduce_miaobyte.hpp"
 
 namespace deepx::tf
 {
@@ -46,19 +46,25 @@ namespace deepx::tf
                 sum<Author, double>(*mem->gettensor<double>(this->args[0].textvalue), dims, keepdims, *mem->gettensor<double>(this->returns[0].textvalue));
                 break;
             case Precision::Float32:
-                sum<Author, float>(*mem->gettensor<float>(this->args[0].textvalue), dims,  keepdims,*mem->gettensor<float>(this->returns[0].textvalue));
+                sum<Author, float>(*mem->gettensor<float>(this->args[0].textvalue), dims, keepdims, *mem->gettensor<float>(this->returns[0].textvalue));
+                break;
+            case Precision::BFloat16:
+                sum<Author, nv_bfloat16>(*mem->gettensor<nv_bfloat16>(this->args[0].textvalue), dims, keepdims, *mem->gettensor<nv_bfloat16>(this->returns[0].textvalue));
+                break;
+            case Precision::Float16:
+                sum<Author, __half>(*mem->gettensor<__half>(this->args[0].textvalue), dims, keepdims, *mem->gettensor<__half>(this->returns[0].textvalue));
                 break;
             case Precision::Int64:
-                sum<Author, int64_t>(*mem->gettensor<int64_t>(this->args[0].textvalue), dims,  keepdims,*mem->gettensor<int64_t>(this->returns[0].textvalue));
+                sum<Author, int64_t>(*mem->gettensor<int64_t>(this->args[0].textvalue), dims, keepdims, *mem->gettensor<int64_t>(this->returns[0].textvalue));
                 break;
             case Precision::Int32:
-                sum<Author, int32_t>(*mem->gettensor<int32_t>(this->args[0].textvalue), dims,  keepdims,*mem->gettensor<int32_t>(this->returns[0].textvalue));
+                sum<Author, int32_t>(*mem->gettensor<int32_t>(this->args[0].textvalue), dims, keepdims, *mem->gettensor<int32_t>(this->returns[0].textvalue));
                 break;
             case Precision::Int16:
-                sum<Author, int16_t>(*mem->gettensor<int16_t>(this->args[0].textvalue), dims,  keepdims,*mem->gettensor<int16_t>(this->returns[0].textvalue));
+                sum<Author, int16_t>(*mem->gettensor<int16_t>(this->args[0].textvalue), dims, keepdims, *mem->gettensor<int16_t>(this->returns[0].textvalue));
                 break;
             case Precision::Int8:
-                sum<Author, int8_t>(*mem->gettensor<int8_t>(this->args[0].textvalue), dims,  keepdims,*mem->gettensor<int8_t>(this->returns[0].textvalue));
+                sum<Author, int8_t>(*mem->gettensor<int8_t>(this->args[0].textvalue), dims, keepdims, *mem->gettensor<int8_t>(this->returns[0].textvalue));
                 break;
             default:
                 error = "Unsupported type: " + precision_str(input_type);
