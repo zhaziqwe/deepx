@@ -35,6 +35,11 @@ namespace deepx::tf
 
         int run(shared_ptr<MemBase> mem, string &error) override
         {
+
+            if (!checktensors({ this->returns[0].textvalue}, mem, error)!=0)
+            {
+                return 1;
+            }
             Precision input_type = mem->gettensor(this->args[0].textvalue).get()->shape.dtype;
             vector<int> shape = this->getvector<int>(1, -1);
             Precision output_type = mem->gettensor(this->returns[0].textvalue).get()->shape.dtype;
@@ -95,6 +100,10 @@ namespace deepx::tf
 
         int run(shared_ptr<MemBase> mem, string &error) override
         {
+            if (!checktensors({this->args[0].textvalue, this->returns[0].textvalue}, mem, error)!=0)
+            {
+                return 1;
+            }
             Precision input_type = mem->gettensor(this->args[0].textvalue).get()->shape.dtype;
             vector<int> dim_order = this->getvector<int>(1, -1);
             Precision output_type = mem->gettensor(this->returns[0].textvalue).get()->shape.dtype;
@@ -153,8 +162,17 @@ namespace deepx::tf
             return make_shared<Concat>(*this);
         }
         int run(shared_ptr<MemBase> mem, string &error) override
-        {
+        {   
+            if (!checktensors({ this->returns[0].textvalue}, mem, error)!=0)
+            {
+                return 1;
+            }
+
             vector<string> tensor_names = this->getvector<string>(0, true);
+            if (!checktensors(tensor_names, mem, error)!=0)
+            {
+                return 1;
+            }
             Precision input_type = mem->gettensor(tensor_names[0]).get()->shape.dtype;
             int axis = this->getvar<int>(1, mem, true);
             switch (input_type)
@@ -256,6 +274,10 @@ namespace deepx::tf
         }
         int run(shared_ptr<MemBase> mem, string &error) override
         {
+            if (!checktensors({this->args[0].textvalue, this->returns[0].textvalue}, mem, error)!=0)
+            {
+                return 1;
+            }
             Precision input_type = mem->gettensor(this->args[0].textvalue).get()->shape.dtype;
             vector<int> new_shape = this->getvector<int>(1, true);
             Precision output_type = mem->gettensor(this->returns[0].textvalue).get()->shape.dtype;
