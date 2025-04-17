@@ -1,10 +1,11 @@
-#ifndef DEEPX_OP_CUDA_NEW_HPP
-#define DEEPX_OP_CUDA_NEW_HPP
+#ifndef DEEPX_TENSORFUNC_TENSORLIFE_MIAOBYTE_HPP
+#define DEEPX_TENSORFUNC_TENSORLIFE_MIAOBYTE_HPP
 
 #include <cuda_runtime.h>
 #include <stdexcept>
 #include "deepx/tensor.hpp"
 #include "deepx/dtype_cuda.hpp"
+#include "deepx/tensorfunc/tensorlife.hpp"
 // 具体的张量类
 namespace deepx::tensorfunc
 {
@@ -32,7 +33,7 @@ namespace deepx::tensorfunc
     }
 
     template <typename T>
-    Tensor<T> New(const std::vector<int> &shapedata, T *data = nullptr)
+    Tensor<T> New(const std::vector<int> &shapedata)
     {
         Shape shape(shapedata);
         shape.dtype=precision<T>();
@@ -42,39 +43,15 @@ namespace deepx::tensorfunc
         tensor.copyer = dataCopy<T>;
         tensor.newer = dataNew<T>;
 
-        if (data != nullptr) {
-            tensor.data = data;
-        } else {
-            tensor.data = dataNew<T>(shape.size);
-        }
+        tensor.data = dataNew<T>(shape.size);
         return tensor;
     }
-
+ 
     template <typename T>
-    Tensor<T> New(const std::initializer_list<int> &shapedata, T *data = nullptr)
+    void copy(const Tensor<T> &src,Tensor<T> &dst)
     {
-        Shape shape(shapedata);
-        shape.dtype=precision<T>();
-        Tensor<T> tensor(shape);
-        tensor.device = CUDA; // 使用 CUDA 设备
-        tensor.deleter = dataFree<T>;
-        tensor.copyer = dataCopy<T>;
-        tensor.newer = dataNew<T>;
-
-        if (data != nullptr) {
-            tensor.data = data;
-        } else {
-            tensor.data = dataNew<T>(shape.size);
-        }
-        return tensor;
-    }
-
-    template <typename T>
-    Tensor<T> clone(const Tensor<T> &tensor)
-    {
-        Tensor<T> result = New<T>(tensor.shape.shape);
-        tensor.copyer(tensor.data, result.data, tensor.shape.size);
-        return result;
+        dst.shape=src.shape;
+        dst.copyer(src.data, dst.data, src.shape.size);
     }
 }
-#endif // DEEPX_OP_CUDA_NEW_HPP
+#endif // DEEPX_TENSORFUNC_TENSORLIFE_MIAOBYTE_HPP

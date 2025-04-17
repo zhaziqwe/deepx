@@ -1,25 +1,24 @@
-from deepx.tensor import Tensor
+from deepx.tensor import Tensor,Shape
 from typing import Optional,Union
 from .leaffunc_reduce import sum
-
+from .leaffunc_life import newtensor
 #mean
  
-def mean(
-        a:Tensor,
-        dims:Optional[Union[list[int],tuple[int]]]=None,
-        keepdim:bool=False,
-        out:Union[str]='')->Tensor:
+def mean(a:Tensor,dim:tuple[int]=None,keepdim:bool=False)->Tensor:
     # 如果dim为None,则对所有维度求平均
-    if dims is None:
-        dims = list(range(a.ndim))
-    elif isinstance(dims, int):
-        dims = [dims]
+    if dim is None:
+        dim = list(range(a.ndim))
+    elif isinstance(dim, int):
+        dim = [dim]
     else:
-        dims = list(dims)
+        dim = list(dim)
     total = 1
-    for i in dims:
+    for i in dim:
         if i < 0:
-            dims[i] = i + a.dim()
+            dim[i] = i + a.dim()
         total *= a.shape[i]
-    result = sum(a, dims, keepdim, out)/total
-    return result
+    reduceshape=Shape.reduceshape(a.shape,dim,keepdim)
+    out=newtensor(reduceshape,dtype=a.dtype)
+    sum(a, dim, keepdim, out)
+    out.div_(total)
+    return out
