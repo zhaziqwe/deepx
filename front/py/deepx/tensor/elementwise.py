@@ -1,6 +1,6 @@
 from typing import Optional,Union
 
-from deepx.tensor import Tensor,tensor_method
+from deepx.tensor import Tensor,tensor_method,Number
 
 @tensor_method
 def add(self,
@@ -129,6 +129,13 @@ def pow_(self,
     from deepx.nn.functional import pow as pow_func
     pow_func(self,b,self)
 
+@tensor_method
+def rpow(self,
+        a:Number,
+        out:Union[Tensor,str]=''):
+    from deepx.nn.functional import rpow as rpow_func
+    return rpow_func(a,self,out)
+
 
 @tensor_method
 def sqrt(self,out:Union[Tensor,str]='')->Tensor:
@@ -149,3 +156,10 @@ def rsqrt(self,out:Union[Tensor,str]='')->Tensor:
 def rsqrt_(self):
     from deepx.nn.functional import rsqrt as rsqrt_func
     rsqrt_func(self,self)
+
+@tensor_method
+def invert(self,out:Union[Tensor,str]='')->Tensor:
+    from deepx.nn.functional import invert as invert_func
+    return invert_func(self,out)
+
+

@@ -1,13 +1,10 @@
 import re
-from typing import (Dict, Iterator, Optional, Tuple, Union, 
-                    Any, List, overload)
+from typing import Dict, Iterator, Optional, Tuple, Any
 from collections import OrderedDict
 from deepx import Tensor
 
 class Module:  
     def __init__(self, name: Optional[str] = None):
-        from deepx.autograd import Graph
-        self._graph=Graph.get_default()
         self._name = name or self._generate_default_name()
         self._parent: Optional[Module] = None
         self._modules: OrderedDict[str, Module] = OrderedDict()
@@ -15,17 +12,14 @@ class Module:
 
     def _generate_default_name(self) -> str:
         class_name = self.__class__.__name__
-        base_name = re.sub(r'(?<!^)(?=[A-Z])', '_', class_name).lower()
+        # 修改正则表达式，保留连续大写字母为一个单词
+        base_name = re.sub(r'(?<![A-Z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])', '_', class_name).lower()
         if not hasattr(self.__class__, '_instance_counter'):
             self.__class__._instance_counter = 0
         count = self.__class__._instance_counter
         self.__class__._instance_counter += 1
         return f"{base_name}_{count}"
-    
-    @property
-    def graph(self):
-        return self._graph
-    
+ 
     @property
     def full_name(self):
         if self._parent is None:
@@ -55,7 +49,9 @@ class Module:
             self._parameters.pop(name, None)
         else:
             self._parameters[name] = param
-            param.addtograph(self.full_name + '.' + name)
+            param.name=self.full_name + '.' + name
+            from deepx.nn.functional.leaffunc_life import rnewtensor
+            rnewtensor(param)
 
     def parameters(self, recurse: bool = True) -> Iterator[Tensor]:
         for name, param in self.named_parameters(recurse=recurse):

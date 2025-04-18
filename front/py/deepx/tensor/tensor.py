@@ -1,5 +1,8 @@
-from typing import Optional,Union
+from typing import Optional,Union,TypeAlias
 from .shape import Shape
+
+
+Number: TypeAlias = Union[int, float, bool]
 
 tensorid=1
 
@@ -27,9 +30,7 @@ class Tensor:
             self._shape = shape
         else:
             raise ValueError("Invalid shape")
- 
-        self._graph = None
-        self._node = None
+
     def copy_to(self,t:'Tensor'):
         from deepx.nn.functional import copytensor
         copytensor(self,t)
@@ -44,7 +45,10 @@ class Tensor:
     @property
     def name(self):
         return self._name
-    
+    @name.setter
+    def name(self,name:str):
+        self._name=name
+
     # shape
     @property
     def shape(self,dim:int=None):
@@ -87,46 +91,48 @@ class Tensor:
     @property
     def dtype(self):
         return self._dtype
- 
-    
-    @property
-    def graph(self):
-        return self._graph
-     
-    @property
-    def node(self):
-        return self._node
+
     
     #elementwise
-    def __add__(self, other):
+    def __add__(self, other:Union[Number,'Tensor']):
         return self.add(other)
     
-    def __sub__(self, other):
+    def __sub__(self, other:Union[Number,'Tensor']):
         return self.sub(other)
     
-    def __mul__(self, other):
+    def __mul__(self, other:Union[Number,'Tensor']):
         return self.mul(other)
     
-    def __truediv__(self, other):
+    def __truediv__(self, other:Union[Number,'Tensor']):
         return self.div(other)
     
-    def __rtruediv__(self, other):
+    def __rtruediv__(self, other:Union[Number,'Tensor']):
         return self.rdiv(other)
 
+    def __pow__(self, other:Union[Number,'Tensor']):
+        return self.pow(other)
+    
+    def __rpow__(self, other:Union[Number,'Tensor']):
+        return self.rpow(other)
+    
+    def __invert__(self):
+        return self.invert()
     #矩阵乘法
-    def __matmul__(self, other):
+    def __matmul__(self, other:Union[Number,'Tensor']):
         return self.matmul(other)
 
     #shape操作
     @property
     def T(self) -> str:
-        return self.transpose(1,0,out=self.node.name+".T")
+        return self.transpose()
 
     # 打印
     def autoformat(self):
         if self._dtype == 'float32' or self._dtype == 'float64' or self._dtype == 'float16' or self._dtype == 'bfloat16':
             self._format = '%.4f'
         elif self._dtype == 'int32' or self._dtype == 'int64' or self._dtype == 'int8' or self._dtype == 'int16':
+            self._format = '%d'
+        elif self._dtype == 'bool':
             self._format = '%d'
         else:
             self._format = '%s'

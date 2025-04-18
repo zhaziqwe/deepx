@@ -1,4 +1,10 @@
 defaultauthor=dict({
+        #io
+        'print':'miaobyte',
+        #init
+        'uniform':'miaobyte',
+        'constant':'miaobyte',
+        'arange':'miaobyte',
         #elementwise
         'add':'miaobyte',
         'addscalar':'miaobyte',
@@ -10,7 +16,7 @@ defaultauthor=dict({
         'divscalar':'miaobyte',
         'rdiv':'miaobyte',
         'rdivscalar':'miaobyte',
-
+        'invert':'miaobyte',
         'compare':'miaobyte',
         'min':'miaobyte',
         'minscalar':'miaobyte',
@@ -20,6 +26,7 @@ defaultauthor=dict({
         'log':'miaobyte',
         'pow':'miaobyte',
         'powscalar':'miaobyte',
+        'rpowscalar':'miaobyte',
         'sqrt':'miaobyte',
         #changeshape
         'reshape':'miaobyte',
@@ -27,7 +34,8 @@ defaultauthor=dict({
         'broadcastTo':'miaobyte',
         'concat':'miaobyte',
         #matmul
-        'matmul':'miaobyte',
+        # 'matmul':'miaobyte',
+        'matmul':'cublas',
         #reduce
         'sum':'miaobyte',
         'prod':'miaobyte',

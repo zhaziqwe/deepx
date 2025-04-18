@@ -1,7 +1,6 @@
-from deepx.tensor import Tensor
+from deepx.tensor import Tensor,Number
 from deepx.nn.deepxir import DeepxIR,Param
 from deepx.scheduler import send
-from typing import Union
 from .rtf import A_B_op_C,A_scalar_op_C,A_op_C
 
 def rtf_add(a:Tensor, b:Tensor, out:Tensor, author='miaobyte')->Tensor:
@@ -55,6 +54,13 @@ def rtf_powscalar(a:Tensor, b:float, out:Tensor, author='miaobyte')->Tensor:
     A_scalar_op_C("powscalar",a,b,out,author)
     return out
 
+def rtf_rpowscalar(a:Number,b:Tensor,out:Tensor,author='miaobyte')->Tensor:
+    args = [ Param.varnum(a),Param.tensor(b)]
+    returns = [Param.tensor(out)]
+    ir = DeepxIR("rpowscalar", args, returns, author)
+    send(ir)
+    return out
+
 def rtf_exp(a:Tensor, out:Tensor, author='miaobyte')->Tensor:
     A_op_C("exp",a,out,author)
     return out
@@ -97,4 +103,8 @@ def rtf_min(a:Tensor, b:Tensor, out:Tensor, author='miaobyte')->Tensor:
 
 def rtf_minscalar(a:Tensor, b:float, out:Tensor, author='miaobyte')->Tensor:
     A_scalar_op_C("minscalar",a,b,out,author)
+    return out
+
+def rtf_invert(a:Tensor, out:Tensor, author='miaobyte')->Tensor:
+    A_op_C("invert",a,out,author)
     return out

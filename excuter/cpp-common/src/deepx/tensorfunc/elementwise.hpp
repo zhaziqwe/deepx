@@ -15,7 +15,6 @@ namespace deepx::tensorfunc
         }
     };
 
-
     // A+B=>C
     template <typename Author, typename T>
     void add(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
@@ -26,7 +25,8 @@ namespace deepx::tensorfunc
     template <typename Author, typename T>
     struct addscalarDispatcher
     {
-        static void addscalar(const Tensor<T> &input, const T value, Tensor<T> &output){
+        static void addscalar(const Tensor<T> &input, const T value, Tensor<T> &output)
+        {
             throw NotImplementError("addscalar");
         }
     };
@@ -41,7 +41,8 @@ namespace deepx::tensorfunc
     template <typename Author, typename T>
     struct subDispatcher
     {
-        static void sub(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C){
+        static void sub(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
+        {
             throw NotImplementError("sub");
         }
     };
@@ -56,7 +57,8 @@ namespace deepx::tensorfunc
     template <typename Author, typename T>
     struct subscalarDispatcher
     {
-        static void subscalar(const Tensor<T> &input, const T value, Tensor<T> &output){
+        static void subscalar(const Tensor<T> &input, const T value, Tensor<T> &output)
+        {
             throw NotImplementError("subscalar");
         }
     };
@@ -94,8 +96,6 @@ namespace deepx::tensorfunc
         mulscalarDispatcher<Author, T>::mulscalar(input, value, output);
     }
 
- 
-  
     template <typename Author, typename T>
     struct divDispatcher
     {
@@ -135,27 +135,12 @@ namespace deepx::tensorfunc
         rdivscalarDispatcher<Author, T>::rdivscalar(value, input, output);
     }
 
-    
-    template <typename Author, typename T,typename = void>
-    struct sqrtDispatcher
-    {
-        static void sqrt(const Tensor<T> &input, Tensor<T> &output) = delete;
-    };
-
-    // sqrt(A)=>C   
-    template <typename Author, typename T>
-    void sqrt(const Tensor<T> &input, Tensor<T> &output)
-    {
-        sqrtDispatcher<Author, T>::sqrt(input, output);
-    }
-
+    // A^B=>C
     template <typename Author, typename T>
     struct powDispatcher
     {
         static void pow(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C) = delete;
     };
-
-    // A^B=>C
     template <typename Author, typename T>
     void pow(const Tensor<T> &A, const Tensor<T> &B, Tensor<T> &C)
     {
@@ -173,6 +158,32 @@ namespace deepx::tensorfunc
     void powscalar(const Tensor<T> &input, const T value, Tensor<T> &output)
     {
         powscalarDispatcher<Author, T>::powscalar(input, value, output);
+    }
+
+    template <typename Author, typename T>
+    struct rpowscalarDispatcher
+    {
+        static void rpowscalar(const T value, const Tensor<T> &input, Tensor<T> &output) = delete;
+    };
+
+    // scalar^A=>C
+    template <typename Author, typename T>
+    void rpowscalar(const T value, const Tensor<T> &input, Tensor<T> &output)
+    {
+        rpowscalarDispatcher<Author, T>::rpowscalar(value, input, output);
+    }
+
+    template <typename Author, typename T, typename = void>
+    struct sqrtDispatcher
+    {
+        static void sqrt(const Tensor<T> &input, Tensor<T> &output) = delete;
+    };
+
+    // sqrt(A)=>C
+    template <typename Author, typename T>
+    void sqrt(const Tensor<T> &input, Tensor<T> &output)
+    {
+        sqrtDispatcher<Author, T>::sqrt(input, output);
     }
 
     template <typename Author, typename T>
@@ -253,8 +264,6 @@ namespace deepx::tensorfunc
         maxDispatcher<Author, T>::max(A, B, C);
     }
 
-    
-
     template <typename Author, typename T>
     struct maxscalarDispatcher
     {
@@ -267,8 +276,6 @@ namespace deepx::tensorfunc
     {
         maxscalarDispatcher<Author, T>::maxscalar(A, b, C);
     }
-
- 
 
     template <typename Author, typename T>
     struct minDispatcher
@@ -295,49 +302,112 @@ namespace deepx::tensorfunc
     {
         minscalarDispatcher<Author, T>::minscalar(A, b, C);
     }
-    
-    template <typename Author, typename T>
-    struct compareDispatcher
-    {
-        static void compare(const Tensor<T> &A, const Tensor<T> &B, Tensor<float> &mask) = delete;
-    };
 
-    // compare(A,B)=>mask
-    // if A[i]==B[i], mask[i]=0.5
-    // if A[i]>B[i], mask[i]=0
-    // if A[i]<B[i], mask[i]=1
-    template <typename Author, typename T>
-    void compare(const Tensor<T> &A, const Tensor<T> &B,Tensor<float> &mask)
-    {
-        compareDispatcher<Author, T>::compare(A, B, mask);
-    }
+    // equal(A,B)=>mask
 
-    template <typename Author, typename T>
-    struct comparescalarDispatcher
-    {
-        static void comparescalar(const Tensor<T> &A, const T scalar, Tensor<float> &mask) = delete;
-    };
-
-    template <typename Author, typename T>
-    void comparescalar(const Tensor<T> &A, const T scalar, Tensor<float> &mask)
-    {
-        comparescalarDispatcher<Author, T>::comparescalar(A, scalar, mask);
-    }
-
-    // 判断两个张量是否相等，TODO
-    template <typename Author, typename T>
+    template <typename Author, typename T, typename MaskT>
     struct equalDispatcher
     {
-        static bool equal(const Tensor<T> &A, const Tensor<T> &B, float epsilon=1e-6) = delete;
+        static void equal(const Tensor<T> &A, const Tensor<T> &B, float epsilon, Tensor<MaskT> &mask) = delete;
+    };
+
+    template <typename Author, typename T, typename MaskT>
+    void equal(const Tensor<T> &A, const Tensor<T> &B, float epsilon, Tensor<MaskT> &mask)
+    {
+        equalDispatcher<Author, T, MaskT>::equal(A, B, epsilon, mask);
+    }
+
+    // equal(A,scalar)=>mask
+    template <typename Author, typename T, typename MaskT>
+    struct equalscalarDispatcher
+    {
+        static void equalscalar(const Tensor<T> &A, const T scalar, float epsilon, Tensor<MaskT> &mask) = delete;
+    };
+
+    template <typename Author, typename T, typename MaskT>
+    void equalscalar(const Tensor<T> &A, const T scalar, float epsilon, Tensor<MaskT> &mask)
+    {
+        equalscalarDispatcher<Author, T, MaskT>::equalscalar(A, scalar, epsilon, mask);
+    }
+
+    // less(A,B)=>mask
+    template <typename Author, typename T, typename MaskT>
+    struct lessDispatcher
+    {
+        static void less(const Tensor<T> &A, const Tensor<T> &B, Tensor<MaskT> &mask) = delete;
+    };
+
+    template <typename Author, typename T, typename MaskT>
+    void less(const Tensor<T> &A, const Tensor<T> &B, Tensor<MaskT> &mask)
+    {
+        lessDispatcher<Author, T, MaskT>::less(A, B, mask);
+    }
+
+    // less(A,scalar)=>mask
+    template <typename Author, typename T, typename MaskT>
+    struct lessscalarDispatcher
+    {
+        static void lessscalar(const Tensor<T> &A, const T scalar, Tensor<MaskT> &mask) = delete;
+    };
+
+    template <typename Author, typename T, typename MaskT>
+    void lessscalar(const Tensor<T> &A, const T scalar, Tensor<MaskT> &mask)
+    {
+        lessscalarDispatcher<Author, T, MaskT>::lessscalar(A, scalar, mask);
+    }
+
+    // greater(A,B)=>C
+    template <typename Author, typename T, typename MaskT>
+    struct greaterDispatcher
+    {
+        static void greater(const Tensor<T> &A, const Tensor<T> &B, Tensor<MaskT> &mask) = delete;
+    };
+
+    template <typename Author, typename T, typename MaskT>
+    void greater(const Tensor<T> &A, const Tensor<T> &B, Tensor<MaskT> &mask)
+    {
+        greaterDispatcher<Author, T, MaskT>::greater(A, B, mask);
+    }
+
+    // greater(A,scalar)=>C
+    template <typename Author, typename T, typename MaskT>
+    struct greaterscalarDispatcher
+    {
+        static void greaterscalar(const Tensor<T> &A, const T scalar, Tensor<MaskT> &mask) = delete;
+    };
+
+    template <typename Author, typename T, typename MaskT>
+    void greaterscalar(const Tensor<T> &A, const T scalar, Tensor<MaskT> &mask)
+    {
+        greaterscalarDispatcher<Author, T, MaskT>::greaterscalar(A, scalar, mask);
+    }
+
+    // switch(tensors,cases)=>C
+    template <typename Author, typename T, typename casesT>
+    struct switchDispatcher
+    {
+        static void Switch(const vector<Tensor<T> *> tensors, const Tensor<casesT> &cases, Tensor<T> &C) = delete;
+    };
+
+    template <typename Author, typename T, typename casesT>
+    void Switch(const vector<Tensor<T> *> tensors, const Tensor<casesT> &cases, Tensor<T> &C)
+    {
+        switchDispatcher<Author, T, casesT>::Switch(tensors, cases, C);
+    }
+
+    // invert(A)=>C
+    template <typename Author, typename T>
+    struct invertDispatcher
+    {
+        static void invert(const Tensor<T> &input, Tensor<T> &output) = delete;
     };
 
     template <typename Author, typename T>
-    bool equal(const Tensor<T> &A, const Tensor<T> &B,float epsilon=1e-6)
+    void invert(const Tensor<T> &input, Tensor<T> &output)
     {
-        return equalDispatcher<Author, T>::equal(A, B, epsilon);
+        invertDispatcher<Author, T>::invert(input, output);
     }
-    
-    
+
 } // namespace deepx::tensorfunc
 
 #endif // DEEPX_TENSORFUNC_ELEMENTWISE_HPP
