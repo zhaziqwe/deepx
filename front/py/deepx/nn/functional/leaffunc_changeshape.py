@@ -64,6 +64,14 @@ def broadcastTo(t:Tensor,new_shape:tuple[int],out:Union[Tensor,str]='',requires_
     return outtensor
 broadcast_to = broadcastTo
 
+def gather(input:Tensor,indices:Tensor,gatheraxis:int,out:Union[Tensor,str]='')->Tensor:
+    outtensor=out
+    if isinstance(out,str):
+        outtensor=newtensor(indices.shape,dtype=input.dtype,name=out)
+    from .rtf_changeshape import rtf_gather
+    rtf_gather(input,indices,gatheraxis,outtensor,defaultauthor['gather'])
+    return outtensor
+
 # def unsqueeze(t:Tensor,dim:int)->Tensor:
 #     # 确保dim是有效的
 #     if dim < -t.ndim-1 or dim > t.ndim:

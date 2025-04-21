@@ -19,7 +19,6 @@ namespace deepx
     std::vector<int> transposeShape(const std::vector<int> &shape, const std::vector<int> &dimOrder);
 
     // concat
-
     Shape concatShape(const std::vector<Shape> &shapes, const int axis);
 
     template <typename T>
@@ -71,6 +70,8 @@ namespace deepx
     };
     std::vector<BroadcastMap> broadcastMap(const std::vector<int> &a, const std::vector<int> &b);
 
-}
 
+    //gather
+    //gather的out.shape=indices.shape,所以无需计算
+}
 #endif // DEEPX_SHAPE_CHANGESHAPE_HPP

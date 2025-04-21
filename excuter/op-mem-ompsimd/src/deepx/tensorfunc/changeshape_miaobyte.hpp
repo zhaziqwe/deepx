@@ -10,12 +10,13 @@
 #include "deepx/tensorfunc/authors.hpp"
 namespace deepx::tensorfunc
 {
+    // reshape
     template <typename T>
     struct reshapeDispatcher<miaobyte, T>
     {
-        static void reshape(const Tensor<T> &tensor, const std::vector<int> &shape,Tensor<T> &output)
+        static void reshape(const Tensor<T> &tensor, const std::vector<int> &shape, Tensor<T> &output)
         { // 参数改为单个tensor引用
-            
+
             int new_prod = 1;
             for (int dim : shape)
             {
@@ -29,18 +30,18 @@ namespace deepx::tensorfunc
             Shape newshape(shape);
             if (tensor.data == output.data)
             {
-                output.shape.shape=newshape.shape;
-                output.shape.strides=newshape.strides;
+                output.shape.shape = newshape.shape;
+                output.shape.strides = newshape.strides;
             }
             else
             {
-                output.shape.shape=newshape.shape;
-                output.shape.strides=newshape.strides;
+                output.shape.shape = newshape.shape;
+                output.shape.strides = newshape.strides;
                 output.copyer(tensor.data, output.data, tensor.shape.size);
             }
         }
     };
-
+    // transpose
     template <typename T>
     struct transposeDispatcher<miaobyte, T>
     {
@@ -55,26 +56,26 @@ namespace deepx::tensorfunc
             {
                 throw std::runtime_error("transpose error!shape");
             }
-            output.shape.rangeParallel(dim_order.size(), [&tensor, &output, &dim_order](int idx_linear, const std::vector<int> &indices, std::vector<int> &newIndices)
+            output.shape.rangeParallel(dim_order.size(), [&tensor, &output, &dim_order](int idx_linear, const std::vector<int> &indices, ThreadLocalVectors &tlv)
                                        {
                                         
                             for (size_t i = 0; i < dim_order.size(); ++i) {
-                                newIndices[dim_order[i]] = indices[i];
+                                tlv.get(0)[dim_order[i]] = indices[i];
                             }
-                            output.data[idx_linear]= tensor.data[tensor.shape.linearat(newIndices)]; }, tensor.shape.dim);
+                            output.data[idx_linear]= tensor.data[tensor.shape.linearat(tlv.get(0))]; }, {tensor.shape.dim});
         }
     };
-
+    // concat
     template <typename T>
     struct concatDispatcher<miaobyte, T>
     {
         static void concat(const vector<Tensor<T> *> tensors, const int axis, Tensor<T> &result)
         {
-            //checkshape
+            // checkshape
             if (!checkShapeConcat(tensors, axis, result))
             {
                 throw TensorShapeError("Output tensor shape size must match the sum of input tensor shape sizes for concat");
-            }   
+            }
             int dimC = axis + 1;
             result.shape.rangeParallel(dimC, [&](const int idx, const std::vector<int> &indices)
                                        {
@@ -124,17 +125,52 @@ namespace deepx::tensorfunc
         static void broadcastTo(const Tensor<T> &A, const vector<int> &new_shape, Tensor<T> &B)
         {
             auto A_broadcastShape = broadcastShape(A.shape.shape, new_shape);
-            if (A_broadcastShape.empty()||A_broadcastShape!=new_shape)
+            if (A_broadcastShape.empty() || A_broadcastShape != new_shape)
             {
                 throw TensorShapeError("Broadcast shape mismatch");
             }
             auto bmap = broadcastMap(A.shape.shape, new_shape);
 
             B.shape.rangeParallel(B.shape.dim, [&](const int idx, const std::vector<int> &bindices)
-                                   {
+                                  {
                         vector<int> aindices=fromBroadcastIndices(bmap, bindices);
-                        B.data[idx] = A.data[A.shape.linearat(aindices)];
-                    });
+                        B.data[idx] = A.data[A.shape.linearat(aindices)]; });
+        }
+    };
+
+    // gather
+    // 支持高维indices
+    // 结果写入input_indices
+    template <typename GatherAxisT>
+    void fromGatherIndices(const vector<int> &output_indices, const Tensor<GatherAxisT> &indices, const int gatherAxis, vector<int> &input_indices)
+    {
+        std::copy(output_indices.begin(), output_indices.begin()+input_indices.size(), input_indices.begin());
+        int indices_idx = indices.shape.linearat(output_indices);
+        input_indices[gatherAxis] = indices.data[indices_idx];
+    }
+
+    template <typename T, typename GatherAxisT>
+    struct gatherDispatcher<miaobyte, T, GatherAxisT>
+    {
+        static void gather(const Tensor<T> &input, const Tensor<GatherAxisT> &indices, const int axis, Tensor<T> &output)
+        {
+            int gatherAxis = axis < 0 ? input.shape.dim + axis : axis;
+            if (gatherAxis < 0 || gatherAxis >= input.shape.dim)
+            {
+                throw std::invalid_argument("Axis is out of bounds");
+            }
+
+            vector<int> input_gatherShape =  indices.shape.shape;
+            if (input_gatherShape.empty() || input_gatherShape != output.shape.shape)
+            {
+                throw TensorShapeError("Gather shape mismatch");
+            }
+            output.shape.rangeParallel(output.shape.dim, [&](const int idx, const std::vector<int> &output_indices, ThreadLocalVectors &tlv)
+                                       {  
+                            fromGatherIndices(output_indices, indices, gatherAxis, tlv.get(0));
+                            output.data[idx] = input.data[input.shape.linearat(tlv.get(0))]; 
+                        },
+                    {input.shape.dim});
         }
     };
 

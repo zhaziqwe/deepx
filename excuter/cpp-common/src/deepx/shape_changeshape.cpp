@@ -3,18 +3,18 @@
 
 #include "deepx/shape_changeshape.hpp"
 
-namespace deepx 
+namespace deepx
 {
-    //transpose
+    // transpose
 
-        std::vector<int> swaplastTwoDimOrder(const std::vector<int> &shape) 
+    std::vector<int> swaplastTwoDimOrder(const std::vector<int> &shape)
     {
         vector<int> dimOrder = shape;
         std::iota(dimOrder.begin(), dimOrder.end(), 0);
         swap(dimOrder[dimOrder.size() - 1], dimOrder[dimOrder.size() - 2]);
         return dimOrder;
     }
-    std::vector<int> transposeShape(const std::vector<int> &shape, const std::vector<int> &dimOrder) 
+    std::vector<int> transposeShape(const std::vector<int> &shape, const std::vector<int> &dimOrder)
     {
         if (dimOrder.size() != shape.size())
         {
@@ -23,16 +23,17 @@ namespace deepx
         std::vector<int> newShape = shape;
         for (size_t i = 0; i < dimOrder.size(); ++i)
         {
-            newShape[i] =shape[dimOrder[i]];
+            newShape[i] = shape[dimOrder[i]];
         }
         return newShape;
     }
 
-    //concat
+    // concat
 
-    Shape concatShape(const std::vector<Shape> &shapes,const int axis){
+    Shape concatShape(const std::vector<Shape> &shapes, const int axis)
+    {
         std::vector<int> outputShape(shapes[0].dim);
-        outputShape=shapes[0].shape;
+        outputShape = shapes[0].shape;
         for (int i = 1; i < shapes.size(); ++i)
         {
             if (shapes[i].dim != outputShape.size())
@@ -54,7 +55,7 @@ namespace deepx
         return Shape(outputShape);
     }
 
-   //broadcast
+    // broadcast
     std::vector<int> broadcastShape(const std::vector<int> &a, const std::vector<int> &b)
     {
         int len1 = a.size();
@@ -102,7 +103,7 @@ namespace deepx
         return broadcastMap;
     }
 
-    void fromBroadcastIndices(const std::vector<BroadcastMap> &broadcastMap, const std::vector<int> &broadcastIndices, std::vector<int> &oldIndices )
+    void fromBroadcastIndices(const std::vector<BroadcastMap> &broadcastMap, const std::vector<int> &broadcastIndices, std::vector<int> &oldIndices)
     {
         for (int i = 0, j = 0; i < broadcastIndices.size(); ++i)
         {
@@ -119,4 +120,5 @@ namespace deepx
             }
         }
     }
+ 
 }

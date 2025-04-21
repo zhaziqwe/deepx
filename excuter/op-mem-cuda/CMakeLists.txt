@@ -41,6 +41,9 @@ set(CMAKE_CUDA_STANDARD 17)
 set(CMAKE_CUDA_ARCHITECTURES 75)  # 根据您的 GPU 计算能力进行调整
 set(CMAKE_CUDA_SEPARABLE_COMPILATION ON) #确保 CMake 能够正确识别 CUDA 文件并将其编译为目标
 
+# 设置 CUDA 编译选项
+# 是否开启PTX 汇编展示
+# set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --ptxas-options=-v")
 
 find_package(yaml-cpp REQUIRED)
  
