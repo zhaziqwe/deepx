@@ -4,19 +4,25 @@ from .shape import Shape
 
 Number: TypeAlias = Union[int, float, bool]
 
-tensorid=1
-
+ 
 class Tensor:
 
     #life
-    def __init__(self,shape:Union[tuple[int],list[int],Shape],dtype:str='float32',name:str=None):
+    def __init__(self,shape:tuple[int,...],dtype:str='float32',name:str=None):
         # name
+        assert isinstance(name,str) or name is None
+        assert isinstance(shape,tuple)
+        for i in shape:
+            assert isinstance(i,int) and i>0
+        assert isinstance(dtype,str)
 
         self._name = name
         if name is None or name =='':
-            global tensorid
-            self._name =tensorid
-            tensorid+=1
+            if not hasattr(self.__class__, '_instance_counter'):
+                self.__class__._instance_counter = 0
+            count = self.__class__._instance_counter
+            self.__class__._instance_counter += 1
+            self._name = count
         # dtype
         self._dtype = dtype
 
@@ -45,8 +51,12 @@ class Tensor:
         return self._name
     @name.setter
     def name(self,name:str):
-        self._name=name
+        assert isinstance(name,str) and name != ''
+        assert self.name is not None and self.name != ''
 
+        from deepx.nn.functional import renametensor
+        renametensor(self,name)
+        self._name = name
     # shape
     @property
     def shape(self,dim:int=None):
@@ -120,8 +130,8 @@ class Tensor:
         return self.matmul(other)
 
     #gather
-    def __getitem__(self, indices:'Tensor'):
-        return self.gather(indices)
+    def __getitem__(self, index:'Tensor'):
+        return self.indexselect(index)
 
     #shape操作
     @property

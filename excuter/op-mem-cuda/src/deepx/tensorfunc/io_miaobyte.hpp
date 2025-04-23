@@ -21,14 +21,19 @@ namespace deepx::tensorfunc
     {
         static void print(const Tensor<T> &t, const std::string &f = "")
         {
-            int bytes = precision_bits(t.shape.dtype) / 8;
-            size_t total_bytes = t.shape.size * bytes;
+            int64_t total_bytes = t.shape.bytes();
 
             // 统一分配CPU内存
             unsigned char *host_data = new unsigned char[total_bytes];
             if (host_data == nullptr)
             {
                 throw std::runtime_error("Failed to allocate host memory");
+            }
+            cudaError_t err = cudaMemcpy(host_data, t.data, total_bytes, cudaMemcpyDeviceToHost);
+            if (err != cudaSuccess)
+            {
+                delete[] host_data;
+                throw std::runtime_error("Failed to copy data from device to host");
             }
 
             stdutil::print(t.shape.shape, host_data, t.shape.dtype, f);
@@ -42,8 +47,7 @@ namespace deepx::tensorfunc
     {
         static void print(const Tensor<half> &t, const std::string &f = "")
         {
-            int bytes = precision_bits(t.shape.dtype) / 8;
-            size_t total_bytes = t.shape.size * bytes;
+            int64_t total_bytes = t.shape.bytes();
 
             // 统一分配CPU内存
             unsigned char *host_data = new unsigned char[total_bytes];
@@ -84,8 +88,7 @@ namespace deepx::tensorfunc
     {
         static void print(const Tensor<nv_bfloat16> &t, const std::string &f = "")
         {
-            int bytes = precision_bits(t.shape.dtype) / 8;
-            size_t total_bytes = t.shape.size * bytes;
+            int64_t total_bytes = t.shape.bytes();
 
             // 统一分配CPU内存
             unsigned char *host_data = new unsigned char[total_bytes];
@@ -131,8 +134,7 @@ namespace deepx::tensorfunc
         shape_fs.close();
 
         // 保存data
-        int bytes = precision_bits(tensor.shape.dtype) / 8;
-        size_t total_bytes = tensor.shape.size * bytes;
+        int64_t total_bytes = tensor.shape.bytes();
 
         // 统一分配CPU内存
         unsigned char *host_data = new unsigned char[total_bytes];
@@ -184,7 +186,7 @@ namespace deepx::tensorfunc
         std::ifstream data_fs(datapath, std::ios::binary);
         data_fs.seekg(0, std::ios::end);
         std::streamsize fileSize = data_fs.tellg();
-        std::streamsize expectedSize = shape.size * precision_bits(shape.dtype) / 8;
+        std::streamsize expectedSize = shape.bytes();
 
         if (fileSize != expectedSize)
         {
