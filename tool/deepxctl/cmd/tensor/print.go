@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	coretensor "github.com/array2d/deepx/deepxctl/tensor"
+	coretensor "github.com/array2d/deepx/tool/deepxctl/tensor"
 )
 
 func PrintCmd() {

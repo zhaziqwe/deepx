@@ -1,4 +1,4 @@
-module github.com/array2d/deepx/deepxctl
+module github.com/array2d/deepx/tool/deepxctl
 
 go 1.23.2
 

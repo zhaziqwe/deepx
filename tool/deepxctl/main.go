@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/array2d/deepx/deepxctl/cmd/tensor"
+	"github.com/array2d/deepx/tool/deepxctl/cmd/tensor"
 )
 
 var version = "0.1.0"
@@ -26,7 +26,7 @@ func main() {
 
 	if len(os.Args) < 2 {
 		printUsage()
-		os.Exit(1)
+		os.Exit(0)
 	}
 
 	// 获取子命令
