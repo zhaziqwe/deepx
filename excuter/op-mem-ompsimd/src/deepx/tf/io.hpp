@@ -78,16 +78,56 @@ namespace deepx::tf
         {
             string name = this->args[0].textvalue;
             string path = this->args[1].textvalue;
-            if (mem->existstensor(name))
+            if (!mem->existstensor(name))
             {
-                auto t = mem->gettensor(name);
-                tensorfunc::save<void>(*t, path);
-            }
-            else
-            {
+   
                 std::cerr << "save " << name << " not found" << std::endl;
                 error = "save " + name + " not found";
                 return 1;
+            }
+            Precision dtype = mem->gettensor(name)->shape.dtype;
+            mem->gettensor(name)->shape.saveShape(path);
+            path+=".data";
+            switch (dtype)
+            {   
+            case Precision::Float64:{
+                auto t = mem->gettensor<double>(name);
+                t->saver(t->data,t->shape.size,path);
+                break;
+            }
+            case Precision::Float32:{
+                auto t = mem->gettensor<float>(name);
+                t->saver(t->data,t->shape.size,path);
+                break;
+            }
+
+            case Precision::Int64:{
+                auto t = mem->gettensor<int64_t>(name);
+                t->saver(t->data,t->shape.size,path);
+                break;  
+            }
+            case Precision::Int32:{
+                auto t = mem->gettensor<int32_t>(name);
+                t->saver(t->data,t->shape.size,path);
+                break;
+            }
+            case Precision::Int16:{
+                auto t = mem->gettensor<int16_t>(name);
+                t->saver(t->data,t->shape.size,path);
+                break;  
+            }
+            case Precision::Int8:{
+                auto t = mem->gettensor<int8_t>(name);
+                t->saver(t->data,t->shape.size,path);
+                break;
+            }
+            case Precision::Bool:{
+                auto t = mem->gettensor<bool>(name);
+                t->saver(t->data,t->shape.size,path);
+                break;  
+            }
+            default:
+                break;
             }
             return 0;
         }
@@ -116,7 +156,7 @@ namespace deepx::tf
         {
             string path = this->args[0].textvalue;
             
-            pair<std::string,Shape> shape_name=tensorfunc::loadShape(path);
+            pair<std::string,Shape> shape_name=Shape::loadShape(path);
             std::string tensor_name=shape_name.first;
             Shape shape=shape_name.second;
 
@@ -168,5 +208,40 @@ namespace deepx::tf
             return 0;
         }
     };
+
+    //loadtensordata
+    class LoadTensorData : public TF
+    {
+    public:
+        LoadTensorData(vector<Param> args, vector<Param> returns)
+        {   
+            this->name = "loadtensordata";
+            this->tftype = "io";
+            this->args = args;
+            this->returns = returns;
+        }   
+        string math_formula() const override
+        {
+            return "loadtensordata(path)->tensor.data";
+        }
+        shared_ptr<TF> clone() const override
+        {   
+            return make_shared<LoadTensorData>(*this);
+        }
+        int run(shared_ptr<MemBase> mem, string &error) override
+        {
+            string path = this->args[0].textvalue;
+            string tensorname = this->returns[0].textvalue;
+            if(!mem->existstensor(tensorname))
+            {
+                error = "loadtensordata " + tensorname + " not found";
+                return 1;
+            }
+            auto t = *mem->gettensor(tensorname);
+            t.loader(path,t.data,t.shape.size);
+            return 0;
+        }
+    };
+    
 }
 #endif // DEEPX_TF_IO_HPP
