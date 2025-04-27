@@ -43,12 +43,6 @@ def transpose_(self):
     return self
 
 @tensor_method
-def broadcastshape(self,other:Tensor)->tuple[int,...]:
-    from deepx.nn.functional import broadcastshape as broadcastshape_func
-    result=broadcastshape_func(self.shape,other.shape)
-    return result
-
-@tensor_method
 def broadcastTo(self,shape:tuple[int,...],out:Union[Tensor,str]='')->Tensor:
     from deepx.nn.functional import broadcastTo as broadcastTo_func
     result=broadcastTo_func(self,shape,out)
@@ -62,7 +56,17 @@ def indexselect(self,index:Tensor,axis:int=0,out:Union[Tensor,str]='')->Tensor:
     result=indexselect_func(self,index,gatheraxis,out)
     return result
 
+@tensor_method
+def squeeze(self,dim:int)->Tensor:
+    from deepx.nn.functional import squeeze as squeeze_func
+    result=squeeze_func(self,dim)
+    return result
 
+@tensor_method
+def unsqueeze(self,dim:int)->Tensor:
+    from deepx.nn.functional import unsqueeze as unsqueeze_func
+    result=unsqueeze_func(self,dim)
+    return result
 
 # @tensor_method
 # def expand(self,shape:tuple)->Tensor:

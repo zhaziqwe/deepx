@@ -28,7 +28,7 @@ def rdiv(
         b: Tensor, 
         out:Union[Tensor,str]=None)->Tensor:
     outtensor=out
-    if isinstance(out,str):
+    if isinstance(out,str) or out is None:
         outtensor=newtensor(b.shape,dtype=b.dtype,name=out)
     from .rtf_elementwise import rtf_rdivscalar
     rtf_rdivscalar(a,b,outtensor,defaultauthor['rdivscalar'])
@@ -41,7 +41,7 @@ min=create_A_B_tf_C('min')
 pow=create_A_B_tf_C('pow')
 def rpow(a:Number,b:Tensor,out:Union[Tensor,str]=None)->Tensor:
     outtensor=out
-    if isinstance(out,str):
+    if isinstance(out,str) or out is None:
         outtensor=newtensor(b.shape,dtype=b.dtype,name=out)
     from .rtf_elementwise import rtf_rpowscalar
     rtf_rpowscalar(a,b,outtensor,defaultauthor['rpowscalar'])
@@ -54,3 +54,25 @@ log=create_A_tf_C('log')
 
 #invert
 invert=create_A_tf_C('invert')
+
+#todtype
+def todtype(t:Tensor,dest:Tensor):
+    assert isinstance(t,Tensor)
+    assert isinstance(dest,Tensor)
+    assert t.shape==dest.shape
+
+    from .rtf_elementwise import rtf_todtype
+    rtf_todtype(t,dest)
+
+#dropout
+def dropout(a:Tensor, p:float, out:Union[Tensor,str]='')->Tensor:
+    assert isinstance(a,Tensor)
+    outtensor=out
+    if isinstance(out,str) or out is None:
+        outtensor=newtensor(a.shape,dtype=a.dtype,name=out)
+    assert a.shape==outtensor.shape
+
+    from .rtf_elementwise import rtf_dropout
+    rtf_dropout(a,p,outtensor,defaultauthor['dropout'])
+    return out
+
