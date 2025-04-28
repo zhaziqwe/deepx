@@ -64,15 +64,3 @@ def todtype(t:Tensor,dest:Tensor):
     from .rtf_elementwise import rtf_todtype
     rtf_todtype(t,dest)
 
-#dropout
-def dropout(a:Tensor, p:float, out:Union[Tensor,str]='')->Tensor:
-    assert isinstance(a,Tensor)
-    outtensor=out
-    if isinstance(out,str) or out is None:
-        outtensor=newtensor(a.shape,dtype=a.dtype,name=out)
-    assert a.shape==outtensor.shape
-
-    from .rtf_elementwise import rtf_dropout
-    rtf_dropout(a,p,outtensor,defaultauthor['dropout'])
-    return out
-
