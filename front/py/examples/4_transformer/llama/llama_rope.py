@@ -1,4 +1,4 @@
-from llama_rope_torch import dir,config
+from token_text import dir,config
 
 ############-------DEEPX-------################
 from deepx.nn.modules import Embedding,Module
