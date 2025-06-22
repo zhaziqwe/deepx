@@ -159,8 +159,48 @@ class Tensor:
     def __rmatmul__(self, other:'Tensor'):
         return other.matmul(self)
 
-    def __getitem__(self, index:'Tensor'):
-        return self.indexselect(index)
+    def __getitem__(self, idx):
+        # 简单操作
+        if  isinstance(idx,Tensor):
+            return self.indexselect(idx)
+        if isinstance(idx, int): 
+            return self.sliceselect(slice(idx,idx+1)).squeeze(dim=0)
+        
+        ## 阶段1,
+        if isinstance(idx, slice):
+            indices = [idx]
+        elif isinstance(idx, tuple):
+            indices = list(idx)
+        else:
+            raise TypeError(f"Index must be an integer, slice, tuple, or Tensor, not {type(idx).__name__}")
+        # 阶段2
+        result = self
+        new_axis_positions = []
+        dim_cursor = 0
+        
+        for item in  indices:
+            if item is None:
+                # 如果是 None，则表示在该位置添加一个新的维度
+                new_axis_positions.append(dim_cursor)
+                continue
+            if item == Ellipsis:
+                num_ellipsis = self.ndim - len(indices) + 1
+                dim_cursor += num_ellipsis
+                continue
+            # 如果是完整的切片 (e.g., ':')，则无需操作，直接进入下一维度
+            if item == slice(None, None, None):
+                dim_cursor += 1
+                continue
+            result=result.sliceselect(item,dim=dim_cursor)
+            dim_cursor += 1
+ 
+        # 2. 在指定位置添加新维度（由 None 产生）
+        i=0
+        for pos in sorted(new_axis_positions):
+            result = result.unsqueeze(pos+i)
+            i += 1
+
+        return result
 
     #shape操作
     @property
