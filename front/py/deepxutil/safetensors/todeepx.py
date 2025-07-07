@@ -1,27 +1,11 @@
 from safetensors import safe_open
-import numpy as np
 import os
 import json
-import yaml
 import argparse
 import shutil
 import glob
 import re
 
-class TensorInfo:
-    def __init__(self, dtype, ndim, shape, size, strides=None):
-        self.dtype = dtype  # 数据精度类型，如"float32"
-        self.ndim = ndim  # 维度数
-        self.shape = shape  # 形状元组
-        self.size = size  # 总元素数量
-        self.strides = strides  # 步长数组（可选）
-
-
-class Tensor:
-    def __init__(self, data, tensorinfo: TensorInfo):
-        assert isinstance(tensorinfo, TensorInfo),"tensorinfo必须是TensorInfo实例"
-        self.data = data
-        self.tensorinfo = tensorinfo
 
 class SafeTensorExporter:
     def __init__(self, model_dir, output_dir):
@@ -63,14 +47,14 @@ class SafeTensorExporter:
         """导出safetensor模型到指定目录"""
         model_files = self._find_model_files()
         
-        from deepxutil.numpy import save_numpy
+        from deepxutil.torch import save_torch
 
         for model_path in model_files:
-            with safe_open(model_path, framework="numpy") as f:
+            with safe_open(model_path, framework="pt") as f:
                 for key in f.keys():
                     t = f.get_tensor(key)
                     path= os.path.join(self.output_dir, key)
-                    save_numpy(t,path)
+                    save_torch(t,path)
 
         self.mvothers()
         
@@ -95,9 +79,9 @@ class SafeTensorExporter:
 if __name__ == "__main__":
     print()
     parser = argparse.ArgumentParser(description='Safetensor模型转换工具')
-    parser.add_argument('--model', type=str, required=True,
+    parser.add_argument('model', type=str, 
                         help='输入目录路径，包含model.safetensors和config.json')
-    parser.add_argument('--output', type=str, required=True,
+    parser.add_argument('--output','-o', type=str, required=True,
                         help='输出目录路径，转换后的DeepX格式数据将保存于此')
 
     args = parser.parse_args()
