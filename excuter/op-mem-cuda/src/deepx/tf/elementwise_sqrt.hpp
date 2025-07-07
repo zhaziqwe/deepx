@@ -3,6 +3,7 @@
 
 #include <cuda_fp16.h>
 #include <cuda_bf16.h>
+#include "deepx/tf/tf.hpp"
 #include "deepx/tensorfunc/elementwise_miaobyte_sqrt.hpp"
 
 namespace deepx::tf

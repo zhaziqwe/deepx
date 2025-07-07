@@ -1,6 +1,7 @@
 #ifndef DEEPX_TENSORFUNC_NEW_MEMPOOL_HPP
 #define DEEPX_TENSORFUNC_NEW_MEMPOOL_HPP
- 
+#include <cstddef>
+
 namespace deepx::tensorfunc
 {
     class MemoryPool

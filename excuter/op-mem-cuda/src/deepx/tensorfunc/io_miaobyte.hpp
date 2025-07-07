@@ -9,6 +9,7 @@
 
 #include <deepx/tensor.hpp>
 #include <deepx/dtype.hpp>
+#include <deepx/dtype_cuda.hpp>
 #include <stdutil/vector.hpp>
 #include <stdutil/print.hpp>
 #include "deepx/tensorfunc/authors.hpp"
